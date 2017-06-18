@@ -1,2 +1,2 @@
 # SoftWar
-C Game Project For ETNA Alternance
+Game Project For ETNA Alternance in C
