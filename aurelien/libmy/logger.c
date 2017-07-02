@@ -34,22 +34,26 @@ int	set_level(t_logger **logger, char *level)
   if (!my_strcmp(level, "debug"))
     {
       (*logger)->lvl = 4;
-      (*logger)->level = my_strdup("DEBUG");
+      if ((*logger)->level = my_strdup("DEBUG"))
+	return (1);
     }
   if (!my_strcmp(level, "info"))
     {
       (*logger)->lvl = 3;
-      (*logger)->level = my_strdup("INFO");
+      if ((*logger)->level = my_strdup("INFO"))
+	return (1);
     }
   if (!my_strcmp(level, "warning"))
     {
       (*logger)->lvl = 2;
-      (*logger)->level = my_strdup("WARNING");
+      if ((*logger)->level = my_strdup("WARNING"))
+	return (1);
     }
   if (!my_strcmp(level, "error"))
     {
       (*logger)->lvl = 1;
-      (*logger)->level = my_strdup("ERROR");
+      if ((*logger)->level = my_strdup("ERROR"))
+	return (1);
     }
   return (0);
 }
@@ -61,15 +65,9 @@ int		set_parameters(t_logger **logger, t_chain *parameters, char *opt)
 
   if (!my_strcmp(opt, "-v"))
     {
-      my_putstr("\nset_parameters opt = -v.");
       ltmp = parameters->first;
       while (ltmp)
 	{
-	  my_putstr("\nset parameters: into parameters treatment with : ");
-	  my_putstr((char*)ltmp->content);
-	  my_putstr("\n");
-	  if ((*logger)->level == NULL)
-	    my_putstr("\nlog level diagnosticated as null...\n");
 	  if ((*logger)->level == NULL
 	      && set_level(logger, (char*)ltmp->content))
 	    {
@@ -84,10 +82,7 @@ int		set_parameters(t_logger **logger, t_chain *parameters, char *opt)
 	devlog(__func__, "error setting log level to info", 1);
     }
   if (!my_strcmp(opt, "-log"))
-    {
-      my_putstr("\nset_parameters: set file path for log.\n");
-      (*logger)->file_path = my_strdup((char*)((t_link*)(parameters->dictionnary[0])->content));
-    }
+    (*logger)->file_path = my_strdup((char*)((t_link*)(parameters->dictionnary[0])->content));
   return (0);
 }
 
@@ -192,14 +187,12 @@ t_logger		*build_logger(char *opt, t_chain *parameters)
       if (opt == NULL)
 	{
 	  logger->level = my_strdup("ERROR");
-	  logger->file_path = "error.log";
+	  logger->lvl = 1;
+	  logger->file_path = my_strdup("error.log");
 	}
       }
   if (opt != NULL)
     {
-      my_putstr("\nopt = ");
-      my_putstr(opt);
-      my_putstr("\ngo into set_parameters");
       if (set_parameters(&logger, parameters, opt))
 	return (NULL);
     }
