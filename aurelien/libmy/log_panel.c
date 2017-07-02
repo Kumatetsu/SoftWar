@@ -8,28 +8,30 @@
 ** Last update Mon Apr 17 21:07:41 2017 CASTELLARNAU Aurelien
 */
 
+#include <stdio.h>
 #include "libmy.h"
 
-void    log_error(char *str)
+void    log_error(char *str, FILE *o)
 {
-  my_putstr_color("red", "< ERROR > ");
-  my_putstr(str);
+  
+  fprintf(o, "< ERROR > ");
+  fprintf(o, str);
 }
 
-void    log_warning(char *str)
+void    log_warning(char *str, FILE *o)
 {
-  my_putstr_color("yellow", "< WARNING > ");
-  my_putstr(str);
+  fprintf(o, "< WARNING > ");
+  fprintf(o, str);
 }
 
-void    log_info(char *str)
+void    log_info(char *str, FILE *o)
 {
-  my_putstr_color("blue", "< INFO > ");
-  my_putstr(str);
+  fprintf(o, "< INFO > ");
+  fprintf(o, str);
 }
 
-void    log_debug(char *str)
+void    log_debug(char *str, FILE *o)
 {
-  my_putstr_color("green", "< DEBUG > ");
-  my_putstr(str);
+  fprintf(o, "< DEBUG > ");
+  fprintf(o, str);
 }

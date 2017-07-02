@@ -8,6 +8,8 @@
 ** Last update Sat Jul  1 02:29:20 2017 CASTELLARNAU Aurelien
 */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include "libmy.h"
 #include "protocol.h"
 #include "argument.h"
@@ -39,6 +41,11 @@ int		main(int argc, char *argv[])
     }
   if (!act)
     help();
+  my_log("main", "Test log error", 1);
+  my_log("main", "Test log warning", 2);
+  my_log("main", "Test log info", 3);
+  my_log("main", "Test log debug\n", 4);
+  delete_logger();
   delete_chain(&options);
   return(0);
 }
