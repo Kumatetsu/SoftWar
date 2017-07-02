@@ -21,6 +21,8 @@ void		help()
 t_chain		*get_options()
 {
   t_chain	*options;
+  t_option	*logger;
+  t_option	*log_file;
   t_option	*protocol;
 
   if ((options = create_chain(free_options_in_chain)) == NULL)
@@ -39,7 +41,27 @@ t_chain		*get_options()
       devlog(__func__, "create option protocol failed", 1); 
       return (NULL);
     }
+  if ((logger = new_option(OPTIONNAL, 0, 1, "-v", build_logger)) == NULL)
+    {
+      devlog(__func__, "create option verbose failed", 1); 
+      return (NULL);
+    }
+  if ((log_file = new_option(OPTIONNAL, 1, 0, "-log", build_logger)) == NULL)
+    {
+      devlog(__func__, "create option protocol failed", 1); 
+      return (NULL);
+    }
   if (add_link(&options, protocol))
+    {
+      devlog(__func__, "add protocol option to chain failed", 1);
+      return (NULL);
+    }
+  if (add_link(&options, logger))
+    {
+      devlog(__func__, "add protocol option to chain failed", 1);
+      return (NULL);
+    }
+  if (add_link(&options, log_file))
     {
       devlog(__func__, "add protocol option to chain failed", 1);
       return (NULL);
@@ -54,6 +76,8 @@ int	execute(t_option *option)
   opt = option->name;
   if (!my_strcmp(opt, "-h"))
     (*(void (*)(void))option->action)();
+  if (!my_strcmp(opt, "-v") || !my_strcmp(opt, "-log"))
+    (*(void (*)(char*, t_chain*))option->action)(opt, option->parameters);
   if (!my_strcmp(opt, "-proto"))
     (*(void (*)(t_chain*))option->action)(option->parameters);
   return (0);

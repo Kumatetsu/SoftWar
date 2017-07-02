@@ -15,11 +15,15 @@
 # define RUNTIME_ERROR -1
 # define MANDATORY 1
 # define OPTIONNAL 0
+
+#include <stdio.h>
+#include <stdlib.h>
 /*
 ** typedef for t_option process
 */
 typedef			void (*void_void)(void);
 typedef			void (*void_char)(char *str);
+typedef			void (*void_char_file)(char *str, FILE *o);
 typedef			void (*void_int)(int n);
 typedef			void (*void_void_star)(void*);
 typedef			void (*void_int_void_star)(int nb_params, void*);
@@ -152,11 +156,11 @@ int		chain_is_empty(t_chain **chain);
 /*
 ** libLog content
 */
-void		log_error(char *str);
-void		log_warning(char *str);
-void		log_info(char *str);
-void		log_debug(char *str);
-t_logger	*build_logger(t_chain *parameters);
+void		log_error(char *str, FILE *o);
+void		log_warning(char *str, FILE *o);
+void		log_info(char *str, FILE *o);
+void		log_debug(char *str, FILE *o);
+t_logger	*build_logger(char *opt, t_chain *parameters);
 t_logger	*get_logger();
 void		devlog(const char *func, char *content, int lvl);
 void		my_log(const char *func, char *content, int lvl);
