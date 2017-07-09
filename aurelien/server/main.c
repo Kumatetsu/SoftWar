@@ -13,7 +13,10 @@
 #include <czmq.h>
 #include "libmy.h"
 #include "argument.h"
+#include "Softwar_ctx.h"
 #include "Notification.h"
+#include "rep.h"
+#include "pub.h"
 
 int		main(int argc, char *argv[])
 {
@@ -24,7 +27,8 @@ int		main(int argc, char *argv[])
   t_chain	*options;
   t_link	*tmp;
   t_option	*opt;
-
+  t_swctx	*ctx;
+  
   act = 0;
   options = get_options();
   if (parse(1, argc, argv, &options))
@@ -44,60 +48,45 @@ int		main(int argc, char *argv[])
       tmp = tmp->next;
     }
   if (!act)
-    help();
-
+    {
+      my_log(__func__, "nothing passed to the program", 2);
+      help();
+    }
   /*
   ** Server REP/REQ, PUB/SUB and polling management
   */
   // basic and hardcoded players management
   int		players;
-  int		rep_port;
-  int		pub_port;
   zsock_t	*responder;
   zsock_t	*publisher;
-  zsock_t	*active_poll;
-  zpoller_t	*poller;
   char		*message = NULL;
 
-  /*
-  ** hard port's definition
-  */
-  rep_port = 4242;
-  pub_port = 4243;
+  
+  ctx = get_swctx();
   /*
   ** REP/REQ server init
   */
-  my_log(__func__, "init responder", 3);
-  responder = zsock_new(ZMQ_REP);
-  assert(responder);
-  my_log(__func__, "bind responder to port 4242", 3);
-  zsock_bind(responder, "tcp://*:%d", rep_port);
-  my_log(__func__, "server ready to REP/REQ on 4242", 3);
+  responder = init_rep(ctx->rep_port);
   /*
   ** PUB/SUB server init
   */
-  my_log(__func__, "init publisher", 3);
-  publisher = zsock_new(ZMQ_PUB);
-  assert(publisher);
-  my_log(__func__, "bind publisher to port 4243", 3);
-  zsock_bind(publisher, "tcp://*:%d", pub_port);
-  my_log(__func__, "publisher ready to publish on 4243", 3);
+  publisher = init_pub(ctx->pub_port);
   while(!zsys_interrupted)
     {
       /*
       ** Poll init
       */
       my_log(__func__, "init poller", 3);
-      poller = zpoller_new(responder, NULL);
-      assert(poller);
+      ctx->poller = zpoller_new(responder, NULL);
+      assert(ctx->poller);
       my_log(__func__, "wait an active socket", 3);
       /*
       ** Poll listen and wait
       */
-      active_poll = (zsock_t*)zpoller_wait(poller, -1);
-      assert(active_poll == responder); // allow to retrieve active socket
-      assert(zpoller_expired(poller) == false); // check poller status
-      assert(zpoller_terminated(poller) == false); // check poller status
+      ctx->active_socket = (zsock_t*)zpoller_wait(ctx->poller, -1);
+      assert(ctx->active_socket == responder); // allow to retrieve active socket
+      assert(zpoller_expired(ctx->poller) == false); // check poller status
+      assert(zpoller_terminated(ctx->poller) == false); // check poller status
       /*
       ** Read message from active socket
       */
@@ -138,5 +127,6 @@ int		main(int argc, char *argv[])
   */
   delete_logger();
   delete_chain(&options);
+  free_ctx();
   return(0);
 }

@@ -20,7 +20,10 @@ LDFLAGS =       -lzmq -lczmq -L ./libmy -lmy
 
 SRC     =       main.c \
 		src/tools/argument.c \
+		model/Softwar_ctx.c \
 		model/Notification.c \
+		src/server/pub.c \
+		src/server/rep.c \
 
 OBJ     =       ${SRC:%.c=%.o}
 
