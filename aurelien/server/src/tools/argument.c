@@ -14,6 +14,9 @@
 #include "Softwar_ctx.h"
 #include "Notification.h"
 
+/*
+** DONT FORGET TO COMPLETE IF ADD OPTION
+*/
 void		help()
 {
   my_putstr_color("cyan", "\n----- HELP -----\n\n");
@@ -27,6 +30,12 @@ void		help()
   my_putstr_color("cyan", "./demo [-cycle] !int > 0 time in micro sec between two ticks\n");
 }
 
+/*
+** On définit les options acceptées
+** par le programme et comment elles
+** doivent être gérées. 
+** voir t_option et option_manager.c dans libmy
+*/
 t_chain		*get_options()
 {
   t_chain	*options;
@@ -111,6 +120,14 @@ t_chain		*get_options()
   return (options);
 }
 
+/*
+** execute()
+** fonction appellée pour gérée le cast
+** et l'appel du callback (action)
+** de l'option passée en paramètre.
+
+** MANQUE LA GESTION D'ERREUR!! 
+*/
 int	execute(t_option *option)
 {
   char	*opt;

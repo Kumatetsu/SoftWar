@@ -13,6 +13,10 @@
 #include "libmy.h"
 #include "rep.h"
 
+/*
+** Initialise une requête rep
+** avec les logs et les assertions.
+*/
 zsock_t		*init_rep(int rep_port)
 {
   zsock_t	*r;

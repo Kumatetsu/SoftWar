@@ -61,10 +61,11 @@ int		main(int argc, char *argv[])
   zsock_t	*publisher;
   char		*message = NULL;
 
-  
-  ctx = get_swctx();
+  ctx = get_swctx(); // à ce moment là, soit ctx est set par les arguments
+		     // soit on récupère ici la valeur par défaut.
   /*
   ** REP/REQ server init
+  ** voir /src/server/rep.c et pub.c
   */
   responder = init_rep(ctx->rep_port);
   /*

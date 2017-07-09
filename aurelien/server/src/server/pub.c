@@ -13,6 +13,10 @@
 #include "libmy.h"
 #include "pub.h"
 
+/*
+** initialise et bind une pub socket
+** avec les logs et les assertions.
+*/
 zsock_t		*init_pub(int pub_port)
 {
   char		mess[50];

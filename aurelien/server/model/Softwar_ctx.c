@@ -16,6 +16,12 @@
 /*
 ** private function
 */
+/*
+** Fonction passée à la création de la chaine
+** t_swctx->sockets
+** Permet de détruire les sockets stockées
+** dans une liste chainée passée en paramètre.
+*/
 void	free_sockets(t_chain **sockets);
 
 /*
@@ -23,6 +29,14 @@ void	free_sockets(t_chain **sockets);
 */
 static t_swctx	*ctx = NULL;
 
+/*
+** finalize_ctx
+** appellée par le getter pour s'assurer de toujours
+** avoir le context. Si la définition du context
+** par le biais du process de parsing foire, on est sûr
+** d'avoir au moins les valeurs par défaut.
+** Si le ctx est bien setté de partout, finalize ne fait rien.
+*/
 t_swctx	*finalize_ctx()
 {
   if (ctx == NULL)
@@ -50,6 +64,14 @@ t_swctx	*finalize_ctx()
   return (ctx);
 }
 
+/*
+** Fonction conçue pour être exécutée avec les options suivantes:
+** -rep-port [int >0]
+** -pub-port [int > 0]
+** -cycle [int > 0]
+** passée comme callback au parseur d'argument, 
+** cette fonction définie le SoftWar_ctx
+*/
 t_swctx			*init_swctx(char *opt, t_chain *parameters)
 {
   t_link		*tmp;
@@ -88,11 +110,22 @@ t_swctx			*init_swctx(char *opt, t_chain *parameters)
   return (ctx);
 }
 
+/*
+** Getter. le ctx étant une instance
+** unique, privée et statique accessible
+** uniquement grâce à cette méthode, c'est un singleton.
+** Important dans le cas des threads: 
+** si deux threads cherchent à modifier le ctx en même temps
+** ca peut poser problème. Voir mutexes et courses concurrentielles.
+*/
 t_swctx	*get_swctx()
 {
   return (finalize_ctx());
 }
 
+/*
+** fonction de libération de la t_chain contenue dans le ctx.
+*/
 void		free_sockets(t_chain **sockets)
 {
   t_link	*tmp;
@@ -107,6 +140,9 @@ void		free_sockets(t_chain **sockets)
     }
 }
 
+/*
+** Libération du ctx.
+*/
 void		free_ctx()
 {
   if (ctx != NULL)
@@ -117,6 +153,11 @@ void		free_ctx()
 	delete_chain(&(ctx->sockets));
       /*
       ** Not sure at all...
+      ** cette socket est renvoyé par le poller
+      ** c'est la socket active à chaque tour de boucle
+      ** je ne sais pas si zpoller_destroy s'en occuppe déjà
+      ** ou même si cette socket reste en vie ou est un pointeur
+      ** sur l'une des notre...
       if (ctx->active_socket != NULL)
         zsock_destroy(ctx->active_socket);
       */
