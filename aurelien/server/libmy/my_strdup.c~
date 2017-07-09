@@ -20,12 +20,14 @@ char	*my_strdup(char *str)
   i = 0;
   while (*(str + i))
     ++i;
-  str2 = malloc(sizeof(*str) * i + 1);
+  if ((str2 = malloc(sizeof(*str) * i + 1)) == NULL)
+    {
+      devlog(__func__, MEM_ERR, 1);
+      return NULL;
+    }
   if (str2 != 0)
     {
       my_strcpy(str2, str);
       return (str2);
     }
-  else
-    return (0);
 }

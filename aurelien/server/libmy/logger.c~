@@ -34,27 +34,29 @@ int	set_level(t_logger **logger, char *level)
   if (!my_strcmp(level, "debug"))
     {
       (*logger)->lvl = 4;
-      if ((*logger)->level = my_strdup("DEBUG"))
+      if (((*logger)->level = my_strdup("DEBUG")) == NULL)
 	return (1);
     }
-  if (!my_strcmp(level, "info"))
+  else if (!my_strcmp(level, "info"))
     {
       (*logger)->lvl = 3;
-      if ((*logger)->level = my_strdup("INFO"))
+      if (((*logger)->level = my_strdup("INFO")) == NULL)
 	return (1);
     }
-  if (!my_strcmp(level, "warning"))
+  else if (!my_strcmp(level, "warning"))
     {
       (*logger)->lvl = 2;
-      if ((*logger)->level = my_strdup("WARNING"))
+      if (((*logger)->level = my_strdup("WARNING")) == NULL)
 	return (1);
     }
-  if (!my_strcmp(level, "error"))
+  else if (!my_strcmp(level, "error"))
     {
       (*logger)->lvl = 1;
-      if ((*logger)->level = my_strdup("ERROR"))
+      if (((*logger)->level = my_strdup("ERROR")) == NULL)
 	return (1);
     }
+  else
+    return (1);
   return (0);
 }
 
