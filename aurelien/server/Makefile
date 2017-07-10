@@ -24,6 +24,7 @@ SRC     =       main.c \
 		model/Notification.c \
 		src/server/pub.c \
 		src/server/rep.c \
+		src/server/poll.c \
 
 OBJ     =       ${SRC:%.c=%.o}
 

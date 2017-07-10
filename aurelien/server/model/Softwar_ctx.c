@@ -30,6 +30,26 @@ void	free_sockets(t_chain **sockets);
 static t_swctx	*ctx = NULL;
 
 /*
+** Crée une socket du type SoftWar
+** adaptée à notre contexte, c'est une
+** socket avec un char * en plus pour nous...
+*/
+t_swsock	*create_socket(char *name, zsock_t *socket)
+{
+  t_swsock	*s;
+
+  if ((s = malloc(sizeof (*s))) == NULL)
+    {
+      my_log(__func__, MEM_ERR, 1);
+      return (NULL);
+    }
+  if ((s->name = my_strdup(name)) == NULL)
+    return (NULL);
+  s->socket = socket;
+  return (s);
+}
+
+/*
 ** finalize_ctx
 ** appellée par le getter pour s'assurer de toujours
 ** avoir le context. Si la définition du context
@@ -50,6 +70,11 @@ t_swctx	*finalize_ctx()
       ctx->pub_port = 0;
       ctx->cycle = 0;
       if ((ctx->sockets = create_chain(free_sockets)) == NULL)
+	{
+	  my_log(__func__, MEM_ERR, 1);
+	  return (NULL);
+	}
+      if ((ctx->active_socket = malloc(sizeof ((*ctx->active_socket)))) == NULL)
 	{
 	  my_log(__func__, MEM_ERR, 1);
 	  return (NULL);
@@ -90,10 +115,14 @@ t_swctx			*init_swctx(char *opt, t_chain *parameters)
 	  my_log(__func__, MEM_ERR, 1);
 	  return (NULL);
 	}
+      if ((ctx->active_socket = malloc(sizeof ((*ctx->active_socket)))) == NULL)
+	{
+	  my_log(__func__, MEM_ERR, 1);
+	  return (NULL);
+	}
       ctx->rep_port = 0;
       ctx->pub_port = 0;
       ctx->cycle = 0;
-      ctx->active_socket = NULL;
       ctx->poller = NULL;
       if ((ctx->sockets = create_chain(free_sockets)) == NULL)
 	{
@@ -129,13 +158,14 @@ t_swctx	*get_swctx()
 void		free_sockets(t_chain **sockets)
 {
   t_link	*tmp;
-  zsock_t	*socket;
+  t_swsock	*s;
 
   tmp = (*sockets)->first;
   while (tmp)
     {
-      socket = (zsock_t*)tmp->content;
-      zsock_destroy(&socket);
+      s = (t_swsock*)tmp->content;
+      zsock_destroy(&(s->socket));
+      free(s->name);
       tmp = tmp->next;
     }
 }
@@ -151,6 +181,8 @@ void		free_ctx()
 	zpoller_destroy(&(ctx->poller));
       if (ctx->sockets != NULL)
 	delete_chain(&(ctx->sockets));
+      if (ctx->active_socket != NULL)
+	free(ctx->active_socket->name);
       /*
       ** Not sure at all...
       ** cette socket est renvoyé par le poller
@@ -158,8 +190,8 @@ void		free_ctx()
       ** je ne sais pas si zpoller_destroy s'en occuppe déjà
       ** ou même si cette socket reste en vie ou est un pointeur
       ** sur l'une des notre...
-      if (ctx->active_socket != NULL)
-        zsock_destroy(ctx->active_socket);
+      if (ctx->active_socket->socket != NULL)
+        zsock_destroy(ctx->active_socket->socket);
       */
       free(ctx);
     }

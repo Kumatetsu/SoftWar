@@ -14,5 +14,6 @@
 void	help();
 t_chain	*get_options();
 int	execute(t_option *options);
+int	sw_parse(int argc, char **argv);
 
 #endif  /* !_ARGUMENT_H_ */

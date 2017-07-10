@@ -15,6 +15,7 @@
 # define RUNTIME_ERROR -1
 # define MANDATORY 1
 # define OPTIONNAL 0
+# define BUFFER 255
 
 #include <stdio.h>
 #include <stdlib.h>

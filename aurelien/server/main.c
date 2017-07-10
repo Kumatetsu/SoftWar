@@ -17,100 +17,38 @@
 #include "Notification.h"
 #include "rep.h"
 #include "pub.h"
+#include "poll.h"
 
 int		main(int argc, char *argv[])
 {
   /*
-  ** Program management part
-  */
-  int		act;
-  t_chain	*options;
-  t_link	*tmp;
-  t_option	*opt;
-  t_swctx	*ctx;
-  
-  act = 0;
-  options = get_options();
-  if (parse(1, argc, argv, &options))
-    {
-      devlog(__func__, "parsing arguments failed", 1);
-      return (1);
-    }
-  tmp = options->first;
-  while (tmp)
-    {
-      opt = (t_option*)tmp->content;
-      if (opt->to_execute)
-	{
-	  act = 1;
-	  execute(opt);
-	}
-      tmp = tmp->next;
-    }
-  if (!act)
-    {
-      my_log(__func__, "nothing passed to the program", 2);
-      help();
-    }
-  /*
   ** Server REP/REQ, PUB/SUB and polling management
   */
-  // basic and hardcoded players management
-  int		players;
-  zsock_t	*responder;
-  zsock_t	*publisher;
+  t_swctx	*ctx;
   char		*message = NULL;
+  zsock_t	*publisher;
 
+  if (sw_parse(argc, argv))
+    my_log(__func__, "failed to parse SoftWar arguments", 2);
   ctx = get_swctx(); // à ce moment là, soit ctx est set par les arguments
 		     // soit on récupère ici la valeur par défaut.
   /*
   ** REP/REQ server init
   ** voir /src/server/rep.c et pub.c
   */
-  responder = init_rep(ctx->rep_port);
+  if (add_link(&(ctx->sockets), create_socket("responder", init_rep(ctx->rep_port))))
+    return (1);
   /*
   ** PUB/SUB server init
   */
-  publisher = init_pub(ctx->pub_port);
+  if (add_link(&(ctx->sockets), create_socket("publisher", init_pub(ctx->pub_port))))
+    return (1);
   while(!zsys_interrupted)
     {
       /*
       ** Poll init
       */
-      my_log(__func__, "init poller", 3);
-      ctx->poller = zpoller_new(responder, NULL);
-      assert(ctx->poller);
-      my_log(__func__, "wait an active socket", 3);
-      /*
-      ** Poll listen and wait
-      */
-      ctx->active_socket = (zsock_t*)zpoller_wait(ctx->poller, -1);
-      assert(ctx->active_socket == responder); // allow to retrieve active socket
-      assert(zpoller_expired(ctx->poller) == false); // check poller status
-      assert(zpoller_terminated(ctx->poller) == false); // check poller status
-      /*
-      ** Read message from active socket
-      */
-      message = zstr_recv(responder);
-      my_putstr("\nmessage received: ");
-      my_putstr(message);
-      my_putchar('\n');
-      /*
-      ** REP/REQ response sending
-      */
-      my_log(__func__, "response to request", 3);
-      if (!my_strcmp(message, "client connection init"))
-	{
-	  zstr_sendf(responder, "%s", "Client connection acknowledge");
-	  players++;
-	}
-      else if(!my_strcmp(message, "client connection destroyed"))
-	{
-	  zstr_sendf(message, "Good Bye!");
-	  players--;
-	}
-      else
-	zstr_sendf(responder, "%s", message);
+      message = init_poll(&ctx);
       /*
       ** Publication to all clients:
       ** The sender should receive his message 2 times,
@@ -118,16 +56,21 @@ int		main(int argc, char *argv[])
       */
       my_log(__func__, "publish message: ", 3);
       my_log(__func__, message, 3);
+      /*
+      ** Là on a besoin d'un moyen de récupérer les socket facilement...
+      */
+      publisher = get_socket("publisher", ctx);
       zstr_sendf(publisher, "SoftWar %s", message);
       zstr_free(&message);
     }
-  zsock_destroy(&responder);
-  zsock_destroy(&publisher);
   /*
   ** libmy extended cleaning
   */
   delete_logger();
-  delete_chain(&options);
+  /*
+  ** lol, on dégage tout avec une fonction
+  ** re lol reste à bien vérifier que ca fait le taf ^^
+  */
   free_ctx();
   return(0);
 }

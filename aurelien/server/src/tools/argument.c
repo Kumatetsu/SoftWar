@@ -143,3 +143,40 @@ int	execute(t_option *option)
     (*(void (*)(t_chain*))option->action)(option->parameters);
   return (0);
 }
+
+/*
+** argument parsing process calls
+*/
+int		sw_parse(int argc, char **argv)
+{
+  int		act;
+  t_chain	*options;
+  t_link        *tmp;
+  t_option      *opt;
+  
+  act = 0;
+  options = get_options();
+  if (parse(1, argc, argv, &options))
+    {
+      devlog(__func__, "parsing arguments failed", 1);
+      return (1);
+    }
+  tmp = options->first;
+  while (tmp)
+    {
+      opt = (t_option*)tmp->content;
+      if (opt->to_execute)
+	{
+	  act = 1;
+	  execute(opt); // gestion d'erreur?
+	}
+      tmp = tmp->next;
+    }
+  if (!act)
+    {
+      my_log(__func__, "nothing passed to the program", 2);
+      help();
+    }
+  delete_chain(&options);
+  return (0);
+}

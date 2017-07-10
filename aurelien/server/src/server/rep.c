@@ -29,3 +29,36 @@ zsock_t		*init_rep(int rep_port)
   my_log(__func__, "server ready to REP/REQ on 4242", 3);
   return (r);
 }
+
+char	*rep_read(zsock_t *socket)
+{
+  char	*message;
+
+  my_log(__func__, "extract message from rep socket", 3);
+  message = zstr_recv(socket);
+  my_putstr_color("cyan", "\nMessage received from [user]: ");
+  my_putstr(message);
+  my_putchar('\n');
+  rep_response(socket, message);
+  return (message);
+}
+
+void	rep_response(zsock_t *socket, char *message )
+{
+  char	log[60];
+
+  sprintf(log, "response to request: %s", message);
+  my_log(__func__, log, 3);
+  if (!my_strcmp(message, "client connection init"))
+    {
+      zstr_sendf(socket, "%s", "Client connection acknowledge");
+      // ctx->players++;
+    }
+  else if(!my_strcmp(message, "client connection destroyed"))
+    {
+      zstr_sendf(socket, "Good Bye!");
+      // ctx->players--;
+    }
+  else
+    zstr_sendf(socket, "%s", message);
+}

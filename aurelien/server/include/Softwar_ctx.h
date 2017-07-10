@@ -13,18 +13,26 @@
 
 #include <czmq.h>
 
+typedef struct  s_swsock
+{
+  char		*name;
+  zsock_t	*socket;
+}		t_swsock;
+
 typedef struct	s_softwar_context
 {
   unsigned int	rep_port;
   unsigned int	pub_port;
   unsigned int	cycle;
-  zsock_t	*active_socket;
+  t_swsock	*active_socket;
   zpoller_t	*poller;
   t_chain	*sockets;
 }		t_swctx;
 
+
 t_swctx		*init_swctx(char *opt, t_chain *parameters);
 t_swctx		*get_swctx();
 void		free_ctx();
+t_swsock	*create_socket(char *name, zsock_t *socket);
 
 #endif /* !_SOFTWAR_CONTEXT_H_ */
