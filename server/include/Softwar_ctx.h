@@ -5,11 +5,11 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul  9 22:28:05 2017 CASTELLARNAU Aurelien
-** Last update Sun Jul  9 22:33:30 2017 CASTELLARNAU Aurelien
+** Last update Tue Jul 11 16:57:22 2017 BILLAUD Jean
 */
 
 #ifndef  _SOFTWAR_CONTEXT_H_
-# define _SOFTWAR_CONTEXT_H_
+#define _SOFTWAR_CONTEXT_H_
 
 #include <czmq.h>
 

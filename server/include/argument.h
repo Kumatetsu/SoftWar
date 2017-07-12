@@ -5,11 +5,11 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sat Jul  1 01:53:49 2017 CASTELLARNAU Aurelien
-** Last update Sat Jul  1 02:29:40 2017 CASTELLARNAU Aurelien
+** Last update Tue Jul 11 16:38:51 2017 BILLAUD Jean
 */
 
-#ifndef  _ARGUMENT_H_
-# define _ARGUMENT_H_
+#ifndef _ARGUMENT_H_
+#define _ARGUMENT_H_
 
 void	help();
 t_chain	*get_options();
