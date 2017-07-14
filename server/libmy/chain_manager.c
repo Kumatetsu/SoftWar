@@ -16,7 +16,10 @@ t_chain		*create_chain(void (*free)(t_chain**))
   t_chain	*chain;
 
   if ((chain = malloc(sizeof(*chain))) == NULL)
-    return (NULL);
+    {
+      devlog(__func__, MEM_ERR, 1);
+      return (NULL);
+    }
   chain->first = NULL;
   chain->last = NULL;
   chain->index = 0;
@@ -39,7 +42,7 @@ int		add_link(t_chain **chain, void *content)
 
   if ((link = malloc(sizeof(*link))) == NULL)
     {
-      my_log(__func__, MEM_ERR, 1);
+      devlog(__func__, MEM_ERR, 1);
       return (1);
     }
   link->content = content;
@@ -89,7 +92,7 @@ int		remove_link(t_chain **chain, t_link *link)
     {
       if (remove_from_index(chain, link))
 	{
-	  my_log(__func__, "can't remove link from index", 1);
+	  devlog(__func__, "can't remove link from index", 1);
 	  return (1);
 	}
       (*chain)->index--;

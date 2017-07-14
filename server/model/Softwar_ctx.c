@@ -177,12 +177,16 @@ void		free_ctx()
 {
   if (ctx != NULL)
     {
-      if (ctx->poller != NULL)
-	zpoller_destroy(&(ctx->poller));
       if (ctx->sockets != NULL)
-	delete_chain(&(ctx->sockets));
+	{
+	  if (ctx->sockets->free != NULL) // DEBUG
+	    my_log(__func__, "sockets list got free function!", 4); //DEBUG
+	  delete_chain(&(ctx->sockets));
+	}
       if (ctx->active_socket != NULL)
 	free(ctx->active_socket->name);
+      if (ctx->poller != NULL)
+	zpoller_destroy(&(ctx->poller));
       /*
       ** Not sure at all...
       ** cette socket est renvoyé par le poller
@@ -191,7 +195,7 @@ void		free_ctx()
       ** ou même si cette socket reste en vie ou est un pointeur
       ** sur l'une des notre...
       if (ctx->active_socket->socket != NULL)
-        zsock_destroy(ctx->active_socket->socket);
+        zsock_destroy(&(ctx->active_socket->socket));
       */
       free(ctx);
     }

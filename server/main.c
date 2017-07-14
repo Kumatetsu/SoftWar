@@ -14,57 +14,63 @@
 #include <json/json.h>
 #include "libmy.h"
 #include "argument.h"
-#include "Softwar_ctx.h"
-#include "Notification.h"
-#include "Game_info.h"
 #include "rep.h"
 #include "pub.h"
 #include "poll.h"
+#include "Softwar_ctx.h"
+#include "Notification.h"
+#include "Player.h"
+#include "Energy_cell.h"
+#include "Game_manager.h"
 
 int		main(int argc, char *argv[])
 {
   /*
   ** Server REP/REQ, PUB/SUB and polling management
   */
-  t_swctx	*ctx;
-  char		*message = NULL;
-  zsock_t	*publisher;
-  t_game_info	*game_info;
+  t_swctx		*ctx;
+  char			*message = NULL;
+  zsock_t		*publisher;
+  t_game_manager	*manager;
 
+  int		it;
+  char		id[20];
+  t_chain	*players;
+  t_chain	*ecs;
+  t_player	*player;
+  t_energy_cell	*ec;
+  
   if (sw_parse(argc, argv))
     my_log(__func__, "failed to parse SoftWar arguments", 2);
   ctx = get_swctx(); // à ce moment là, soit ctx est set par les arguments
 		     // soit on récupère ici la valeur par défaut.
-    /*
-  ** Serialization example:
-  */
-  char *str = "{'name':'joys of promagramming'}";
-  json_object *jobj = json_tokener_parse(str);
-  enum json_type type = json_object_get_type(jobj);
-
-  switch (type) {
-  case json_type_null: printf("json_type_nulln");
-    break;
-  case json_type_boolean: printf("json_type_booleann");
-    break;
-  case json_type_double: printf("json_type_doublen");
-    break;
-  case json_type_int: printf("json_type_intn");
-    break;
-  case json_type_object: printf("json_type_objectn");
-    break;
-  case json_type_array: printf("json_type_arrayn");
-    break;
-  case json_type_string: printf("json_type_stringn");
-    break;
-  }
-
-  /*
-  ** Implémentation d'une sérialisation sur la structure game info:
-  */
-  if ((game_info = init_game_info(5, 0, "Poney Content", 8)) == NULL)
+  manager = get_game_manager();
+  if ((players = create_chain(free_players)) == NULL)
     return (1);
-  printf("\nStringified game_info: %s", game_info_to_json(game_info));
+  for (it = 0; it < 4; it++)
+    {
+      sprintf(id, "0X0%d", it);
+      player = init_player(id, it, (it + 2), (it + 20), 0);
+      if (add_link(&players, player))
+	my_log(__func__, "add player to list failed", 2);
+    }
+  if ((ecs = create_chain(free_ecs)) == NULL)
+    return (1);
+  for (it = 0; it < 10; it++)
+    {
+      ec = init_energy_cell(it + 3, it + 2, it * 2.5);
+      if (add_link(&ecs, ec))
+	my_log(__func__, "add energy cell to list failed", 2);
+    }
+  /*
+  ** Implémentation d'une sérialisation sur la structure game info
+  ** servie en ANSI par le manager:
+  */
+  if (manager->init(5, 0, players, ecs) == NULL)
+    return (1);
+  printf("\nStringified game_info: %s", json_object_to_json_string(manager->serialize()));
+  manager->free();
+  free(manager);
   /*
   ** REP/REQ server init
   ** voir /src/server/rep.c et pub.c
