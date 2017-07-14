@@ -22,7 +22,9 @@ SRC     =       main.c \
 		src/tools/argument.c \
 		model/Softwar_ctx.c \
 		model/Notification.c \
-		model/Game_info.c \
+		model/Player.c \
+		model/Energy_cell.c \
+		model/Game_manager.c \
 		src/server/pub.c \
 		src/server/rep.c \
 		src/server/poll.c \
