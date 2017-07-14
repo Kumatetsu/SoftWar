@@ -9,6 +9,7 @@
 */
 
 #include <stdio.h>
+#include <json/json.h>
 #include "libmy.h"
 #include "Energie_cell.h"
 
@@ -30,4 +31,38 @@ t_energy_cell	*create_energy_cell(unsigned int x, unsigned int y, unsigned int v
 void	free_energy_cell(t_energy_cell *e)
 {
   free(e);
+}
+
+json_object	*energy_cell_to_json(t_energy_cell *ec)
+{
+  json_object	*ec_json;
+  json_object   *x_json;
+  json_object   *y_json;
+  json_object   *value_json;
+
+  ec_json	= json_object_new_object();
+  x_json        = json_object_new_int(ec->x);
+  y_json        = json_object_new_int(ec->y);
+  value_json	= json_object_new_int(ec->value);
+  json_object_object_add(ec_json, "x", x_json);
+  json_object_object_add(ec_json, "y", y_json);
+  json_object_object_add(ec_json, "value", value_json);
+  return (ec_json);
+}
+
+json_object	*energy_cells_to_json(t_chain *ecs)
+{
+  t_link	*tmp;
+  t_energy_cell	*ec;
+  json_object	*ecs_json;
+
+  ecs_json = json_object_new_array();
+  tmp = ecs->first;
+  while (tmp)
+    {
+      ec = tmp->content;
+      json_object_array_add(ecs_json, energy_cell_to_json(ec));
+      tmp = tmp->next;
+    }
+  return (ecs_json);
 }

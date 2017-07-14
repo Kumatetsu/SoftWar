@@ -20,4 +20,7 @@ typedef struct	s_player
   uint		looking;
 }		t_player;
 
+json_object	*player_to_json(t_player *player);
+json_object	*players_to_json(t_chain *players); 
+
 #endif /* !_PLAYER_H */

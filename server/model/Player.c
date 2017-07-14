@@ -9,6 +9,7 @@
 */
 
 #include <stdio.h>
+#include <json/json.h>
 #include "libmy.h"
 #include "Player.h"
 
@@ -36,4 +37,44 @@ void	free_player(t_player *p)
 {
   free(p->name);
   free(p);
+}
+
+json_object	*player_to_json(t_player *player)
+{
+  json_object	*player_json;
+  json_object	*identity_json;
+  json_object	*x_json;
+  json_object	*y_json;
+  json_object	*energy_json;
+  json_object	*looking_json;
+
+  player_json	= json_object_new_object();
+  identity_json = json_object_new_string(player->identity);
+  x_json	= json_object_new_int(player->x);
+  y_json	= json_object_new_int(player->y);
+  energy_json	= json_object_new_int(player->energy);
+  looking_json	= json_object_new_int(player->looking);
+  json_object_object_add(player_json, "identity", identity_json);
+  json_object_object_add(player_json, "x", x_json);
+  json_object_object_add(player_json, "y", y_json);
+  json_object_object_add(player_json, "energy", energy_json);
+  json_object_object_add(player_json, "looking", looking_json);
+  return (player_json);
+}
+
+json_object	*players_to_json(t_chain *players)
+{
+  t_link	*tmp;
+  t_player	*p;
+  json_object	*players_json;
+
+  players_json = json_object_new_array();
+  tmp = players->first;
+  while(tmp)
+    {
+      p = (t_player*)(tmp->content);
+      json_object_array_add(players_json, player_to_json(p));
+      tmp = tmp->next;
+    }
+  return (players_json);
 }
