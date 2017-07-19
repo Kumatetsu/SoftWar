@@ -11,11 +11,14 @@
 #ifndef _ENERGY_CELL_H_
 #define _ENERGY_CELL_H_
 
-typedef struct 	s_energy_cell
+typedef struct s_energy_cell
 {
   unsigned int	x;
   unsigned int	y;
   unsigned int	value;
 }		t_energy_cell;
+
+json_object	*energy_cell_to_json(t_energy_cell *ec);
+json_object	*energy_cells_to_json(t_chain *ecs);
 
 #endif /* !_ENERGY_CELL_H_ */
