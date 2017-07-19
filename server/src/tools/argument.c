@@ -45,7 +45,7 @@ t_chain		*get_options()
   t_option	*rep_port;
   t_option	*pub_port;
   t_option	*cycle;
-
+  
   if ((options = create_chain(free_options_in_chain)) == NULL)
     {
       // devlog construit un logger temporaire
@@ -94,12 +94,12 @@ t_chain		*get_options()
     }
   if (add_link(&options, logger))
     {
-      devlog(__func__, "add protocol option to chain failed", 1);
+      devlog(__func__, "add logger option to chain failed", 1);
       return (NULL);
     }
   if (add_link(&options, log_file))
     {
-      devlog(__func__, "add protocol option to chain failed", 1);
+      devlog(__func__, "add log_file option to chain failed", 1);
       return (NULL);
     }
   if (add_link(&options, rep_port))

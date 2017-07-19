@@ -14,14 +14,17 @@ NAME    =       sw_server
 
 LIB     =       ./libmy
 
-CFLAGS  =       -W -Wextra -Werror -Wall -g -Iinclude/ -Ilibmy
+CFLAGS  =       -W -Wextra -Werror -Wall -g -Iinclude/ -Ilibmy $(shell pkg-config --cflags json-c)
 
-LDFLAGS =       -lzmq -lczmq -L ./libmy -lmy
+LDFLAGS =       -lzmq -lczmq -L ./libmy -lmy $(shell pkg-config --libs json-c)
 
 SRC     =       main.c \
 		src/tools/argument.c \
 		model/Softwar_ctx.c \
 		model/Notification.c \
+		model/Player.c \
+		model/Energy_cell.c \
+		model/Game_manager.c \
 		src/server/pub.c \
 		src/server/rep.c \
 		src/server/poll.c \

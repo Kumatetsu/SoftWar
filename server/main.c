@@ -11,27 +11,66 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <czmq.h>
+#include <json/json.h>
 #include "libmy.h"
 #include "argument.h"
-#include "Softwar_ctx.h"
-#include "Notification.h"
 #include "rep.h"
 #include "pub.h"
 #include "poll.h"
+#include "Softwar_ctx.h"
+#include "Notification.h"
+#include "Player.h"
+#include "Energy_cell.h"
+#include "Game_manager.h"
 
 int		main(int argc, char *argv[])
 {
   /*
   ** Server REP/REQ, PUB/SUB and polling management
   */
-  t_swctx	*ctx;
-  char		*message = NULL;
-  zsock_t	*publisher;
+  t_swctx		*ctx;
+  char			*message = NULL;
+  zsock_t		*publisher;
+  t_game_manager	*manager;
 
+  int		it;
+  char		id[20];
+  t_chain	*players;
+  t_chain	*ecs;
+  t_player	*player;
+  t_energy_cell	*ec;
+  
   if (sw_parse(argc, argv))
     my_log(__func__, "failed to parse SoftWar arguments", 2);
   ctx = get_swctx(); // à ce moment là, soit ctx est set par les arguments
 		     // soit on récupère ici la valeur par défaut.
+  manager = get_game_manager();
+  if ((players = create_chain(free_players)) == NULL)
+    return (1);
+  for (it = 0; it < 4; it++)
+    {
+      sprintf(id, "0X0%d", it);
+      player = init_player(id, it, (it + 2), (it + 20), 0);
+      if (add_link(&players, player))
+	my_log(__func__, "add player to list failed", 2);
+    }
+  if ((ecs = create_chain(free_ecs)) == NULL)
+    return (1);
+  for (it = 0; it < 10; it++)
+    {
+      ec = init_energy_cell(it + 3, it + 2, it * 2.5);
+      if (add_link(&ecs, ec))
+	my_log(__func__, "add energy cell to list failed", 2);
+    }
+  /*
+  ** Implémentation d'une sérialisation sur la structure game info
+  ** servie en ANSI par le manager:
+  */
+  if (manager->init(5, 0, players, ecs) == NULL)
+    return (1);
+  printf("\nStringified game_info: %s", json_object_to_json_string(manager->serialize()));
+  manager->free();
+  free(manager);
   /*
   ** REP/REQ server init
   ** voir /src/server/rep.c et pub.c
@@ -65,6 +104,7 @@ int		main(int argc, char *argv[])
     }
   /*
   ** libmy extended cleaning
+  ** options are cleaned in /src/tools/argument.c
   */
   delete_logger();
   /*
