@@ -84,7 +84,7 @@ int			init_runtime()
 
   ctx = get_swctx();
   manager = get_game_manager();
-  manager->map_size = ctx->size;
+  manager->set_map_size(ctx->size); // muahah
   init_network(&ctx);
   if (serve_game(&ctx, &manager))
     {
