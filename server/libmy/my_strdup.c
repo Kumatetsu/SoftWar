@@ -19,12 +19,17 @@ char	*my_strdup(char *str)
   int	i;
 
   i = 0;
+  if (str == NULL)
+    {
+      devlog(__func__, "try to strdup a NULL value", 3);
+      return (NULL);
+    }
   while (*(str + i))
     ++i;
   if ((str2 = malloc(sizeof(*str) * i + 1)) == NULL)
     {
       devlog(__func__, MEM_ERR, 1);
-      return NULL;
+      return (NULL);
     }
   if (str2 != 0)
     {

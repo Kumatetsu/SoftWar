@@ -9,11 +9,7 @@
 */
 
 #include <stdlib.h>
-
-char	*my_strdup(char *str);
-void	my_putstr(char *str);
-void	my_putchar(char c);
-void	my_put_nbr(int n);
+#include "libmy.h"
 
 int	is_alpha_num(char c)
 {
@@ -58,7 +54,11 @@ char	*organize_tab(char *str, int *i, int *stock_i)
       ++word_size;
     }
   *stock_i = *i;
-  temp_str = malloc(sizeof (str[0]) * word_size + 1);
+  if ((temp_str = malloc(sizeof (str[0]) * word_size + 1)) == NULL)
+    {
+      my_log(__func__, MEM_ERR, 1);
+      return (NULL);
+    }
   temp_str[word_size] = '\0';
   while (word_size)
     {
@@ -81,14 +81,21 @@ char	**my_str_to_wordtab(char *str)
   i = 0;
   k = 0;
   word_counter = count_word(str);
-  wordtab = malloc(sizeof (str) * word_counter + 1);
+  if ((wordtab = malloc(sizeof (str) * word_counter + 1)) == NULL)
+    {
+      my_log(__func__, MEM_ERR, 1);
+      return (NULL);
+    }
   while (k < word_counter)
     {
-      temp_str = organize_tab(str, &i, &stock_i);
-      wordtab[k] = my_strdup(temp_str);
+      if ((temp_str = organize_tab(str, &i, &stock_i)) == NULL)
+	return (NULL);
+      if ((wordtab[k] = my_strdup(temp_str)) == NULL)
+	return (NULL);
       free(temp_str);
       i = stock_i;
       ++k;
     }
   return (wordtab);
 }
+

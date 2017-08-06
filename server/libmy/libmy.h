@@ -109,8 +109,10 @@ char		*my_strncat(char *dest, char *src, int n);
 int		my_strncmp(char *s1, char *s2, int n);
 char		*my_strncpy(char *dest, char *src, int n);
 char		*my_strstr(char *str, char *to_find);
+int		is_alpha_num(char c);
 char		**my_str_to_wordtab(char *str);
 void		my_swap(int *a, int *b);
+char		**my_split(char *str, char separator);
 
 /*
 ** display general messages from the lib
