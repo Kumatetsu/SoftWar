@@ -33,7 +33,6 @@ t_player	*create_player(char *identity)
   p->looking = 0;
   p->x = 0;
   p->y = 0;
-  p->hash = 0;
   return (p);
 }
 
