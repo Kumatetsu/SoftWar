@@ -28,6 +28,7 @@ void		help()
   my_putstr_color("cyan", "./demo [-rep-port] !int > 0 port for REP/REQ\n");
   my_putstr_color("cyan", "./demo [-pub-port] !int > 0 port for PUB/SUB\n");
   my_putstr_color("cyan", "./demo [-cycle] !int > 0 time in micro sec between two ticks\n");
+  my_putstr_color("cyan", "./demo [-map-size] 0 < !int < 8 size for a side of the map\n");
 }
 
 /*
@@ -45,6 +46,7 @@ t_chain		*get_options()
   t_option	*rep_port;
   t_option	*pub_port;
   t_option	*cycle;
+  t_option	*map;
   
   if ((options = create_chain(free_options_in_chain)) == NULL)
     {
@@ -87,6 +89,11 @@ t_chain		*get_options()
       devlog(__func__, "create option cycle failed", 1); 
       return (NULL);
     }
+  if ((map = new_option(OPTIONNAL, 1, 0, "-map-size", init_swctx)) == NULL)
+    {
+      devlog(__func__, "create option map size failed", 1); 
+      return (NULL);
+    }
   if (add_link(&options, protocol))
     {
       devlog(__func__, "add protocol option to chain failed", 1);
@@ -115,6 +122,11 @@ t_chain		*get_options()
   if (add_link(&options, cycle))
     {
       devlog(__func__, "add cycle option to chain failed", 1);
+      return (NULL);
+    }
+  if (add_link(&options, map))
+    {
+      devlog(__func__, "add map option to chain failed", 1);
       return (NULL);
     }
   return (options);
