@@ -23,8 +23,8 @@ void		help()
   my_putstr_color("cyan", "./demo [-v] ?debug|info|warning|error\n");
   my_putstr_color("cyan", "Default -v value is info\n");
   my_putstr_color("cyan", "Without verbose mode, log error in error.log\n");
-  my_putstr_color("cyan", "./demo [-log] ![filepath]\n");
-  my_putstr_color("cyan", "./demo [-proto] !int[int...4]\n");
+  my_putstr_color("cyan", "./demo [-log] ![filepath], set a filepath for logs\n");
+  my_putstr_color("cyan", "./demo [-proto] !int[int...4], display the differents notifications\n");
   my_putstr_color("cyan", "./demo [-rep-port] !int > 0 port for REP/REQ\n");
   my_putstr_color("cyan", "./demo [-pub-port] !int > 0 port for PUB/SUB\n");
   my_putstr_color("cyan", "./demo [-cycle] !int > 0 time in micro sec between two ticks\n");
@@ -156,6 +156,7 @@ int		sw_parse(int argc, char **argv)
   
   act = 0;
   options = get_options();
+  
   if (parse(1, argc, argv, &options))
     {
       devlog(__func__, "parsing arguments failed", 1);

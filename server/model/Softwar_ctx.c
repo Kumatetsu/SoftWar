@@ -153,7 +153,14 @@ t_swctx			*init_swctx(char *opt, t_chain *parameters)
 */
 t_swctx	*get_swctx()
 {
-  return (finalize_ctx());
+  t_swctx *ctx;
+
+  ctx = finalize_ctx();
+  if (ctx->sockets != NULL)
+    my_log(__func__, "sockets instanciated", 4);
+  if (ctx->sockets->first == NULL)
+    my_log(__func__, "first == NULL", 4);
+  return (ctx);
 }
 
 /*
