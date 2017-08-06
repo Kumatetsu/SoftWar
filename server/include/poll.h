@@ -11,9 +11,9 @@
 #ifndef  _POLL_H_
 # define _POLL_H_
 
-char	*init_poll(t_swctx **ctx);
+zmsg_t	*init_poll(t_swctx **ctx);
 int	listen_and_wait(t_swctx **ctx);
-char	*read_socket(t_swctx **ctx);
-zsock_t	*get_socket(char *name, t_swctx *ctx);
+zmsg_t	*read_socket(t_swctx **ctx);
+zsock_t	*get_socket(char *name, t_swctx **ctx);
 
 #endif  /* !_POLL_H_ */

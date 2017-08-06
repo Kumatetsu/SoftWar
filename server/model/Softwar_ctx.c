@@ -79,7 +79,10 @@ t_swctx	*finalize_ctx()
 	  my_log(__func__, MEM_ERR, 1);
 	  return (NULL);
 	}
+      ctx->active_id = NULL;
     }
+  if (ctx->sockets->first == NULL)
+    my_log(__func__, "sockets instaciated", 4);
   if (ctx->rep_port == 0)
     ctx->rep_port = 4242;
   if (ctx->pub_port == 0)
@@ -124,6 +127,7 @@ t_swctx			*init_swctx(char *opt, t_chain *parameters)
       ctx->pub_port = 0;
       ctx->cycle = 0;
       ctx->poller = NULL;
+      ctx->active_id = NULL;
       if ((ctx->sockets = create_chain(free_sockets)) == NULL)
 	{
 	  my_log(__func__, MEM_ERR, 1);
@@ -187,6 +191,8 @@ void		free_ctx()
 	free(ctx->active_socket->name);
       if (ctx->poller != NULL)
 	zpoller_destroy(&(ctx->poller));
+      if (ctx->active_id != NULL)
+	free(ctx->active_id);
       /*
       ** Not sure at all...
       ** cette socket est renvoyé par le poller
