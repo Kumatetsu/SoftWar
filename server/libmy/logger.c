@@ -29,8 +29,8 @@ const static void_char_file log_panel[] = {
 */
 int	set_level(t_logger **logger, char *level)
 {
-  my_putstr("\nset_level: ");
-  my_putstr(level);
+  devlog(__func__, "Try set log level to: ", 3);
+  devlog(__func__, level, 3);
   if (!my_strcmp(level, "debug"))
     {
       (*logger)->lvl = 4;

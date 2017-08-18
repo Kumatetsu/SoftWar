@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <json/json.h>
 #include "libmy.h"
-#include "Energie_cell.h"
+#include "Energy_cell.h"
 
 t_energy_cell	*create_energy_cell(unsigned int x, unsigned int y, unsigned int value)
 {
@@ -28,9 +28,27 @@ t_energy_cell	*create_energy_cell(unsigned int x, unsigned int y, unsigned int v
   return (e);
 }
 
-void	free_energy_cell(t_energy_cell *e)
+void    free_energy_cell(t_energy_cell *e)
 {
-  free(e);
+  if (e != NULL)
+    free(e);
+}
+
+void		free_energy_cells(t_chain **ecs)
+{
+  t_link	*tmp;
+  t_energy_cell	*ec;
+
+  if (!chain_is_null(ecs))
+    {
+      tmp = (*ecs)->first;
+      while (tmp)
+	      {
+	        ec = tmp->content;
+          free_energy_cell(ec);
+	        tmp = tmp->next;
+	      }
+    }
 }
 
 json_object	*energy_cell_to_json(t_energy_cell *ec)

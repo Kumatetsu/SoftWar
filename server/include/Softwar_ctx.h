@@ -24,7 +24,9 @@ typedef struct	s_softwar_context
   unsigned int	rep_port;
   unsigned int	pub_port;
   unsigned int	cycle;
+  unsigned int  size;
   t_swsock	*active_socket;
+  char		*active_id;
   zpoller_t	*poller;
   t_chain	*sockets;
 }		t_swctx;

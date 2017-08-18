@@ -9,9 +9,9 @@
 */
 
 #include <unistd.h>
+#include "libmy.h"
 
-void	my_putchar(char c);
-
+/*
 int	my_nb_len(int n)
 {
   int	counter;
@@ -31,6 +31,7 @@ int	my_nb_len(int n)
     }
   return (counter);
 }
+*/
 
 void	display_exception()
 {

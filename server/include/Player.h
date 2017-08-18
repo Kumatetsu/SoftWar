@@ -18,8 +18,11 @@ typedef struct	s_player
   uint		y;
   uint		energy;
   uint		looking;
-}		t_player;
+}		            t_player;
 
+t_player	  *create_player(char *identity);
+void		    free_player(t_player *player);
+void		    free_players(t_chain **players);
 json_object	*player_to_json(t_player *player);
 json_object	*players_to_json(t_chain *players); 
 

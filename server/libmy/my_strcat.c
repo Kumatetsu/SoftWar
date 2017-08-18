@@ -42,7 +42,5 @@ char	*my_strcat(char *dest, char *src)
       ++j;
     }
   cat[i] = '\0';
-  my_putstr(cat);
-  my_putstr(&cat[0]);
   return (&cat[0]);
 }

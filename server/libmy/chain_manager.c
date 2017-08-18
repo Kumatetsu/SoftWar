@@ -46,7 +46,7 @@ int		add_link(t_chain **chain, void *content)
       return (1);
     }
   link->content = content;
-  if ((*chain)->first == NULL)
+  if (chain_is_empty(chain))
     {
       init_chain(chain, &link);
       init_index(chain);
@@ -67,9 +67,8 @@ int		remove_link(t_chain **chain, t_link *link)
 {
   if (link == (*chain)->first && link == (*chain)->last)
     {
-      free((*chain)->dictionnary);
-      free((*chain));
-      (*chain) = NULL;
+      (*chain)->first = NULL;
+      (*chain)->last = NULL;
       free(link);
       return (-1);
     }
@@ -105,11 +104,13 @@ int	delete_chain(t_chain **chain)
 {
   if ((*chain)->free != NULL)
     (*chain)->free(chain);
-  while ((*chain) != NULL)
+  while ((*chain)->first != NULL)
     {
       if (remove_link(chain, (*chain)->last))
 	return (1);
     }
+  free((*chain)->dictionnary);
+  free((*chain));
   return (0);
 }
 

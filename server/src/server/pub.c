@@ -21,7 +21,7 @@ zsock_t		*init_pub(int pub_port)
 {
   char		mess[50];
   zsock_t	*publisher;
-  
+
   my_log(__func__, "init publisher", 3);
   publisher = zsock_new(ZMQ_PUB);
   assert(publisher);

@@ -69,17 +69,22 @@ int		main(int argc, char *argv[])
   /*
   ** Client REP/REQ and PUB/SUB management in poller.
   */
-  int		synchroniseur;
   int		rep_port;
   int		pub_port;
-  zsock_t	*request;
+  zsock_t	*dealer;
   zsock_t	*subscriber;
   zsock_t	*active_poll;
   zpoller_t	*poller;
   char		*input;
-  char		*response;
+  zmsg_t	*msg;
+  char		*output;
+  char		**commands;
+  zmsg_t	*response;
   char		*publication;
-
+  zframe_t	*address;
+  char		log[60];
+  char		*identity;
+  
   /*
   ** hardcoded ports
   */
@@ -90,19 +95,39 @@ int		main(int argc, char *argv[])
   ** Initialisation de la socket REP/REQ côté REQUEST
   */
   my_log(__func__, "init request socket", 3);
-  request = zsock_new(ZMQ_REQ);
-  assert(request);
-  my_log(__func__, "connect request to localhost:4242", 3);
-  zsock_connect(request, "tcp://localhost:%d", rep_port);
+  dealer = zsock_new(ZMQ_DEALER);
+  assert(dealer);
+  my_log(__func__, "connect dealer to localhost:4242", 3);
+  zsock_connect(dealer, "tcp://localhost:%d", rep_port);
+
   /*
   ** On envoit un premier message qui permet
   ** de simuler une gestion du nombre de joueur
   ** côté serveur. Pareil à la déconnection.
   */
   my_log(__func__, "inform serveur of connection", 3);
-  zstr_send(request, "client connection init");
-  response = zstr_recv(request);
-  zstr_free(&response);
+  msg = zmsg_new();
+  zmsg_pushstr(msg, "identity");
+  zmsg_pushstr(msg, "identify");
+  my_log(__func__, "before zmsg send", 3);
+  zmsg_send(&msg, dealer);
+  my_log(__func__, "before zmsg recv", 3);
+  response = zmsg_recv(dealer);
+  address = zmsg_pop(response);
+  if (address == NULL)
+    my_log(__func__, "address est null", 3);
+  else
+    my_log(__func__, "address isnt null", 3);
+  output = zmsg_popstr(response);
+  commands = my_split(output, '|');
+  if (!my_strcmp(commands[0], "ok"))
+    {
+      my_log(__func__, "connection ok", 3);
+      if ((identity = my_strdup(commands[1])) == NULL)
+	return (1);
+      sprintf(log, "identity set to: %s", identity);
+      my_log(__func__, log, 3);
+    }
 
   /*
   ** On initialise le subscriber PUB/SUB
@@ -112,6 +137,7 @@ int		main(int argc, char *argv[])
   assert(subscriber);
   my_log(__func__, "connect subscriber to localhost:4243", 3);
   zsock_connect(subscriber, "tcp://localhost:%d", pub_port);
+
   /*
   ** On le lie au channel SoftWar, côté serveur,
   ** les messages envoyés devront commencer par
@@ -121,88 +147,80 @@ int		main(int argc, char *argv[])
   zsock_set_subscribe(subscriber, "SoftWar");
   while (!zsys_interrupted)
     {
-      /*
-      ** On colle le sync à 0
-      ** Ce tricks permet de recevoir
-      ** les deux retours du serveur.
-      ** Sans ca, le client récupère une socket
-      ** et redemande le readline(). Du coup, le
-      ** message du publisher (serveur) arrive après
-      ** ce nouvel input, décalage moche... 
-      ** C'est un cas pourri lié
-      ** à mon client fake context...
-      */
-      synchroniseur = 0;
+      msg = zmsg_new();
       if ((input = readline()) != NULL)
-	zstr_sendf(request, input);
+	{
+	  my_log(__func__, "before push identity", 3);
+	  zmsg_pushstr(msg, identity);
+	  my_log(__func__, "before push input", 3);
+	  zmsg_pushstr(msg, input);
+	  my_log(__func__, "before push address", 3);
+	  zmsg_send(&msg, dealer);
+	}
       my_putchar('\n');
 
-      while (!zsys_interrupted && synchroniseur < 2
-	     && "Ici, on aimerait une condition du style"
-	     && "SI message de publisher == Structure GameInfo"
-	     && "THEN tu as le droit d'entré un nouvel input"
-	     && "et donc je casse la boucle")
+      /*
+      ** CLIENT poll init
+      ** Je déclare une poll avec mes deux socket
+      */
+      my_log(__func__, "poller init", 3);
+      poller = zpoller_new(dealer, subscriber, NULL);
+      assert(poller);
+      /*
+      ** poller listen and wait
+      ** je demande à mon poller d'attendre
+      */
+      my_log(__func__, "poller wait an active socket", 3);
+      active_poll = (zsock_t*)zpoller_wait(poller, 20); // n'attendra pas plus de 20 msec
+      /*
+      ** je test sur active_poll
+      ** pour savoir quelle socket
+      ** s'est manifesté
+      */
+      if (active_poll == dealer)
 	{
-	  /*
-	  ** CLIENT poll init
-	  ** Je déclare une poll avec mes deux socket
-	  */
-	  my_log(__func__, "poller init", 3);
-	  poller = zpoller_new(request, subscriber, NULL);
-	  assert(poller);
-	  /*
-	  ** poller listen and wait
-	  ** je demande à mon poller d'attendre
-	  */
-	  my_log(__func__, "poller wait an active socket", 3);
-	  active_poll = (zsock_t*)zpoller_wait(poller, 20); // n'attendra pas plus de 20 msec
-	  /*
-	  ** je test sur active_poll
-	  ** pour savoir quelle socket
-	  ** s'est manifesté
-	  */
-	  if (active_poll == request)
+	  assert(zpoller_expired(poller) == false);
+	  assert(zpoller_terminated(poller) == false);
+	  response = zmsg_recv(dealer);
+	  address = zmsg_pop(response);
+	  while (zmsg_size(response) > 0)
 	    {
-	      assert(zpoller_expired(poller) == false);
-	      assert(zpoller_terminated(poller) == false);
-	      response = zstr_recv(request);
 	      my_putstr("\nresponse from sw_server: ");
-	      my_putstr(response);
+	      my_putstr(zmsg_popstr(response));
 	      my_putchar('\n');
-	      zstr_free(&response);
 	    }
-	  if (active_poll == subscriber)
-	    {
-	      /*
-	      ** après une publication 
-	      ** le synchroniseur passe à 2
-	      ** et on sort de la boucle pour demander
-	      ** un nouvel input.
-	      */
-	      synchroniseur = 2;
-	      assert(zpoller_expired(poller) == false);
-	      assert(zpoller_terminated(poller) == false);
-	      publication = zstr_recv(subscriber);
-	      my_putstr("\nmessage published on 4243: ");
-	      my_putstr(publication);
-	      my_putchar('\n');
-	      zstr_free(&publication);
-	    }
+	  zmsg_destroy(&response);
+	}
+      if (active_poll == subscriber)
+	{
+	  assert(zpoller_expired(poller) == false);
+	  assert(zpoller_terminated(poller) == false);
+	  publication = zstr_recv(subscriber);
+	  my_putstr("\nmessage published on 4243: ");
+	  my_putstr(publication);
+	  my_putchar('\n');
+	  zstr_free(&publication);
 	}
     }
   /*
   ** avec le zsys_interrupted, un ctrl + c nous amène là...
   */
-  zstr_sendf(request, "client connection destroy");
-  response = zstr_recv(request);
-  my_putstr("\nSoftwar says: ");
-  my_putstr(response);
-  my_putstr("\n");
-  sleep(2);
-  zsock_destroy(&request);
+  msg = zmsg_new();
+  zmsg_pushstr(msg, identity);
+  zmsg_pushstr(msg, "leave|");
+  zmsg_send(&msg, dealer);
+  zmsg_destroy(&msg);
+  response = zmsg_recv(dealer);
+  while (zmsg_size(response) > 0)
+    {
+      my_putstr("\nSoftwar says: ");
+      my_putstr(zmsg_popstr(response));
+      my_putstr("\n");
+    }
+  zmsg_destroy(&response);
+  zsock_destroy(&dealer);
   zsock_destroy(&subscriber);
   zstr_free(&input);
-  zstr_free(&response);
   zstr_free(&publication);
   zpoller_destroy(&poller);
   /*

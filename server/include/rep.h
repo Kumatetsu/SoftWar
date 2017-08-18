@@ -13,6 +13,6 @@
 
 zsock_t	*init_rep(int rep_port);
 char	*rep_read(zsock_t *socket);
-void	rep_response(zsock_t *socket, char *message);
+int	rep_response(zsock_t *socket, char *message);
 
 #endif /* !_REP_H_ */

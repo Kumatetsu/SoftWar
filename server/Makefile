@@ -20,6 +20,7 @@ LDFLAGS =       -lzmq -lczmq -L ./libmy -lmy $(shell pkg-config --libs json-c)
 
 SRC     =       main.c \
 		src/tools/argument.c \
+		src/tools/hash.c \
 		model/Softwar_ctx.c \
 		model/Notification.c \
 		model/Player.c \
@@ -27,7 +28,12 @@ SRC     =       main.c \
 		model/Game_manager.c \
 		src/server/pub.c \
 		src/server/rep.c \
+		src/server/router.c \
 		src/server/poll.c \
+		src/server/command.c \
+		src/server/exec.c \
+		src/server/runtime.c \
+
 
 OBJ     =       ${SRC:%.c=%.o}
 

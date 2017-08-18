@@ -12,21 +12,21 @@
 #include <czmq.h>
 #include "libmy.h"
 #include "Softwar_ctx.h"
-#include "poll.h"
 #include "rep.h"
+#include "router.h"
+#include "poll.h"
 
 /*
 ** Et là ca commence à me plaire,
 ** on a une poll de socket, les sockets
 ** et leurs noms, dans la même variable...
 */
-char   		*init_poll(t_swctx **ctx)
+zmsg_t  	*init_poll(t_swctx **ctx)
 {
-  char		*message;
+  zmsg_t	*message;
   t_link	*tmp;
   t_swsock	*sw_socket;
-  
-  my_log(__func__, "init ctx poller", 3);
+
   (*ctx)->poller = zpoller_new(NULL);
   tmp = (*ctx)->sockets->first;
   while (tmp)
@@ -42,8 +42,8 @@ char   		*init_poll(t_swctx **ctx)
     }
   if (!listen_and_wait(ctx))
     message = read_socket(ctx);
-  else
-    message = NULL;
+  if (!message)
+    my_log(__func__, "no message return... failed", 2);
   return (message);
 }
 
@@ -58,12 +58,11 @@ int		listen_and_wait(t_swctx **ctx)
   t_link	*tmp;
   t_swsock	*sw_socket;
 
-  my_log(__func__, "wait an active socket", 3);
   tmp = (*ctx)->sockets->first;
+  my_log(__func__, "wait an active socket", 3);
   (*ctx)->active_socket->socket = (zsock_t*)zpoller_wait((*ctx)->poller, -1);
   assert(zpoller_expired((*ctx)->poller) == false);
   assert(zpoller_terminated((*ctx)->poller) == false);
-  my_log(__func__, "active socket detected", 3);
   while (tmp)
     {
       sw_socket = tmp->content;
@@ -74,6 +73,10 @@ int		listen_and_wait(t_swctx **ctx)
     }
   if ((*ctx)->active_socket->name == NULL)
     {
+      /*
+      ** retourne mais affiche un warning,
+      ** un fail ici n'arrête pas le serveur pour autant.
+      */
       my_log(__func__, "polling failed: unable to retrieve active socket", 2);
       return (1);
     }
@@ -83,18 +86,24 @@ int		listen_and_wait(t_swctx **ctx)
 }
 
 /*
-** Fonction chargée de faire le mini router interne
-** permet de gérer les messages en fonction de la socket.
+** Pour le moment, le couple read_socket/router_read
+** est inutile...
+** La fonction read_socket aurait pour but de différencier
+** le traitement en fonction de la socket. 
 */
-char	*read_socket(t_swctx **ctx)
+zmsg_t		*read_socket(t_swctx **ctx)
 {
-  char	*message;
+  zmsg_t	*msg;
 
   my_log(__func__, "try to compare setted active socket with known ones", 3);
-  if (!my_strcmp((*ctx)->active_socket->name, "responder"))
+  if (!my_strcmp((*ctx)->active_socket->name, "router"))
     {
-      message = rep_read((*ctx)->active_socket->socket);
-      return (message);
+      if ((msg = router_read((*ctx)->active_socket->socket)) == NULL)
+	{
+	  my_log(__func__, "reading router socket failed", 1);
+	  return (NULL);
+	}
+      return (msg);
     }
   my_log(__func__, "unable to compare the active socket, no match", 2);
   return (NULL);
@@ -103,13 +112,13 @@ char	*read_socket(t_swctx **ctx)
 /*
 ** Retrouve la socket dans le ctx grâce à son nom
 */
-zsock_t		*get_socket(char *name, t_swctx *ctx)
+zsock_t		*get_socket(char *name, t_swctx **ctx)
 {
   char		log[BUFFER];
   t_link	*tmp;
   t_swsock	*sw_s;
 
-  tmp = ctx->sockets->first;
+  tmp = (*ctx)->sockets->first;
   while (tmp)
     {
       sw_s = tmp->content;

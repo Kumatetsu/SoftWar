@@ -21,7 +21,7 @@ zsock_t		*init_rep(int rep_port)
 {
   zsock_t	*r;
 
-  my_log(__func__, "init responder", 3);
+  my_log(__func__, "init rep", 3);
   r = zsock_new(ZMQ_REP);
   assert(r);
   my_log(__func__, "bind responder to port 4242", 3);
@@ -39,26 +39,19 @@ char	*rep_read(zsock_t *socket)
   my_putstr_color("cyan", "\nMessage received from [user]: ");
   my_putstr(message);
   my_putchar('\n');
-  rep_response(socket, message);
   return (message);
 }
 
-void	rep_response(zsock_t *socket, char *message )
+int	rep_response(zsock_t *socket, char *message )
 {
   char	log[60];
+  char	*output;
 
-  sprintf(log, "response to request: %s", message);
+  if ((output = my_strdup(message)) == NULL)
+    return (1);
+  sprintf(log, "response to request: %s", output);
   my_log(__func__, log, 3);
-  if (!my_strcmp(message, "client connection init"))
-    {
-      zstr_sendf(socket, "%s", "Client connection acknowledge");
-      // ctx->players++;
-    }
-  else if(!my_strcmp(message, "client connection destroyed"))
-    {
-      zstr_sendf(socket, "Good Bye!");
-      // ctx->players--;
-    }
-  else
-    zstr_sendf(socket, "%s", message);
+  zstr_sendf(socket, "%s", output);
+  free(output);
+  return (0);
 }

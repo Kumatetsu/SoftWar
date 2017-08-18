@@ -28,6 +28,7 @@ SRC	=	my_putchar.c \
 		my_strncat.c \
 		my_strstr.c \
 		my_str_to_wordtab.c \
+		my_split.c \
 		my_strdup.c \
 		my_string.c \
 		readline.c \

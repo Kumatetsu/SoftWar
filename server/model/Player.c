@@ -27,16 +27,40 @@ t_player	*create_player(char *identity)
       my_log(__func__, MEM_ERR, 1);
       return (NULL);
     }
-  if ((p->name = my_strdup(name)) == NULL)
+  if ((p->identity = my_strdup(identity)) == NULL)
     return (NULL);
   p->energy = 50;
+  p->looking = 0;
+  p->x = 0;
+  p->y = 0;
   return (p);
 }
 
-void	free_player(t_player *p)
+void		free_player(t_player *p)
 {
-  free(p->name);
-  free(p);
+  if (p != NULL)
+	  {
+	    if (p->identity != NULL)
+	      free(p->identity);
+	    free(p);
+	  }
+}
+
+void		free_players(t_chain **players)
+{
+  t_link	*tmp;
+  t_player	*p;
+
+  if (!chain_is_null(players))
+    {
+      tmp = (*players)->first;
+      while (tmp)
+	{
+	  p = tmp->content;
+    free_player(p);
+    tmp = tmp->next;
+	}
+    }
 }
 
 json_object	*player_to_json(t_player *player)
@@ -68,6 +92,8 @@ json_object	*players_to_json(t_chain *players)
   t_player	*p;
   json_object	*players_json;
 
+  if (players == NULL || players->first == NULL)
+    return (NULL);
   players_json = json_object_new_array();
   tmp = players->first;
   while(tmp)
