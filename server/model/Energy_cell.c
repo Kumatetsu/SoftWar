@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Tue Jul 11 17:41:31 2017 BILLAUD Jean
-** Last update Wed Jul 12 16:53:30 2017 BILLAUD Jean
+** Last update Fri Aug 18 16:37:36 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -43,11 +43,11 @@ void		free_energy_cells(t_chain **ecs)
     {
       tmp = (*ecs)->first;
       while (tmp)
-	      {
-	        ec = tmp->content;
+	{
+	  ec = tmp->content;
           free_energy_cell(ec);
-	        tmp = tmp->next;
-	      }
+	  tmp = tmp->next;
+	}
     }
 }
 

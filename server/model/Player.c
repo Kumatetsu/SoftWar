@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Tue Jul 11 17:07:34 2017 BILLAUD Jean
-** Last update Wed Jul 12 16:55:27 2017 BILLAUD Jean
+** Last update Sat Aug 19 16:24:59 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -39,11 +39,11 @@ t_player	*create_player(char *identity)
 void		free_player(t_player *p)
 {
   if (p != NULL)
-	  {
-	    if (p->identity != NULL)
-	      free(p->identity);
-	    free(p);
-	  }
+    {
+      if (p->identity != NULL)
+	free(p->identity);
+      free(p);
+    }
 }
 
 void		free_players(t_chain **players)
