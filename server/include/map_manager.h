@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Fri Aug 18 17:01:41 2017 BILLAUD Jean
-** Last update Sat Aug 19 22:18:03 2017 BILLAUD Jean
+** Last update Sun Aug 20 18:24:42 2017 BILLAUD Jean
 */
 
 #ifndef  _MAP_MANAGER_H_
@@ -22,3 +22,5 @@ typedef struct	s_map_manager
 t_map_manager	*get_map_manager();
 
 #endif /* !_GAME_INFO_H_ */
+
+/**test **/
