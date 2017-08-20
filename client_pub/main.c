@@ -5,13 +5,13 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sat Jul  1 01:11:51 2017 CASTELLARNAU Aurelien
-** Last update Sat Jul  1 02:29:20 2017 CASTELLARNAU Aurelien
+** Last update Sat Aug 19 20:28:27 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <czmq.h>
-#include "libmy.h"
+#include "../server/libmy/libmy.h"
 #include "protocol.h"
 #include "argument.h"
 

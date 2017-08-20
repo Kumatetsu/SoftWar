@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Sat Aug 19 17:21:50 2017 BILLAUD Jean
-** Last update Sat Aug 19 22:16:34 2017 BILLAUD Jean
+** Last update Sun Aug 20 18:12:05 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -31,7 +31,7 @@ int		get_pos(char *identity, t_chain *players)
 	}
       player = player->next;
     }
-  return (0);
+  return (-1);
 }
 
 /*
