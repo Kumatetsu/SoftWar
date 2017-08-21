@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Sun Jul 16 03:34:56 2017 CASTELLARNAU Aurelien
+** Last update Mon Aug 21 17:25:59 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -18,6 +18,7 @@
 #include "Game_manager.h"
 #include "hash.h"
 #include "command.h"
+#include "Enum.h"
 
 /*
 ** génère un unique id
@@ -130,10 +131,27 @@ char		*leave(t_game_manager **manager, char *identity, char *optional)
 char		*forward(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
-  //  t_player	*player;
+  t_player	*player;
 
-  if ((*manager)->ready)
+  if ((*manager)->ready) {    
     sprintf(log, "manager ready, parameter: %s", identity);
+    player = manager->get_player(identity);
+    switch (player->position)
+      {
+      case LEFT:
+	player->x = player->x - 1;
+	break;
+      case UP:
+	player->y = player->y - 1;
+	break;
+      case RIGHT:
+	player->x = player->x + 1;
+	break;
+      case DOWN:
+	player->y = player->y + 1;
+	break;
+    }
+  }
   else
     sprintf(log, "manager not ready, parameter: %s", identity);
   my_log(__func__, "call function forward", 3);

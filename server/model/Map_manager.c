@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Sat Aug 19 17:21:50 2017 BILLAUD Jean
-** Last update Sun Aug 20 18:12:05 2017 BILLAUD Jean
+** Last update Mon Aug 21 16:24:15 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -25,8 +25,8 @@ int		get_pos(char *identity, t_chain *players)
     {
       if (my_strcmp(identity, player->identity == 0))
 	{
-	  pos[1] = player->x;
-	  pos[2] = player->y;
+	  pos[0] = player->x;
+	  pos[1] = player->y;
 	  return (pos);
 	}
       player = player->next;
