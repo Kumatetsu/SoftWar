@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Jul 12 13:50:33 2017 CASTELLARNAU Aurelien
-** Last update Wed Jul 12 14:16:41 2017 CASTELLARNAU Aurelien
+** Last update Tue Aug 22 18:01:03 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -90,6 +90,19 @@ t_chain		*get_players()
   
   game_info = get_info();
   return ((*game_info)->players);
+}
+
+void			set_players_pos(t_game_manager **manager)
+{
+  t_player 		*player;
+  static uint 	const map_size = (*manager)->get_map_size;
+  static int 	const pos[4][2] = {
+    {0, map_size, 0, map_size},
+    {0, 0, map_size, map_size}
+  };
+  
+  player = (*manager)->get_players->first;
+  my_putstr(player->identity);
 }
 
 t_chain		*get_energy_cells()
@@ -195,6 +208,7 @@ t_game_manager		*get_game_manager()
       manager->get_energy_cells = &get_energy_cells;
       manager->set_map_size	= &set_map_size;
       manager->set_game_status	= &set_game_status;
+      manager->set_players_pos  = &set_players_pos;
       manager->add_player	= &add_player;
       manager->set_energy_cells = &set_energy_cells;
       manager->serialize	= &game_info_to_json;

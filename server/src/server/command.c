@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Mon Aug 21 17:25:59 2017 BILLAUD Jean
+** Last update Tue Aug 22 17:55:31 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -126,7 +126,15 @@ char		*leave(t_game_manager **manager, char *identity, char *optional)
 }
 
 /*
-** fonctions non définies
+** fonctions en cours de définition,
+** la mise en place des mouvement et des energy cells va permettre de facilement
+** définir des fonctions de map pour qu'elle soient utilisable et pour les energy cells
+** et pour les players !
+** phase 1 : gérer les mouvements
+** phase 2 : gérer le placement initial des players et apparition des energy cells
+** phase 3 : gérer les calculs de map sur map manager
+** phse 4 et fin: mettre map manager in game manager
+** phase 5 (bonus): faire en sorte que ça marche xD
 */
 char		*forward(t_game_manager **manager, char *identity, char *optional)
 {
@@ -135,8 +143,8 @@ char		*forward(t_game_manager **manager, char *identity, char *optional)
 
   if ((*manager)->ready) {    
     sprintf(log, "manager ready, parameter: %s", identity);
-    player = manager->get_player(identity);
-    switch (player->position)
+    player = (*manager)->get_player(identity);
+    switch (player->looking)
       {
       case LEFT:
 	player->x = player->x - 1;
@@ -159,25 +167,49 @@ char		*forward(t_game_manager **manager, char *identity, char *optional)
   return (identity);
 }
 
-char	*backward(t_game_manager **manager, char *identity, char *optional)
+char		*backward(t_game_manager **manager, char *identity, char *optional)
 {
-  char	log[50];
-
-  if ((*manager)->ready)
+  char		log[50];
+  t_player	*player;
+  
+  if ((*manager)->ready) {
     sprintf(log, "manager ready, parameter: %s", identity);
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
+    player = (*manager)->get_player(identity);
+    switch (player->looking)
+      {
+      case LEFT:
+	player->x = player->x + 1;
+	break;
+      case UP:
+	player->y = player->y + 1;
+	break;
+      case RIGHT:
+	player->x = player->x - 1;
+	break;
+      case DOWN:
+	player->y = player->y - 1;
+	break;
+      }
+  }
+ else
+   sprintf(log, "manager not ready, parameter: %s", identity);
   my_log(__func__, "call function backward", 3);
   my_log(__func__, optional, 3);
   return (identity);
 }
 
-char	*leftfwd(t_game_manager **manager, char *identity, char *optional)
+char		*leftfwd(t_game_manager **manager, char *identity, char *optional)
 {
-  char	log[50];
-
-  if ((*manager)->ready)
+  char		log[50];
+  t_player	*player;
+  
+  if ((*manager)->ready) {
     sprintf(log, "manager ready, parameter: %s", identity);
+    //le optionnal je suis vraiment pas sûr je sais pas dans quel cas il sera là???
+    //donc coup de poker ça sera changé si besoin;
+    left(manager, identity, optional);
+    forward(manager,identity, optional);
+  }
   else
     sprintf(log, "manager not ready, parameter: %s", identity);
   my_log(__func__, "call function leftfwd", 3);
@@ -185,12 +217,16 @@ char	*leftfwd(t_game_manager **manager, char *identity, char *optional)
   return (identity);
 }
 
-char	*rightfwd(t_game_manager **manager, char *identity, char *optional)
+char		*rightfwd(t_game_manager **manager, char *identity, char *optional)
 {
-  char	log[50];
+  char		log[50];
+  t_player	*player;
 
-  if ((*manager)->ready)
+  if ((*manager)->ready) {
     sprintf(log, "manager ready, parameter: %s", identity);
+    righ(manager, identity, optional);
+    forward(manager, identity, optional);
+  }
   else
     sprintf(log, "manager not ready, parameter: %s", identity);
   my_log(__func__, "call function rightfwd", 3);
@@ -198,12 +234,20 @@ char	*rightfwd(t_game_manager **manager, char *identity, char *optional)
   return (identity);
 }
 
-char	*left(t_game_manager **manager, char *identity, char *optional)
+char		*left(t_game_manager **manager, char *identity, char *optional)
 {
-  char	log[50];
+  char		log[50];
+  t_player	*player;
 
-  if ((*manager)->ready)
+  if ((*manager)->ready){
     sprintf(log, "manager ready, parameter: %s", identity);
+    player = (*manager)->get_player(identity);
+    if (player->looking == LEFT) {
+      player->looking = DOWN;
+    } else {
+      player->looking--;
+    }
+  }
   else
     sprintf(log, "manager not ready, parameter: %s", identity);
   my_log(__func__, "call function left", 3);
@@ -211,12 +255,20 @@ char	*left(t_game_manager **manager, char *identity, char *optional)
   return (identity);
 }
 
-char	*right(t_game_manager **manager, char *identity, char *optional)
+char		*right(t_game_manager **manager, char *identity, char *optional)
 {
-  char	log[50];
-
-  if ((*manager)->ready)
+  char		log[50];
+  t_player	*player;
+  
+  if ((*manager)->ready) {
     sprintf(log, "manager ready, parameter: %s", identity);
+    player = (*manager)->get_player(identity);
+    if (player->looking == DOWN){
+      player->looking = LEFT;
+    } else {
+      player->looking++;
+    }
+  }
   else
     sprintf(log, "manager not ready, parameter: %s", identity);
   my_log(__func__, "call function right", 3);
