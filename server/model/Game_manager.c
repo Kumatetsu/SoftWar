@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Jul 12 13:50:33 2017 CASTELLARNAU Aurelien
-** Last update Thu Aug 24 17:21:08 2017 BILLAUD Jean
+** Last update Thu Aug 24 17:37:45 2017 BILLAUD Jean
 */
 
 #include <time.h>
@@ -136,16 +136,21 @@ void		set_game_status(uint game_status)
   (*game_info)->game_status = game_status;
 }
 
-void		energy_fall(t_chain *energys, uint map_size)
+void		energy_fall(uint map_size)
 {
   int		x;
   int		y;
   int		power;
-  
+  t_game_info	**game_info;
+
+  game_info = get_info();
   srand(time(NULL));
   x = rand() % (map_size + 1);
   y = rand() % (map_size + 1);
   power = rand() % (15 - 5) + 5;
+  if (add_link(&((*game_info)->energy_cells), create_energy_cell(x, y, power)))
+    return;
+  return;
 }
 
 int		add_player(t_player *player)

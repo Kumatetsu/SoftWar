@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Jul 12 13:28:35 2017 CASTELLARNAU Aurelien
-** Last update Thu Aug 24 17:24:12 2017 BILLAUD Jean
+** Last update Thu Aug 24 17:34:20 2017 BILLAUD Jean
 */
 
 #ifndef  _GAME_MANAGER_H_
@@ -37,7 +37,7 @@ typedef struct	s_game_manager
   int		(*add_player)(t_player *player);
   void		(*set_energy_cells)(t_chain *ecs);
   void		(*set_players_pos)(t_chain *players, uint map_size);
-  void		(*energy_fall)(t_chain *energys, uint map_size);
+  void		(*energy_fall)(uint map_size);
   t_game_info	**(*get_info)();
   json_object	*(*serialize)(void);
   int		ready;
