@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Jul 12 13:50:33 2017 CASTELLARNAU Aurelien
-** Last update Tue Aug 22 20:37:55 2017 BILLAUD Jean
+** Last update Thu Aug 24 16:48:33 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -95,10 +95,20 @@ t_chain		*get_players()
 void			set_players_pos(t_chain *players, uint map)
 {
   t_link		*node_player;
+  t_player		*player;
+  int			i;
   int 			x[4] = {0, map, 0, map};
   int			y[4] = {0, 0, map, map};
-  
+
+  i = 0;
   node_player = (players->first);
+  while (node_player) {
+    player = (t_player*)node_player->content;
+    player->x = x[i];
+    player->y = y[i];
+    i++;
+    node_player = node_player->next;
+  }
 }
 
 t_chain		*get_energy_cells()

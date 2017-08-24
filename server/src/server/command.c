@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Tue Aug 22 17:55:31 2017 BILLAUD Jean
+** Last update Thu Aug 24 16:49:16 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -201,7 +201,6 @@ char		*backward(t_game_manager **manager, char *identity, char *optional)
 char		*leftfwd(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
-  t_player	*player;
   
   if ((*manager)->ready) {
     sprintf(log, "manager ready, parameter: %s", identity);
@@ -220,11 +219,10 @@ char		*leftfwd(t_game_manager **manager, char *identity, char *optional)
 char		*rightfwd(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
-  t_player	*player;
 
   if ((*manager)->ready) {
     sprintf(log, "manager ready, parameter: %s", identity);
-    righ(manager, identity, optional);
+    right(manager, identity, optional);
     forward(manager, identity, optional);
   }
   else
