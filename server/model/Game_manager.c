@@ -5,9 +5,10 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Jul 12 13:50:33 2017 CASTELLARNAU Aurelien
-** Last update Thu Aug 24 16:48:33 2017 BILLAUD Jean
+** Last update Thu Aug 24 17:21:08 2017 BILLAUD Jean
 */
 
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <json/json.h>
@@ -92,13 +93,13 @@ t_chain		*get_players()
   return ((*game_info)->players);
 }
 
-void			set_players_pos(t_chain *players, uint map)
+void			set_players_pos(t_chain *players, uint map_size)
 {
   t_link		*node_player;
   t_player		*player;
   int			i;
-  int 			x[4] = {0, map, 0, map};
-  int			y[4] = {0, 0, map, map};
+  int 			x[4] = {0, map_size, 0, map_size};
+  int			y[4] = {0, 0, map_size, map_size};
 
   i = 0;
   node_player = (players->first);
@@ -135,6 +136,18 @@ void		set_game_status(uint game_status)
   (*game_info)->game_status = game_status;
 }
 
+void		energy_fall(t_chain *energys, uint map_size)
+{
+  int		x;
+  int		y;
+  int		power;
+  
+  srand(time(NULL));
+  x = rand() % (map_size + 1);
+  y = rand() % (map_size + 1);
+  power = rand() % (15 - 5) + 5;
+}
+
 int		add_player(t_player *player)
 {
   t_game_info   **game_info;
@@ -145,6 +158,10 @@ int		add_player(t_player *player)
   return (0);
 }
 
+/**
+ ** Pas convaincu par cette fonction, on peut faire pop qu'un cell d'energie
+ ** par round, on aura jamais à remaplce la t_chain créer à l'init du game, juste à add ou delete des energy cells...
+ */
 void		set_energy_cells(t_chain *ecs)
 {
   t_game_info   **game_info;
@@ -217,6 +234,7 @@ t_game_manager		*get_game_manager()
       manager->set_players_pos  = &set_players_pos;
       manager->add_player	= &add_player;
       manager->set_energy_cells = &set_energy_cells;
+      manager->energy_fall      = &energy_fall;
       manager->serialize	= &game_info_to_json;
       manager->ready		= 0;
     }
