@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Jul 12 13:50:33 2017 CASTELLARNAU Aurelien
-** Last update Thu Aug 24 17:37:45 2017 BILLAUD Jean
+** Last update Sun Aug 27 14:57:57 2017 BILLAUD Jean
 */
 
 #include <time.h>
@@ -98,8 +98,8 @@ void			set_players_pos(t_chain *players, uint map_size)
   t_link		*node_player;
   t_player		*player;
   int			i;
-  int 			x[4] = {0, map_size, 0, map_size};
-  int			y[4] = {0, 0, map_size, map_size};
+  int 			x[4] = {map_size, 0, map_size, 0};
+  int			y[4] = {map_size, map_size, 0, 0};
 
   i = 0;
   node_player = (players->first);
@@ -142,13 +142,16 @@ void		energy_fall(uint map_size)
   int		y;
   int		power;
   t_game_info	**game_info;
+  t_energy_cell	*ecs;
 
   game_info = get_info();
   srand(time(NULL));
   x = rand() % (map_size + 1);
   y = rand() % (map_size + 1);
-  power = rand() % (15 - 5) + 5;
-  if (add_link(&((*game_info)->energy_cells), create_energy_cell(x, y, power)))
+  power = rand() % (15 - 5) + 5; 
+  if ((ecs = create_energy_cell(x, y, power)) == NULL)
+    return;
+  if (add_link(&((*game_info)->energy_cells), ecs))
     return;
   return;
 }
