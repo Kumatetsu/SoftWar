@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Jul 12 13:50:33 2017 CASTELLARNAU Aurelien
-** Last update Sun Aug 27 14:57:57 2017 BILLAUD Jean
+** Last update Sun Aug 27 16:35:41 2017 BILLAUD Jean
 */
 
 #include <time.h>
@@ -15,6 +15,7 @@
 #include "libmy.h"
 #include "Player.h"
 #include "Energy_cell.h"
+#include "map_manager.h"
 #include "Game_manager.h"
 
 t_game_info		**init_game_info(unsigned int map_size,
@@ -244,6 +245,7 @@ t_game_manager		*get_game_manager()
       manager->set_energy_cells = &set_energy_cells;
       manager->energy_fall      = &energy_fall;
       manager->serialize	= &game_info_to_json;
+      manager->map_manager      = &get_map_manager;
       manager->ready		= 0;
     }
   return (manager);
