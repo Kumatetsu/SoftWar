@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Sat Aug 19 17:21:50 2017 BILLAUD Jean
-** Last update Mon Sep  4 17:44:00 2017 BILLAUD Jean
+** Last update Mon Sep  4 20:38:12 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -31,7 +31,7 @@ int		is_free_square(uint x, uint y, t_chain *players, t_chain *ecs)
     {
       if (((t_player *)(tp->content))->x == x
 	  && ((t_player *)(tp->content))->y == y)
-	return (0);
+	return (1);
       tp = tp->next;
     }
 
@@ -43,14 +43,14 @@ int		is_free_square(uint x, uint y, t_chain *players, t_chain *ecs)
       te = te->next;
     }
 
-  return (1);
+  return (0);
 }
 
 int	is_wall(uint x, uint y, uint map_size)
 {
   if (x > map_size || y > map_size)
-    return (0);
-  return (1);
+    return (1);
+  return (0);
 }
 
 

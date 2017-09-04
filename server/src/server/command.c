@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep  4 17:48:09 2017 BILLAUD Jean
+** Last update Mon Sep  4 20:48:14 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -19,6 +19,7 @@
 #include "hash.h"
 #include "command.h"
 #include "Enum.h"
+#include "utils.h"
 
 /*
 ** génère un unique id
@@ -50,7 +51,7 @@ char		*identify(t_game_manager **manager, char *identity, char *optional)
   if ((*manager)->ready)
     {
       my_log(__func__, "server full", 3);
-      if ((output = my_strdup("ko|server full")) == NULL)
+      if((output = my_strdup("ko|server full")) == NULL)
 	return (NULL);
       return (output);
     }
@@ -136,10 +137,12 @@ char		*leave(t_game_manager **manager, char *identity, char *optional)
 ** phse 4 et fin: mettre map manager in game manager
 ** phase 5 (bonus): faire en sorte que ça marche xD
 */
-char		*forward(t_game_manager **manager, char *identity, char *optional)
+int		forward(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
   t_player	*p;
+  t_chain	*players;
+  t_chain	*ecs;
   t_map_manager *map;
   /*
    ** Je suis pas sûr de ce if else, ça serait pas au programme de faire en sorte que l'ia soit en 2 phase?
@@ -149,23 +152,29 @@ char		*forward(t_game_manager **manager, char *identity, char *optional)
   if ((*manager)->ready) {    
     sprintf(log, "manager ready, parameter: %s", identity);
     p = (*manager)->get_player(identity);
+    players = (*manager)->get_players();
+    ecs = (*manager)->get_energy_cells();
     map = (*manager)->map_manager();
     switch (p->looking)
       {
       case LEFT:
-	if (map->is_wall(p->x - 1, p->y, (*manager)->get_map_size()) == 0) {
-	  sprintf(log, "%s try to go in a wall", identity);
-	  return (0);
-	}
+	if (check_mvmnt(p->x - 1, p->y, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
+	  return (1);
 	p->x = p->x - 1;
 	break;
       case UP:
+	if (check_mvmnt(p->x, p->y - 1, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
+	  return (1);
 	p->y = p->y - 1;
 	break;
       case RIGHT:
+	if (check_mvmnt(p->x + 1, p->y, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
+	  return (1);
 	p->x = p->x + 1;
 	break;
       case DOWN:
+	if (check_mvmnt(p->x, p->y + 1, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
+	  return (1);
 	p->y = p->y + 1;
 	break;
     }
@@ -174,7 +183,7 @@ char		*forward(t_game_manager **manager, char *identity, char *optional)
     sprintf(log, "manager not ready, parameter: %s", identity);
   my_log(__func__, "call function forward", 3);
   my_log(__func__, optional, 3);
-  return (identity);
+  return (0);
 }
 
 char		*backward(t_game_manager **manager, char *identity, char *optional)
@@ -188,7 +197,6 @@ char		*backward(t_game_manager **manager, char *identity, char *optional)
     switch (player->looking)
       {
       case LEFT:
-	if ()
 	player->x = player->x + 1;
 	break;
       case UP:
