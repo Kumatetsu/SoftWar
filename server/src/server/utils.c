@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Mon Sep  4 20:05:35 2017 BILLAUD Jean
-** Last update Mon Sep  4 20:44:55 2017 BILLAUD Jean
+** Last update Mon Sep  4 21:21:56 2017 BILLAUD Jean
 */
 
 
@@ -24,19 +24,17 @@
 
 int		check_mvmnt(uint x, uint y, t_map_manager *map, t_chain *players, t_chain *ecs, uint map_size, char *identity)
 {
-  switch (true)
-    {
-    case (map->is_wall(x, y, map_size) == 1):
-      sprintf(log, "%s tried to go in a wall", identity);
-      return (1);
-    case (map->is_free_square(x, y, players, ecs) == 1):
-      sprintf(log, "%s tried to walk on another player", identity);
-      return (1);
-    case (map->is_free_square(x, y, players, ecs) == 2):
-      sprintf(log, "%s increased his power", identity);
-      /*ici on va avoir besoin d'un add Energy to player + delete energy cell*/
-      return (0);
-    default:
-      return (0);
-    }
+  char		log[50];
+  if (map->is_wall(x, y, map_size) == 1) {
+    sprintf(log, "%s tried to go in a wall", identity);
+    return (1);
+  } else if (map->is_free_square(x, y, players, ecs) == 1) {
+    sprintf(log, "%s tried to walk on another player", identity);
+    return (1);
+  } else if (map->is_free_square(x, y, players, ecs) == 2) {
+    sprintf(log, "%s increased his power", identity);
+    /*ici on va avoir besoin d'un add Energy to player + delete energy cell*/
+    return (0);
+  } else
+    return (0);
 }

@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep  4 20:48:14 2017 BILLAUD Jean
+** Last update Mon Sep  4 21:21:57 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -17,9 +17,10 @@
 #include "Energy_cell.h"
 #include "Game_manager.h"
 #include "hash.h"
+#include "utils.h"
 #include "command.h"
 #include "Enum.h"
-#include "utils.h"
+
 
 /*
 ** génère un unique id
@@ -137,7 +138,7 @@ char		*leave(t_game_manager **manager, char *identity, char *optional)
 ** phse 4 et fin: mettre map manager in game manager
 ** phase 5 (bonus): faire en sorte que ça marche xD
 */
-int		forward(t_game_manager **manager, char *identity, char *optional)
+char		*forward(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
   t_player	*p;
@@ -159,23 +160,27 @@ int		forward(t_game_manager **manager, char *identity, char *optional)
       {
       case LEFT:
 	if (check_mvmnt(p->x - 1, p->y, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
-	  return (1);
-	p->x = p->x - 1;
+	  sprintf(log, "%s can't move left", identity);
+	else
+	  p->x = p->x - 1;
 	break;
       case UP:
 	if (check_mvmnt(p->x, p->y - 1, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
-	  return (1);
-	p->y = p->y - 1;
+	  sprintf(log, "%s can't move up", identity);
+	else
+	  p->y = p->y - 1;
 	break;
       case RIGHT:
 	if (check_mvmnt(p->x + 1, p->y, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
-	  return (1);
-	p->x = p->x + 1;
+	  sprintf(log, "%s can't move right", identity);
+	else
+	  p->x = p->x + 1;
 	break;
       case DOWN:
 	if (check_mvmnt(p->x, p->y + 1, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
-	  return (1);
-	p->y = p->y + 1;
+	  sprintf(log, "%s can't move down", identity);
+	else
+	  p->y = p->y + 1;
 	break;
     }
   }
@@ -183,7 +188,7 @@ int		forward(t_game_manager **manager, char *identity, char *optional)
     sprintf(log, "manager not ready, parameter: %s", identity);
   my_log(__func__, "call function forward", 3);
   my_log(__func__, optional, 3);
-  return (0);
+  return (identity);
 }
 
 char		*backward(t_game_manager **manager, char *identity, char *optional)

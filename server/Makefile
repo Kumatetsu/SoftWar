@@ -5,7 +5,7 @@
 ## Login   <castel_a@etna-alternance.net>
 ## 
 ## Started on  Wed Feb  1 09:37:15 2017 CASTELLARNAU Aurelien
-## Last update Sun Aug 27 15:27:25 2017 BILLAUD Jean
+## Last update Mon Sep  4 21:05:41 2017 BILLAUD Jean
 ##
 
 CC      =       gcc
@@ -31,6 +31,7 @@ SRC     =       main.c \
 		src/server/rep.c \
 		src/server/router.c \
 		src/server/poll.c \
+		src/server/utils.c \
 		src/server/command.c \
 		src/server/exec.c \
 		src/server/runtime.c \
