@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Sun Aug 27 15:18:27 2017 BILLAUD Jean
+** Last update Mon Sep  4 17:48:09 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -139,24 +139,34 @@ char		*leave(t_game_manager **manager, char *identity, char *optional)
 char		*forward(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
-  t_player	*player;
-
+  t_player	*p;
+  t_map_manager *map;
+  /*
+   ** Je suis pas sûr de ce if else, ça serait pas au programme de faire en sorte que l'ia soit en 2 phase?
+   ** une phase out game où il a seulement accès à identity et un autre ou il a accès à ses commandes?
+   ** parce que je trouve ça un peu "sale" d'avoir des commandes qui doivent toutes checker si le jeu a commencé ^^' 
+   */
   if ((*manager)->ready) {    
     sprintf(log, "manager ready, parameter: %s", identity);
-    player = (*manager)->get_player(identity);
-    switch (player->looking)
+    p = (*manager)->get_player(identity);
+    map = (*manager)->map_manager();
+    switch (p->looking)
       {
       case LEFT:
-	player->x = player->x - 1;
+	if (map->is_wall(p->x - 1, p->y, (*manager)->get_map_size()) == 0) {
+	  sprintf(log, "%s try to go in a wall", identity);
+	  return (0);
+	}
+	p->x = p->x - 1;
 	break;
       case UP:
-	player->y = player->y - 1;
+	p->y = p->y - 1;
 	break;
       case RIGHT:
-	player->x = player->x + 1;
+	p->x = p->x + 1;
 	break;
       case DOWN:
-	player->y = player->y + 1;
+	p->y = p->y + 1;
 	break;
     }
   }
@@ -178,6 +188,7 @@ char		*backward(t_game_manager **manager, char *identity, char *optional)
     switch (player->looking)
       {
       case LEFT:
+	if ()
 	player->x = player->x + 1;
 	break;
       case UP:
