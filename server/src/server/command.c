@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep  4 21:21:57 2017 BILLAUD Jean
+** Last update Tue Sep  5 17:32:54 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -145,11 +145,7 @@ char		*forward(t_game_manager **manager, char *identity, char *optional)
   t_chain	*players;
   t_chain	*ecs;
   t_map_manager *map;
-  /*
-   ** Je suis pas sûr de ce if else, ça serait pas au programme de faire en sorte que l'ia soit en 2 phase?
-   ** une phase out game où il a seulement accès à identity et un autre ou il a accès à ses commandes?
-   ** parce que je trouve ça un peu "sale" d'avoir des commandes qui doivent toutes checker si le jeu a commencé ^^' 
-   */
+  
   if ((*manager)->ready) {    
     sprintf(log, "manager ready, parameter: %s", identity);
     p = (*manager)->get_player(identity);
@@ -194,24 +190,42 @@ char		*forward(t_game_manager **manager, char *identity, char *optional)
 char		*backward(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
-  t_player	*player;
+  t_player	*p;
+  t_chain	*players;
+  t_chain	*ecs;
+  t_map_manager *map;
   
+  players = (*manager)->get_players();
+  ecs = (*manager)->get_energy_cells();
+  map = (*manager)->map_manager();
   if ((*manager)->ready) {
     sprintf(log, "manager ready, parameter: %s", identity);
-    player = (*manager)->get_player(identity);
-    switch (player->looking)
+    p = (*manager)->get_player(identity);
+    switch (p->looking)
       {
       case LEFT:
-	player->x = player->x + 1;
+	if (check_mvmnt(p->x + 1, p->y, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
+	  sprintf(log, "%s can't backward right", identity);
+	else
+	p->x = p->x + 1;
 	break;
       case UP:
-	player->y = player->y + 1;
+	if (check_mvmnt(p->x, p->y + 1, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
+	  sprintf(log, "%s can't backward down", identity);
+	else
+	p->y = p->y + 1;
 	break;
       case RIGHT:
-	player->x = player->x - 1;
+	if (check_mvmnt(p->x - 1, p->y, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
+	  sprintf(log, "%s can't backward left", identity);
+	else
+	p->x = p->x - 1;
 	break;
       case DOWN:
-	player->y = player->y - 1;
+	if (check_mvmnt(p->x, p->y + 1, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
+	  sprintf(log, "%s can't backward up", identity);
+	else
+	p->y = p->y + 1;
 	break;
       }
   }
@@ -270,8 +284,6 @@ char		*leftfwd(t_game_manager **manager, char *identity, char *optional)
   
   if ((*manager)->ready) {
     sprintf(log, "manager ready, parameter: %s", identity);
-    //le optionnal je suis vraiment pas sûr je sais pas dans quel cas il sera là???
-    //donc coup de poker ça sera changé si besoin;
     left(manager, identity, optional);
     forward(manager,identity, optional);
   }
