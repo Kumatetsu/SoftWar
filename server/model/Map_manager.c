@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Sat Aug 19 17:21:50 2017 BILLAUD Jean
-** Last update Mon Sep  4 20:38:12 2017 BILLAUD Jean
+** Last update Wed Sep  6 16:30:43 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -39,7 +39,7 @@ int		is_free_square(uint x, uint y, t_chain *players, t_chain *ecs)
     {
       if (((t_energy_cell *)(te->content))->x == x
 	  && ((t_energy_cell *)(te->content))->y == y)
-	return (2);
+	return (1);
       te = te->next;
     }
 
