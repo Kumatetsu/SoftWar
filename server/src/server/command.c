@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Fri Sep  8 16:57:57 2017 BILLAUD Jean
+** Last update Fri Sep  8 17:25:36 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -362,6 +362,120 @@ char		*rightfwd(t_game_manager **manager, char *identity, char *optional)
   return (identity);
 }
 
+/**
+ ** Prototype des commandes restantes à coder ;)
+ */
+char		*looking(t_game_manager **manager, char *identity, char *optional)
+{
+  char		log[50];
+
+  if ((*manager)->ready) {
+    sprintf(log, "manager ready, parameter: %s", identity);
+  }
+  else
+    sprintf(log, "manager not ready, parameter: %s", identity);
+  my_log(__func__, "call function rightfwd", 3);
+  my_log(__func__, optional, 3);
+  return (identity);
+}
+
+char		*gather(t_game_manager **manager, char *identity, char *optional)
+{
+  char		log[50];
+
+  if ((*manager)->ready) {
+    sprintf(log, "manager ready, parameter: %s", identity);
+  }
+  else
+    sprintf(log, "manager not ready, parameter: %s", identity);
+  my_log(__func__, "call function rightfwd", 3);
+  my_log(__func__, optional, 3);
+  return (identity);
+}
+
+char		*watch(t_game_manager **manager, char *identity, char *optional)
+{
+  char		log[50];
+
+  if ((*manager)->ready) {
+    sprintf(log, "manager ready, parameter: %s", identity);
+  }
+  else
+    sprintf(log, "manager not ready, parameter: %s", identity);
+  my_log(__func__, "call function rightfwd", 3);
+  my_log(__func__, optional, 3);
+  return (identity);
+}
+
+char		*attack(t_game_manager **manager, char *identity, char *optional)
+{
+  char		log[50];
+
+  if ((*manager)->ready) {
+    sprintf(log, "manager ready, parameter: %s", identity);
+  }
+  else
+    sprintf(log, "manager not ready, parameter: %s", identity);
+  my_log(__func__, "call function rightfwd", 3);
+  my_log(__func__, optional, 3);
+  return (identity);
+}
+
+char		*jump(t_game_manager **manager, char *identity, char *optional)
+{
+  char		log[50];
+
+  if ((*manager)->ready) {
+    sprintf(log, "manager ready, parameter: %s", identity);
+  }
+  else
+    sprintf(log, "manager not ready, parameter: %s", identity);
+  my_log(__func__, "call function rightfwd", 3);
+  my_log(__func__, optional, 3);
+  return (identity);
+}
+
+char		*self_stats(t_game_manager **manager, char *identity, char *optional)
+{
+  char		log[50];
+
+  if ((*manager)->ready) {
+    sprintf(log, "manager ready, parameter: %s", identity);
+  }
+  else
+    sprintf(log, "manager not ready, parameter: %s", identity);
+  my_log(__func__, "call function rightfwd", 3);
+  my_log(__func__, optional, 3);
+  return (identity);
+}
+
+char		*inspect(t_game_manager **manager, char *identity, char *optional)
+{
+  char		log[50];
+
+  if ((*manager)->ready) {
+    sprintf(log, "manager ready, parameter: %s", identity);
+  }
+  else
+    sprintf(log, "manager not ready, parameter: %s", identity);
+  my_log(__func__, "call function rightfwd", 3);
+  my_log(__func__, optional, 3);
+  return (identity);
+}
+
+char		*next(t_game_manager **manager, char *identity, char *optional)
+{
+  char		log[50];
+
+  if ((*manager)->ready) {
+    sprintf(log, "manager ready, parameter: %s", identity);
+  }
+  else
+    sprintf(log, "manager not ready, parameter: %s", identity);
+  my_log(__func__, "call function rightfwd", 3);
+  my_log(__func__, optional, 3);
+  return (identity);
+}
 
 /*
 ** Attention, tout ajout de fonction doit donner
@@ -388,7 +502,14 @@ t_command		**get_commands()
       commands[hash_command("rightfwd")] = rightfwd; // 7
       commands[hash_command("left")] = left; // 8
       commands[hash_command("right")] = right; // 9
-      // etc
+      commands[hash_command("looking")] = looking; // 10
+      commands[hash_command("gather")] = gather; // 11
+      commands[hash_command("attack")] = attack; // 12
+      commands[hash_command("jump")] = jump; // 13
+      commands[hash_command("watch")] = watch; // 14
+      commands[hash_command("selfstats")] = self_stats; // 15
+      commands[hash_command("inspect")] = inspect; // 16
+      commands[hash_command("next")] = next; // 17
     }
   return (commands);
 }
