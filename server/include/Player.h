@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Tue Jul 11 16:37:52 2017 BILLAUD Jean
-** Last update Wed Jul 12 16:45:44 2017 BILLAUD Jean
+** Last update Fri Sep  8 16:33:11 2017 BILLAUD Jean
 */
 
 #ifndef _PLAYER_H
@@ -17,6 +17,7 @@ typedef struct	s_player
   uint		x;
   uint		y;
   uint		energy;
+  uint		action;
   uint		looking;
 }		            t_player;
 

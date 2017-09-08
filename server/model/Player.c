@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Tue Jul 11 17:07:34 2017 BILLAUD Jean
-** Last update Sat Aug 19 16:24:59 2017 BILLAUD Jean
+** Last update Fri Sep  8 16:33:51 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -31,6 +31,7 @@ t_player	*create_player(char *identity)
     return (NULL);
   p->energy = 50;
   p->looking = 0;
+  p->action = 0;
   p->x = 0;
   p->y = 0;
   return (p);

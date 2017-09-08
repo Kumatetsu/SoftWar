@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Tue Sep  5 17:32:54 2017 BILLAUD Jean
+** Last update Fri Sep  8 16:57:57 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -157,26 +157,42 @@ char		*forward(t_game_manager **manager, char *identity, char *optional)
       case LEFT:
 	if (check_mvmnt(p->x - 1, p->y, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
 	  sprintf(log, "%s can't move left", identity);
-	else
+	else if (p->action < 0.5)
+	  sprintf(log, "%s action point are too low", identity);
+	else {
+	  p->action = p->action - 0.5;
 	  p->x = p->x - 1;
+	}
 	break;
       case UP:
 	if (check_mvmnt(p->x, p->y - 1, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
 	  sprintf(log, "%s can't move up", identity);
-	else
+	else if (p->action < 0.5)
+	  sprintf(log, "%s action point are too low", identity);
+	else {
+	  p->action = p->action - 0.5;
 	  p->y = p->y - 1;
+	}
 	break;
       case RIGHT:
 	if (check_mvmnt(p->x + 1, p->y, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
 	  sprintf(log, "%s can't move right", identity);
-	else
+	else if (p->action < 0.5)
+	  sprintf(log, "%s action point are too low", identity);
+	else {
+	  p->action = p->action - 0.5;
 	  p->x = p->x + 1;
+	}
 	break;
       case DOWN:
 	if (check_mvmnt(p->x, p->y + 1, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
 	  sprintf(log, "%s can't move down", identity);
-	else
+	else if (p->action < 0.5)
+	  sprintf(log, "%s action point are too low", identity);
+	else {
+	  p->action = p->action - 0.5;
 	  p->y = p->y + 1;
+	}
 	break;
     }
   }
@@ -206,26 +222,42 @@ char		*backward(t_game_manager **manager, char *identity, char *optional)
       case LEFT:
 	if (check_mvmnt(p->x + 1, p->y, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
 	  sprintf(log, "%s can't backward right", identity);
-	else
-	p->x = p->x + 1;
+	else if (p->action < 0.5)
+	  sprintf(log, "%s action point are too low", identity);
+	else {
+	  p->action = p->action - 0.5;
+	  p->x = p->x + 1;
+	}
 	break;
       case UP:
 	if (check_mvmnt(p->x, p->y + 1, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
 	  sprintf(log, "%s can't backward down", identity);
-	else
-	p->y = p->y + 1;
+	else if (p->action < 0.5)
+	  sprintf(log, "%s action point are too low", identity);
+	else {
+	  p->action = p->action - 0.5;
+	  p->y = p->y + 1;
+	}
 	break;
       case RIGHT:
 	if (check_mvmnt(p->x - 1, p->y, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
 	  sprintf(log, "%s can't backward left", identity);
-	else
-	p->x = p->x - 1;
+	else if (p->action < 0.5)
+	  sprintf(log, "%s action point are too low", identity);
+	else {
+	  p->action = p->action - 0.5;
+	  p->x = p->x - 1;
+	}
 	break;
       case DOWN:
 	if (check_mvmnt(p->x, p->y + 1, map, players, ecs, (*manager)->get_map_size(), identity) == 1)
 	  sprintf(log, "%s can't backward up", identity);
-	else
-	p->y = p->y + 1;
+	else if (p->action < 0.5)
+	  sprintf(log, "%s action point are too low", identity);
+	else {
+	  p->action = p->action - 0.5;
+	  p->y = p->y + 1;
+	}
 	break;
       }
   }
@@ -244,9 +276,13 @@ char		*left(t_game_manager **manager, char *identity, char *optional)
   if ((*manager)->ready){
     sprintf(log, "manager ready, parameter: %s", identity);
     player = (*manager)->get_player(identity);
-    if (player->looking == LEFT) {
+    if (player->action < 0.5)
+      sprintf("%s action point are too low", identity);
+    else if (player->looking == LEFT) {
+      player->action = player->action - 0.5;
       player->looking = DOWN;
     } else {
+      player->action = player->action - 0.5;
       player->looking--;
     }
   }
@@ -265,9 +301,13 @@ char		*right(t_game_manager **manager, char *identity, char *optional)
   if ((*manager)->ready) {
     sprintf(log, "manager ready, parameter: %s", identity);
     player = (*manager)->get_player(identity);
-    if (player->looking == DOWN){
+    if (player->action < 0.5)
+      sprintf("%s action point are too low", identity);
+    else if (player->looking == DOWN){
+      player->action = player->action - 0.5;
       player->looking = LEFT;
     } else {
+      player->action = player->action - 0.5;
       player->looking++;
     }
   }
@@ -281,11 +321,17 @@ char		*right(t_game_manager **manager, char *identity, char *optional)
 char		*leftfwd(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
-  
+  t_player	*player;
+
+  player = (*manager)->get_player(identity);
   if ((*manager)->ready) {
     sprintf(log, "manager ready, parameter: %s", identity);
-    left(manager, identity, optional);
-    forward(manager,identity, optional);
+    if (player->action < 1)
+      sprintf("%s action point are too low", identity);
+    else {
+      left(manager, identity, optional);
+      forward(manager,identity, optional);
+    }
   }
   else
     sprintf(log, "manager not ready, parameter: %s", identity);
@@ -297,11 +343,17 @@ char		*leftfwd(t_game_manager **manager, char *identity, char *optional)
 char		*rightfwd(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
+  t_player	*player;
 
+  player = (*manager)->get_player(identity);
   if ((*manager)->ready) {
     sprintf(log, "manager ready, parameter: %s", identity);
-    right(manager, identity, optional);
-    forward(manager, identity, optional);
+    if (player->action < 1)
+      sprintf("%s action point are too low", identity);
+    else {
+      right(manager, identity, optional);
+      forward(manager, identity, optional);
+    }
   }
   else
     sprintf(log, "manager not ready, parameter: %s", identity);
