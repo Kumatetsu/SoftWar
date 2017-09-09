@@ -11,8 +11,6 @@
 #ifndef  _MAP_MANAGER_H_
 # define _MAP_MANAGER_H_
 
-#include <json/json.h>
-
 typedef struct	s_map_manager
 {
   int		(*get_pos)(char *identity, t_chain *players);
@@ -23,5 +21,3 @@ typedef struct	s_map_manager
 t_map_manager	*get_map_manager();
 
 #endif /* !_GAME_INFO_H_ */
-
-/**test **/

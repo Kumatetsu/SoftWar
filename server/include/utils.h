@@ -11,6 +11,6 @@
 #ifndef  _UTILS_H_
 # define _UTILS_H_
 
-int		check_mvmnt(uint x, uint y, t_map_manager *map, t_chain *players, t_chain *ecs, uint map_size, char *identity);
+int		check_mvmnt(uint x, uint y, char *identity, t_game_manager *manager);
 
 #endif /* !_UTILS_H_ */

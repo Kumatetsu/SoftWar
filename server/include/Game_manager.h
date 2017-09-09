@@ -13,7 +13,7 @@
 
 #include <json/json.h>
 #include "Player.h"
-#include "map_manager.h"
+#include "Map_manager.h"
 
 typedef struct	s_game_info
 {

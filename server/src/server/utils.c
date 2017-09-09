@@ -13,18 +13,22 @@
 #include <stdlib.h>
 #include <json/json.h>
 #include "libmy.h"
-#include "Softwar_ctx.h"
 #include "Player.h"
 #include "Energy_cell.h"
 #include "Game_manager.h"
-#include "hash.h"
-#include "command.h"
-#include "Enum.h"
 
-
-int		check_mvmnt(uint x, uint y, t_map_manager *map, t_chain *players, t_chain *ecs, uint map_size, char *identity)
+int		check_mvmnt(uint x, uint y, char *identity, t_game_manager *manager)
 {
   char		log[50];
+  t_chain       *players;
+  t_chain       *ecs;
+  t_map_manager *map;
+  int		map_size;
+  
+  players = manager->get_players();
+  ecs = manager->get_energy_cells();
+  map = manager->map_manager();
+  map_size = manager->get_map_size();
   if (map->is_wall(x, y, map_size) == 1) {
     sprintf(log, "%s tried to go in a wall", identity);
     return (1);

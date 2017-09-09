@@ -14,4 +14,5 @@
 typedef char *(t_command)(t_game_manager**, char*, char*);
 
 t_command	**get_commands();
+
 #endif  /* !_COMMAND_H_ */

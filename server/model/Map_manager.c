@@ -14,7 +14,7 @@
 #include <libmy.h>
 #include <Player.h>
 #include <Energy_cell.h>
-#include <map_manager.h>
+#include <Map_manager.h>
 
 /*
 ** ci-dessous les is_*

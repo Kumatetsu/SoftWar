@@ -15,7 +15,7 @@
 #include "libmy.h"
 #include "Player.h"
 #include "Energy_cell.h"
-#include "map_manager.h"
+#include "Map_manager.h"
 #include "Game_manager.h"
 
 t_game_info		**init_game_info(unsigned int map_size,
