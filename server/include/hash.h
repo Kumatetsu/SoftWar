@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 01:19:47 2017 CASTELLARNAU Aurelien
-** Last update Sun Jul 16 01:36:40 2017 CASTELLARNAU Aurelien
+** Last update Fri Sep  8 17:25:10 2017 BILLAUD Jean
 */
 
 #ifndef  _HASH_H_
@@ -23,7 +23,7 @@
 /*
 ** nombre de fonctions dans command.c
 */
-# define HCOMMANDSIZE 9
+# define HCOMMANDSIZE 17
 /*
 ** code pour signifier que ce n'est pas une commande
 */

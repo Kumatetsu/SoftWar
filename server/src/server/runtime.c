@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 30 23:34:27 2017 CASTELLARNAU Aurelien
-** Last update Sun Jul 30 23:38:57 2017 CASTELLARNAU Aurelien
+** Last update Sat Aug 19 22:18:07 2017 BILLAUD Jean
 */
 
 #include <json/json.h>
@@ -84,7 +84,7 @@ int			init_runtime()
 
   ctx = get_swctx();
   manager = get_game_manager();
-  manager->set_map_size(ctx->size); // muahah
+  manager->set_map_size(ctx->size);
   init_network(&ctx);
   if (serve_game(&ctx, &manager))
     {

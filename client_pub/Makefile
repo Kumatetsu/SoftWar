@@ -5,14 +5,14 @@
 ## Login   <castel_a@etna-alternance.net>
 ## 
 ## Started on  Wed Feb  1 09:37:15 2017 CASTELLARNAU Aurelien
-## Last update Sat Jul  1 01:39:24 2017 CASTELLARNAU Aurelien
+## Last update Sat Aug 19 20:27:04 2017 BILLAUD Jean
 ##
 
 CC      =       gcc
 
 NAME    =       demo
 
-LIB     =       ./libmy
+LIB     =       ./../server/libmy
 
 CFLAGS  =       -W -Wextra -Werror -Wall -g -Iinclude/ -Ilibmy
 
@@ -20,7 +20,7 @@ LDFLAGS =       -lzmq -lczmq -L ./libmy -lmy
 
 SRC     =       main.c \
 		src/tools/argument.c \
-		src/server/protocol.c \
+		src/server/protocol.c
 
 OBJ     =       ${SRC:%.c=%.o}
 

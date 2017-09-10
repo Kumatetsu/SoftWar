@@ -5,15 +5,17 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Jul 12 13:50:33 2017 CASTELLARNAU Aurelien
-** Last update Wed Jul 12 14:16:41 2017 CASTELLARNAU Aurelien
+** Last update Sun Aug 27 16:35:41 2017 BILLAUD Jean
 */
 
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <json/json.h>
 #include "libmy.h"
 #include "Player.h"
 #include "Energy_cell.h"
+#include "Map_manager.h"
 #include "Game_manager.h"
 
 t_game_info		**init_game_info(unsigned int map_size,
@@ -92,6 +94,25 @@ t_chain		*get_players()
   return ((*game_info)->players);
 }
 
+void			set_players_pos(t_chain *players, uint map_size)
+{
+  t_link		*node_player;
+  t_player		*player;
+  int			i;
+  int 			x[4] = {map_size, 0, map_size, 0};
+  int			y[4] = {map_size, map_size, 0, 0};
+
+  i = 0;
+  node_player = (players->first);
+  while (node_player) {
+    player = (t_player*)node_player->content;
+    player->x = x[i];
+    player->y = y[i];
+    i++;
+    node_player = node_player->next;
+  }
+}
+
 t_chain		*get_energy_cells()
 {
   t_game_info   **game_info;
@@ -116,6 +137,26 @@ void		set_game_status(uint game_status)
   (*game_info)->game_status = game_status;
 }
 
+void		energy_fall(uint map_size)
+{
+  int		x;
+  int		y;
+  int		power;
+  t_game_info	**game_info;
+  t_energy_cell	*ecs;
+
+  game_info = get_info();
+  srand(time(NULL));
+  x = rand() % (map_size + 1);
+  y = rand() % (map_size + 1);
+  power = rand() % (15 - 5) + 5; 
+  if ((ecs = create_energy_cell(x, y, power)) == NULL)
+    return;
+  if (add_link(&((*game_info)->energy_cells), ecs))
+    return;
+  return;
+}
+
 int		add_player(t_player *player)
 {
   t_game_info   **game_info;
@@ -126,6 +167,10 @@ int		add_player(t_player *player)
   return (0);
 }
 
+/**
+ ** Pas convaincu par cette fonction, on peut faire pop qu'un cell d'energie
+ ** par round, on aura jamais à remaplce la t_chain créer à l'init du game, juste à add ou delete des energy cells...
+ */
 void		set_energy_cells(t_chain *ecs)
 {
   t_game_info   **game_info;
@@ -195,9 +240,12 @@ t_game_manager		*get_game_manager()
       manager->get_energy_cells = &get_energy_cells;
       manager->set_map_size	= &set_map_size;
       manager->set_game_status	= &set_game_status;
+      manager->set_players_pos  = &set_players_pos;
       manager->add_player	= &add_player;
       manager->set_energy_cells = &set_energy_cells;
+      manager->energy_fall      = &energy_fall;
       manager->serialize	= &game_info_to_json;
+      manager->map_manager      = &get_map_manager;
       manager->ready		= 0;
     }
   return (manager);
