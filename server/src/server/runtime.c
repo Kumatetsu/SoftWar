@@ -5,10 +5,11 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 30 23:34:27 2017 CASTELLARNAU Aurelien
-** Last update Sat Aug 19 22:18:07 2017 BILLAUD Jean
+** Last update Sun Sep 10 18:07:29 2017 BILLAUD Jean
 */
 
 #include <json/json.h>
+#include <pthread.h>
 #include "libmy.h"
 #include "Game_manager.h"
 #include "Softwar_ctx.h"
@@ -20,6 +21,7 @@
 #include "router.h"
 #include "exec.h"
 #include "runtime.h"
+#include "thread.h"
 
 int		init_network(t_swctx **ctx)
 {
@@ -47,6 +49,12 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   zmsg_t	*response;
   zframe_t	*address;
   char		*input;
+  pthread_t 	tic;
+
+  if (pthread_create(&tic, NULL, tic_thread, manager) == -1) {
+    perror("pthread_create");
+    return EXIT_FAILURE;
+  }
   
   while (!zsys_interrupted)
     {

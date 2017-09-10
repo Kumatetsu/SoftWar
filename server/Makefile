@@ -5,7 +5,7 @@
 ## Login   <castel_a@etna-alternance.net>
 ## 
 ## Started on  Wed Feb  1 09:37:15 2017 CASTELLARNAU Aurelien
-## Last update Mon Sep  4 21:05:41 2017 BILLAUD Jean
+## Last update Sun Sep 10 16:53:40 2017 BILLAUD Jean
 ##
 
 CC      =       gcc
@@ -16,7 +16,7 @@ LIB     =       ./libmy
 
 CFLAGS  =       -W -Wextra -Werror -Wall -g -Iinclude/ -Ilibmy $(shell pkg-config --cflags json-c)
 
-LDFLAGS =       -lzmq -lczmq -L ./libmy -lmy $(shell pkg-config --libs json-c)
+LDFLAGS =       -lzmq -lczmq -lpthread -L ./libmy -lmy $(shell pkg-config --libs json-c)
 
 SRC     =       main.c \
 		src/tools/argument.c \
@@ -35,6 +35,7 @@ SRC     =       main.c \
 		src/server/command.c \
 		src/server/exec.c \
 		src/server/runtime.c \
+		src/server/thread.c \
 
 
 OBJ     =       ${SRC:%.c=%.o}
