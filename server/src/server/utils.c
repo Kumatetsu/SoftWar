@@ -13,9 +13,11 @@
 #include <stdlib.h>
 #include <json/json.h>
 #include "libmy.h"
-#include "Player.h"
-#include "Energy_cell.h"
-#include "Game_manager.h"
+#include "player.h"
+#include "energy_cell.h"
+#include "game_info.h"
+#include "map_manager.h"
+#include "game_manager.h"
 
 int		check_mvmnt(uint x, uint y, char *identity, t_game_manager *manager)
 {

@@ -9,7 +9,7 @@
 */
 
 #include "libmy.h"
-#include "Game_info.h"
+#include "game_info.h"
 #include "map.h"
 
 /*

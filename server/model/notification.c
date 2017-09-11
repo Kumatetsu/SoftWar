@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "libmy.h"
-#include "Notification.h"
+#include "notification.h"
 
 static char *notifications[] = { "cycle_info",
 				 "game_started",

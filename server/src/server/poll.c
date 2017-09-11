@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <czmq.h>
 #include "libmy.h"
-#include "Softwar_ctx.h"
+#include "softwar_ctx.h"
 #include "rep.h"
 #include "router.h"
 #include "poll.h"

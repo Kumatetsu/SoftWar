@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <json/json.h>
 #include "libmy.h"
-#include "Player.h"
+#include "player.h"
 
 /*
 ** Crée une structure player

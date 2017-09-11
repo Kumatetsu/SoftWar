@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <json/json.h>
 #include "libmy.h"
-#include "Energy_cell.h"
+#include "energy_cell.h"
 
 t_energy_cell	*create_energy_cell(unsigned int x, unsigned int y, unsigned int value)
 {

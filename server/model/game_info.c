@@ -11,7 +11,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "libmy.h"
-#include "Game_info.h"
+#include "energy_cell.h"
+#include "player.h"
+#include "game_info.h"
 
 t_game_info             **init_game_info(unsigned int map_size,
 					 unsigned int game_status)

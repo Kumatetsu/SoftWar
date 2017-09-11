@@ -13,60 +13,7 @@
 #include <stdlib.h>
 #include <json/json.h>
 #include "libmy.h"
-#include "Player.h"
-#include "Softwar_ctx.h"
-#include "Energy_cell.h"
-#include "Map_manager.h"
-#include "Game_manager.h"
-#include "pub.h"
-#include "utils.h"
-
-t_game_info		**init_game_info(unsigned int map_size,
-					unsigned int game_status)
-{
-  static t_game_info	*game_info;
-
-  if (game_info == NULL)
-    {
-      if ((game_info = malloc(sizeof (*game_info))) == NULL)
-	{
-	  my_log(__func__, MEM_ERR, 1);
-	  return (NULL);
-	}
-      if ((game_info->players = create_chain(free_players)) == NULL)
-	return (NULL);
-      if ((game_info->energy_cells = create_chain(free_energy_cells)) == NULL)
-	return (NULL);
-      game_info->map_size = map_size;
-      game_info->game_status = game_status;
-    }
-  return (&game_info);
-}
-
-t_game_info	**get_info()
-{
-  t_game_info	**gi;
-
-  if ((gi = init_game_info(0, 0)) == NULL)
-    return (NULL);
-  return (gi);
-}
-
-uint		get_map_size()
-{
-  t_game_info  **game_info;
-
-  game_info = get_info();
-  return ((*game_info)->map_size);
-}
-
-uint		get_game_status()
-{
-  t_game_info  **game_info;
-
-  game_info = get_info();
-  return ((*game_info)->game_status);
-}
+#include "game_manager.h"
 
 t_player	*get_player(char *identity)
 {
@@ -122,22 +69,6 @@ t_chain		*get_energy_cells()
   
   game_info = get_info();
   return ((*game_info)->energy_cells);
-}
-
-void		set_map_size(uint map_size)
-{
-  t_game_info   **game_info;
-  
-  game_info = get_info();
-  (*game_info)->map_size = map_size;
-}
-
-void		set_game_status(uint game_status)
-{
-  t_game_info   **game_info;
-  
-  game_info = get_info();
-  (*game_info)->game_status = game_status;
 }
 
 void		energy_fall(uint map_size)

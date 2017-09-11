@@ -12,14 +12,11 @@
 #include <stdlib.h>
 #include <json/json.h>
 #include "libmy.h"
-#include "Softwar_ctx.h"
-#include "Player.h"
-#include "Energy_cell.h"
-#include "Game_manager.h"
+#include "softwar_ctx.h"
+#include "game_manager.h"
 #include "hash.h"
 #include "utils.h"
 #include "command.h"
-#include "Enum.h"
 
 /*
 ** génère le bon début d'output

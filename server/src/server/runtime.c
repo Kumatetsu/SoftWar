@@ -11,9 +11,9 @@
 #include <json/json.h>
 #include <pthread.h>
 #include "libmy.h"
-#include "Game_manager.h"
-#include "Softwar_ctx.h"
-#include "Player.h"
+#include "game_manager.h"
+#include "softwar_ctx.h"
+#include "player.h"
 #include "command.h"
 #include "hash.h"
 #include "pub.h"

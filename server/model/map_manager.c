@@ -12,9 +12,9 @@
 #include <stdlib.h>
 #include <json/json.h>
 #include <libmy.h>
-#include <Player.h>
-#include <Energy_cell.h>
-#include <Map_manager.h>
+#include <player.h>
+#include <energy_cell.h>
+#include <map_manager.h>
 
 /*
 ** ci-dessous les is_*

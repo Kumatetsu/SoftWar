@@ -10,7 +10,7 @@
 
 #include "libmy.h"
 #include "hash.h"
-#include "Game_manager.h"
+#include "game_manager.h"
 #include "command.h"
 #include "exec.h"
 
