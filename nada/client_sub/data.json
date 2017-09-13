@@ -2,23 +2,23 @@
     "clients": [
 	{
 	    "identity": "0x00",
-	    "position_x": "25",
-	    "position_y": "25"
+	    "x": "25",
+	    "y": "25"
 	},
 	{
-	    "identity": "0x00",
-	    "position_x": "375",
-	    "position_y": "25"
+	    "identity": "0x01",
+	    "x": "375",
+	    "y": "25"
 	},
 	{
-	    "identity": "0x00",
-	    "position_x": "25",
-	    "position_y": "375"
+	    "identity": "0x02",
+	    "x": "25",
+	    "y": "375"
 	},
 	{
-	    "identity": "0x00",
-	    "position_x": "375",
-	    "position_y": "375"
+	    "identity": "0x03",
+	    "x": "375",
+	    "y": "375"
 	}
 	]
 }
