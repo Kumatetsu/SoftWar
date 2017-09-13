@@ -1,0 +1,24 @@
+{
+    "clients": [
+	{
+	    "identity": "0x00",
+	    "position_x": "25",
+	    "position_y": "25"
+	},
+	{
+	    "identity": "0x00",
+	    "position_x": "375",
+	    "position_y": "25"
+	},
+	{
+	    "identity": "0x00",
+	    "position_x": "25",
+	    "position_y": "375"
+	},
+	{
+	    "identity": "0x00",
+	    "position_x": "375",
+	    "position_y": "375"
+	}
+	]
+}
