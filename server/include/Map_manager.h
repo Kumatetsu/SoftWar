@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Fri Aug 18 17:01:41 2017 BILLAUD Jean
-** Last update Sun Aug 27 15:35:15 2017 BILLAUD Jean
+** Last update Wed Sep 13 21:43:57 2017 BILLAUD Jean
 */
 
 #ifndef  _MAP_MANAGER_H_

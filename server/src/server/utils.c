@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Mon Sep  4 20:05:35 2017 BILLAUD Jean
-** Last update Fri Sep  8 16:56:29 2017 BILLAUD Jean
+** Last update Wed Sep 13 22:44:27 2017 BILLAUD Jean
 */
 
 
@@ -37,4 +37,26 @@ int		check_mvmnt(uint x, uint y, char *identity, t_game_manager *manager)
     return (1);
   } else
     return (0);
+}
+
+int		count_ecs(t_chain *ecs, uint map_size)
+{
+  t_link	*tmp;
+  int		max;
+  int		count;
+
+  count = 0; 
+  max = (map_size * map_size) - 4;
+  my_put_nbr(max);
+  tmp = ecs->first;
+  while(tmp)
+    {
+      count++;
+      tmp = tmp->next;
+    }
+  my_put_nbr(count);
+  if (count < max)
+    return (0);
+  else
+    return (1);
 }

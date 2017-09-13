@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 30 23:34:27 2017 CASTELLARNAU Aurelien
-** Last update Wed Sep 13 16:20:05 2017 BILLAUD Jean
+** Last update Wed Sep 13 20:27:36 2017 BILLAUD Jean
 */
 
 #include <json/json.h>
@@ -53,6 +53,7 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   pthread_t 	tic;
   t_thread	*t;
 
+  identify(manager, "X0TOTO", "option");
   t = init_thread(*ctx, *(*manager)->get_info());
   if (pthread_create(&tic, NULL, tic_thread, t) == -1) {
     perror("pthread_create");

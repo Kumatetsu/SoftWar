@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Jul 12 13:50:33 2017 CASTELLARNAU Aurelien
-** Last update Wed Sep 13 19:21:49 2017 BILLAUD Jean
+** Last update Wed Sep 13 22:49:50 2017 BILLAUD Jean
 */
 
 #include <time.h>
@@ -19,6 +19,7 @@
 #include "Map_manager.h"
 #include "Game_manager.h"
 #include "pub.h"
+#include "utils.h"
 
 t_game_info		**init_game_info(unsigned int map_size,
 					unsigned int game_status)
@@ -146,23 +147,30 @@ void		energy_fall(uint map_size)
   int		power;
   t_game_info	**game_info;
   t_energy_cell	*ecs;
+  t_map_manager *map;
 
+  map = get_map_manager();
   game_info = get_info();
-  srand(time(NULL));
   x = rand() % (map_size + 1);
   y = rand() % (map_size + 1);
-  power = rand() % (15 - 5) + 5; 
-  if ((ecs = create_energy_cell(x, y, power)) == NULL)
-    return;
-  if (add_link(&((*game_info)->energy_cells), ecs))
-    return;
+  power = rand() % (16 - 5) + 5;
+  if (count_ecs((*game_info)->energy_cells, map_size) == 0)
+    {
+      if (map->is_free_square(x, y, (*game_info)->players, (*game_info)->energy_cells) == 0) {
+	if ((ecs = create_energy_cell(x, y, power)) == NULL)
+	  return;
+	if (add_link(&((*game_info)->energy_cells), ecs))
+	  return;
+      } else {
+	energy_fall(map_size);
+      }
+    }
   return;
 }
 
 int		add_player(t_player *player)
 {
   t_game_info   **game_info;
-  
   game_info = get_info();
   if (add_link(&((*game_info)->players), player))
     return (1);
@@ -194,14 +202,12 @@ json_object	*game_info_to_json(t_game_info *info)
   game_info_json	= json_object_new_object();
   map_size_json		= json_object_new_int((*game_info)->map_size);
   game_status_json	= json_object_new_int((*game_info)->game_status);
-  if ((*game_info)->players != NULL && (*game_info)->players->first != NULL)
-    players_json		= players_to_json((*game_info)->players);
+  players_json		= players_to_json((*game_info)->players);
   energy_cells_json	= energy_cells_to_json((*game_info)->energy_cells);
 
   json_object_object_add(game_info_json, "map_size", map_size_json);
   json_object_object_add(game_info_json, "game_status", game_status_json);
-  if ((*game_info)->players != NULL && (*game_info)->players->first != NULL)
-    json_object_object_add(game_info_json, "players", players_json);
+  json_object_object_add(game_info_json, "players", players_json);
   json_object_object_add(game_info_json, "energy_cells", energy_cells_json);
   return (game_info_json);
 }
