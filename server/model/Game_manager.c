@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Jul 12 13:50:33 2017 CASTELLARNAU Aurelien
-** Last update Sun Aug 27 16:35:41 2017 BILLAUD Jean
+** Last update Wed Sep 13 16:10:57 2017 BILLAUD Jean
 */
 
 #include <time.h>
@@ -14,9 +14,11 @@
 #include <json/json.h>
 #include "libmy.h"
 #include "Player.h"
+#include "Softwar_ctx.h"
 #include "Energy_cell.h"
 #include "Map_manager.h"
 #include "Game_manager.h"
+#include "pub.h"
 
 t_game_info		**init_game_info(unsigned int map_size,
 					unsigned int game_status)
@@ -230,23 +232,24 @@ t_game_manager		*get_game_manager()
 	  my_log(__func__, MEM_ERR, 1);
 	  return (NULL);
 	}
-      manager->init		= &init_game_info;
-      manager->free		= &free_game_info;
-      manager->get_info		= &get_info;
-      manager->get_map_size	= &get_map_size;
-      manager->get_game_status	= &get_game_status;
-      manager->get_player	= &get_player;
-      manager->get_players	= &get_players;
-      manager->get_energy_cells = &get_energy_cells;
-      manager->set_map_size	= &set_map_size;
-      manager->set_game_status	= &set_game_status;
-      manager->set_players_pos  = &set_players_pos;
-      manager->add_player	= &add_player;
-      manager->set_energy_cells = &set_energy_cells;
-      manager->energy_fall      = &energy_fall;
-      manager->serialize	= &game_info_to_json;
-      manager->map_manager      = &get_map_manager;
-      manager->ready		= 0;
+      manager->init		 = &init_game_info;
+      manager->free		 = &free_game_info;
+      manager->get_info		 = &get_info;
+      manager->get_map_size	 = &get_map_size;
+      manager->get_game_status	 = &get_game_status;
+      manager->get_player	 = &get_player;
+      manager->get_players	 = &get_players;
+      manager->get_energy_cells  = &get_energy_cells;
+      manager->set_map_size	 = &set_map_size;
+      manager->set_game_status	 = &set_game_status;
+      manager->set_players_pos   = &set_players_pos;
+      manager->add_player	 = &add_player;
+      manager->set_energy_cells  = &set_energy_cells;
+      manager->energy_fall       = &energy_fall;
+      manager->serialize	 = &game_info_to_json;
+      manager->map_manager       = &get_map_manager;
+      manager->get_swctx         = &get_swctx;
+      manager->ready		 = 0;
     }
   return (manager);
 }

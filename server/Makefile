@@ -5,7 +5,7 @@
 ## Login   <castel_a@etna-alternance.net>
 ## 
 ## Started on  Wed Feb  1 09:37:15 2017 CASTELLARNAU Aurelien
-## Last update Sun Sep 10 16:53:40 2017 BILLAUD Jean
+## Last update Wed Sep 13 16:20:57 2017 BILLAUD Jean
 ##
 
 CC      =       gcc
@@ -27,6 +27,7 @@ SRC     =       main.c \
 		model/Energy_cell.c \
 		model/Game_manager.c \
 		model/Map_manager.c \
+		model/thread_data.c \
 		src/server/pub.c \
 		src/server/rep.c \
 		src/server/router.c \

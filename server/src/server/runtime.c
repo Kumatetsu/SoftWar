@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 30 23:34:27 2017 CASTELLARNAU Aurelien
-** Last update Sun Sep 10 18:07:29 2017 BILLAUD Jean
+** Last update Wed Sep 13 16:20:05 2017 BILLAUD Jean
 */
 
 #include <json/json.h>
@@ -22,6 +22,7 @@
 #include "exec.h"
 #include "runtime.h"
 #include "thread.h"
+#include "thread_data.h"
 
 int		init_network(t_swctx **ctx)
 {
@@ -50,8 +51,10 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   zframe_t	*address;
   char		*input;
   pthread_t 	tic;
+  t_thread	*t;
 
-  if (pthread_create(&tic, NULL, tic_thread, manager) == -1) {
+  t = init_thread(*ctx, *(*manager)->get_info());
+  if (pthread_create(&tic, NULL, tic_thread, t) == -1) {
     perror("pthread_create");
     return EXIT_FAILURE;
   }
@@ -93,7 +96,10 @@ int			init_runtime()
   ctx = get_swctx();
   manager = get_game_manager();
   manager->set_map_size(ctx->size);
-  init_network(&ctx);
+  if(init_network(&ctx) == 1) {
+    my_putstr("init sockets faileds");
+    return (0);
+  }
   if (serve_game(&ctx, &manager))
     {
       my_log(__func__, "serving game failed", 1);
