@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Jul 12 13:28:35 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep 11 17:24:11 2017 BILLAUD Jean
+** Last update Wed Sep 13 19:21:48 2017 BILLAUD Jean
 */
 
 #ifndef  _GAME_MANAGER_H_
@@ -44,10 +44,11 @@ typedef struct	s_game_manager
   t_game_info	**(*get_info)();
   t_swctx	*(*get_swctx)();
   t_map_manager *(*map_manager)();
-  json_object	*(*serialize)(void);
+  json_object	*(*serialize)(t_game_info *info);
   int		ready;
 }		t_game_manager;
 
 t_game_manager	*get_game_manager();
+json_object	*game_info_to_json(t_game_info *info);
 
 #endif /* !_GAME_INFO_H_ */

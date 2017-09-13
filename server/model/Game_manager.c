@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Jul 12 13:50:33 2017 CASTELLARNAU Aurelien
-** Last update Wed Sep 13 16:10:57 2017 BILLAUD Jean
+** Last update Wed Sep 13 19:21:49 2017 BILLAUD Jean
 */
 
 #include <time.h>
@@ -181,7 +181,7 @@ void		set_energy_cells(t_chain *ecs)
   (*game_info)->energy_cells = ecs;
 }
 
-json_object	*game_info_to_json()
+json_object	*game_info_to_json(t_game_info *info)
 {
   json_object	*game_info_json;
   json_object	*map_size_json;
@@ -190,7 +190,7 @@ json_object	*game_info_to_json()
   json_object	*energy_cells_json;
   t_game_info   **game_info;
   
-  game_info		= get_info();
+  game_info		= &info;
   game_info_json	= json_object_new_object();
   map_size_json		= json_object_new_int((*game_info)->map_size);
   game_status_json	= json_object_new_int((*game_info)->game_status);
