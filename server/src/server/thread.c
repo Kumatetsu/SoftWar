@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Thu Aug 17 17:00:01 2017 BILLAUD Jean
-** Last update Wed Sep 13 22:11:24 2017 BILLAUD Jean
+** Last update Thu Sep 14 17:47:27 2017 BILLAUD Jean
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +17,22 @@
 #include "Game_manager.h"
 #include "Softwar_ctx.h"
 #include "thread_data.h"
+
+void		refresh_ap(t_game_info **info)
+{
+  t_link	*l;
+  t_player	*p;
+  
+  l = (*info)->players->first;
+  while (l)
+    {
+      p = ((t_player *)(l->content));
+      p->action = 1;
+      l = l->next;
+    }
+
+  return;
+}
 
 void 		*tic_thread(void *manager)
 {
@@ -36,8 +52,8 @@ void 		*tic_thread(void *manager)
     my_putstr(json_object_to_json_string(json));
     my_putstr("\n");
     energy_fall(thread->info->map_size);
+    refresh_ap(&thread->info);
   }
   pthread_exit(NULL);
 }
-
 
