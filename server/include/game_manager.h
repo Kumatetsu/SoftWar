@@ -19,6 +19,7 @@
 #include "map_manager.h"
 #include "map.h"
 #include "game_status.h"
+#include "softwar_ctx.h"
 
 typedef struct	s_game_manager
 {
@@ -43,7 +44,10 @@ typedef struct	s_game_manager
 }		t_game_manager;
 
 t_game_manager	*get_game_manager();
+json_object	*game_info_to_json(t_game_info *info);
+void		energy_fall(uint map_size);
 
 #include "command.h"
+#include "utils.h"
 
 #endif /* !_GAME_INFO_H_ */

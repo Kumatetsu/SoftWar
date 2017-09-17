@@ -45,5 +45,3 @@ t_game_info     **get_info()
     return (NULL);
   return (gi);
 }
-
-

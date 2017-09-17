@@ -13,11 +13,9 @@
 #include <pthread.h>
 #include <json/json.h>
 #include "libmy.h"
-#include "Player.h"
-#include "Game_manager.h"
-#include "Softwar_ctx.h"
+#include "game_manager.h"
 #include "thread_data.h"
-#include "Enum.h"
+#include "enum.h"
 
 void		refresh_ap(t_game_info **info)
 {

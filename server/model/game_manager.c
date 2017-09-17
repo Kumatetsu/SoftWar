@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <json/json.h>
 #include "libmy.h"
+#include "softwar_ctx.h"
 #include "game_manager.h"
 
 t_player	*get_player(char *identity)

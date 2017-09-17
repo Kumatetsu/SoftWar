@@ -12,8 +12,8 @@
 # define _THREAD_DATA_H_
 
 #include "libmy.h"
-#include "Game_manager.h"
-#include "Softwar_ctx.h"
+#include "game_manager.h"
+#include "softwar_ctx.h"
 
 typedef struct s_thread_data
 {

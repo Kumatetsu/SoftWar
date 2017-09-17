@@ -28,6 +28,7 @@ SRC     =       main.c \
 		model/game_info.c \
 		model/game_manager.c \
 		model/map_manager.c \
+		model/thread_data.c \
 		src/server/pub.c \
 		src/server/rep.c \
 		src/server/router.c \
