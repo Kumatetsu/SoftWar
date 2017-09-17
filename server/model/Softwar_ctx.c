@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul  9 22:32:32 2017 CASTELLARNAU Aurelien
-** Last update Sun Jul  9 22:34:32 2017 CASTELLARNAU Aurelien
+** Last update Wed Sep 13 21:27:24 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -88,7 +88,7 @@ t_swctx	*finalize_ctx()
   if (ctx->pub_port == 0)
     ctx->pub_port = 4243;
   if (ctx->cycle == 0)
-    ctx->cycle = 1000000;
+    ctx->cycle = 500000;
   if (ctx->size == 0)
     ctx->size = 4;
   return (ctx);

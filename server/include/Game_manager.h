@@ -5,15 +5,17 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Jul 12 13:28:35 2017 CASTELLARNAU Aurelien
-** Last update Sun Aug 27 16:37:50 2017 BILLAUD Jean
+** Last update Wed Sep 13 20:33:07 2017 BILLAUD Jean
 */
 
 #ifndef  _GAME_MANAGER_H_
 # define _GAME_MANAGER_H_
 
 #include <json/json.h>
+#include <czmq.h>
 #include "Player.h"
 #include "Map_manager.h"
+#include "Softwar_ctx.h"
 
 typedef struct	s_game_info
 {
@@ -40,11 +42,13 @@ typedef struct	s_game_manager
   void		(*set_players_pos)(t_chain *players, uint map_size);
   void		(*energy_fall)(uint map_size);
   t_game_info	**(*get_info)();
+  t_swctx	*(*get_swctx)();
   t_map_manager *(*map_manager)();
-  json_object	*(*serialize)(void);
+  json_object	*(*serialize)(t_game_info *info);
   int		ready;
 }		t_game_manager;
 
 t_game_manager	*get_game_manager();
-
+json_object	*game_info_to_json(t_game_info *info);
+void		energy_fall(uint map_size);
 #endif /* !_GAME_INFO_H_ */

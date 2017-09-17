@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Fri Sep  8 17:41:32 2017 BILLAUD Jean
+** Last update Thu Sep 14 17:25:58 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -26,6 +26,7 @@
 ** en fonction d'un bool
 ** ALLOCATE MEMORY
 */
+
 char	*generate_output(int success)
 {
   char	tmp[4];
