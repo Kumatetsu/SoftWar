@@ -3,11 +3,8 @@ import time
 import random
 from datetime import datetime
 import zmq
-
-IP_SERV = '192.168.1.22'
-IP_LOCAL = '127.0.0.1'
-IP_USED = IP_LOCAL
-PORT = 5555
+import option_req as opt
+import action
 
 process_player = 0
 
@@ -35,7 +32,8 @@ def main():
     context = zmq.Context()
     print "Connecting to server..."
     socket = context.socket(zmq.REQ)
-    socket.connect ("tcp://localhost:%s" % PORT)
+    socket.connect ('tcp://%s:%s' % (opt.host, opt.port))
+    print action.identity()
     for request in range (1,10):
         print "Sending request ", request,"..."
         socket.send ("Hello")

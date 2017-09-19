@@ -4,3 +4,4 @@ client_rep/libmy
 client_rep/libmy/*
 server/*.log
 server/sw_server
+**/*.pyc
