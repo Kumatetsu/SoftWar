@@ -10,9 +10,6 @@
 
 #include <json/json.h>
 #include "libmy.h"
-#include "player.h"
-#include "game_info.h"
-#include "map_manager.h"
 #include "game_manager.h"
 #include "game_status.h"
 

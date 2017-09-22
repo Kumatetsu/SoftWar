@@ -16,34 +16,56 @@
 #include <energy_cell.h>
 #include <map_manager.h>
 
+t_energy_cell	*is_energy_cell(uint x, uint y, t_chain *ecs)
+{
+  t_link	*te;
+  t_energy_cell	*ec;
+
+  if (ecs == NULL)
+    {
+      my_log(__func__, "ecs == null", 4);
+      return (NULL);
+    }
+  te = ecs->first;
+  while (te)
+    {
+      ec = (t_energy_cell*)(te->content); 
+      if (ec->x == x && ec->y == y)
+	return (ec);
+    }
+  return (NULL);
+}
+
+t_player	*is_player(uint x, uint y, t_chain *players)
+{
+  t_link	*tp;
+  t_player	*p;
+
+  if (players == NULL)
+    {
+      my_log(__func__, "player == null", 4);
+      return (NULL);
+    }
+  tp = players->first;
+  while (tp)
+    {
+      p = (t_player*)(tp->content);
+      if (p->x == x && p->y == y)
+	return (p);
+      tp = tp->next;
+    }
+  return (NULL);
+}
+
 /*
 ** ci-dessous les is_*
 */
-int		is_free_square(uint x, uint y, t_chain *players, t_chain *ecs)
+int	is_free_square(uint x, uint y, t_chain *players, t_chain *ecs)
 {
-  t_link	*tp;
-  t_link	*te;
+  int	is_free;
 
-  tp = players->first;
-  te = ecs->first;
-  
-  while (tp)
-    {
-      if (((t_player *)(tp->content))->x == x
-	  && ((t_player *)(tp->content))->y == y)
-	return (1);
-      tp = tp->next;
-    }
-
-  while (te)
-    {
-      if (((t_energy_cell *)(te->content))->x == x
-	  && ((t_energy_cell *)(te->content))->y == y)
-	return (1);
-      te = te->next;
-    }
-
-  return (0);
+  is_free = (is_energy_cell(x, y, ecs) == NULL && is_player(x, y, players) == NULL) ? 1 : 0;
+  return (is_free);
 }
 
 int	is_wall(uint x, uint y, uint map_size)
@@ -65,6 +87,8 @@ t_map_manager		*get_map_manager()
 	  my_log(__func__, MEM_ERR, 1);
 	  return (NULL);
 	}
+      manager->is_player = &is_player;
+      manager->is_energy_cell = &is_energy_cell;
       manager->is_free_square = &is_free_square;
       manager->is_wall = &is_wall;
     }

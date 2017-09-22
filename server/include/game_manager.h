@@ -35,17 +35,18 @@ typedef struct	s_game_manager
   int		(*add_player)(t_player *player);
   void		(*set_energy_cells)(t_chain *ecs);
   void		(*set_players_pos)(t_chain *players, uint map_size);
-  void		(*energy_fall)(uint map_size);
+  void		(*energy_fall)(t_game_info **info);
   t_game_info	**(*get_info)();
   t_swctx	*(*get_swctx)();
   t_map_manager *(*map_manager)();
   json_object	*(*serialize)(t_game_info *info);
+  int		(*set_change)(int change);
   int		ready;
 }		t_game_manager;
 
 t_game_manager	*get_game_manager();
 json_object	*game_info_to_json(t_game_info *info);
-void		energy_fall(uint map_size);
+void		energy_fall(t_game_info **info);
 
 #include "command.h"
 #include "utils.h"

@@ -18,6 +18,7 @@ typedef struct  s_game_info
   t_chain       *players;
   t_chain       *energy_cells;
   int           ready;
+  int		change;
 }               t_game_info;
 
 t_game_info	**init_game_info(uint map_size, uint game_status);

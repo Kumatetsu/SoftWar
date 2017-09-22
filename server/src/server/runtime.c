@@ -52,13 +52,15 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   char		*input;
   pthread_t 	tic;
   t_thread	*t;
+  t_game_info	**gi;
 
-  identify(manager, "X0TOTO", "option");
-  t = init_thread(*ctx, *(*manager)->get_info());
+  gi = (*manager)->get_info();
+  t = init_thread(*ctx, *gi);
   if (pthread_create(&tic, NULL, tic_thread, t) == -1) {
     perror("pthread_create");
     return EXIT_FAILURE;
   }
+  
   
   while (!zsys_interrupted)
     {

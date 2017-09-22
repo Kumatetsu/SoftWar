@@ -60,3 +60,38 @@ int		count_ecs(t_chain *ecs, uint map_size)
   else
     return (1);
 }
+
+uint	**eq_watch(uint a, uint b, int operator_inv, int swap)
+{
+  uint	**coord;
+  uint	swaper[2];
+  int	i;
+  int	x;
+  int	y;
+  int	z;
+
+  x = (operator_inv) ? 1 : -1;
+  y = (operator_inv) ? 2 : -2;
+  z = (operator_inv) ? -1 : 1;
+  coord = (uint **)malloc(4 * sizeof(uint *));
+  for (i = 0; i < 4; i++)
+    coord[i] = (uint *)malloc(2 * sizeof(uint));
+  coord[0][0] = (a + x);
+  coord[0][1] = b;
+  coord[1][0] = (a + y);
+  coord[1][1] = (b + z);
+  coord[2][0] = (a + y);
+  coord[2][1] = b;
+  coord[3][0] = (a + y);
+  coord[3][1] = (b + x);
+  if (swap)
+    {
+      swaper[0] = coord[1][0];
+      swaper[1] = coord[1][1];
+      coord[1][0] = coord[3][0];
+      coord[1][1] = coord[3][1];
+      coord[3][0] = swaper[0];
+      coord[3][1] = swaper[1];
+    }
+  return (coord);
+}

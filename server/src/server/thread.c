@@ -29,7 +29,6 @@ void		refresh_ap(t_game_info **info)
       p->action = 1;
       l = l->next;
     }
-
   return;
 }
 
@@ -52,8 +51,64 @@ int		dead(t_chain *players)
     }
   return (count);
 }
-
+/*
 void 		*tic_thread(void *manager)
+{
+  t_thread	*thread = (t_thread *)(manager);
+  zsock_t	*pub;
+  t_swsock	*pub_sw;
+  json_object	*json;
+  uint		cycle;
+  int		dead_count;
+  int		count;
+  int		nb_player;
+  char		output[50];
+  char		*malloc_output;
+
+  srand(time(NULL));
+  count = 0;
+  cycle = thread->ctx->cycle;
+  pub = ((t_swsock *)(thread->ctx->sockets->first->content))->socket;
+  pub_sw = (t_swsock *)(thread->ctx->sockets->first->content);
+  my_log(__func__, "socket check: ", 4);
+  my_log(__func__, pub_sw->name, 4);
+  if (thread == NULL)
+    my_log(__func__, "thread is null", 4);
+  if (thread->info == NULL)
+    my_log(__func__, "thread info is null", 4);
+  while (!zsys_interrupted) {
+    usleep(cycle);
+    if (thread->info->game_status == 1) {
+      zstr_sendf(pub, "%s %d", "Softwar", GAME_START);
+    }
+    dead_count = dead(thread->info->players);
+    nb_player = (4 - dead_count);
+    while (dead_count > count) {
+      zstr_sendf(pub, "%s %d", "Softwar", CLIENT_DEAD);
+      count++;
+      my_log(__func__, "client dead\n", 3);
+    }
+    if (nb_player < 2)
+      {
+	 zstr_sendf(pub, "%s %d", "Softwar", CLIENT_WIN);
+	 zstr_sendf(pub, "%s %d", "Softwar", GAME_END);
+	 thread->info->game_status = 0;
+	 my_log(__func__, "client win, game is end\n", 3);
+      }
+    json = game_info_to_json(thread->info);
+    sprintf(output, "%s %d %s l.101", "Softwar", CYCLE, json_object_to_json_string(json));
+    if ((malloc_output = my_strdup(output)) == NULL)
+      return (NULL);
+    my_log(__func__, malloc_output, 3);
+    zstr_send(pub, malloc_output);
+    energy_fall(&thread->info);
+    refresh_ap(&thread->info);
+    count = 0;
+  }
+  pthread_exit(NULL);
+}
+*/
+void		*tic_thread(void *manager)
 {
   t_thread	*thread = (t_thread *)(manager);
   zsock_t	*pub;
@@ -84,19 +139,19 @@ void 		*tic_thread(void *manager)
     }
     if (nb_player < 2)
       {
-	 zstr_sendf(pub, "%s %d", "Softwar", CLIENT_WIN);
-	 zstr_sendf(pub, "%s %d", "Softwar", GAME_END);
-	 thread->info->game_status = 0;
-	 my_putstr("client win, game is end\n");
+	zstr_sendf(pub, "%s %d", "Softwar", CLIENT_WIN);
+	zstr_sendf(pub, "%s %d", "Softwar", GAME_END);
+	thread->info->game_status = 0;
+	my_putstr("client win, game is end\n");
       }
     json = game_info_to_json(thread->info);
     zstr_sendf(pub, "%s %d %s", "Softwar", CYCLE,json_object_to_json_string(json));
+    my_log(__func__, "display game info: ", 3);
     my_putstr(json_object_to_json_string(json));
     my_putstr("\n");
-    energy_fall(thread->info->map_size);
+    energy_fall(&thread->info);
     refresh_ap(&thread->info);
     count = 0;
   }
   pthread_exit(NULL);
 }
-

@@ -33,6 +33,7 @@ t_game_info             **init_game_info(unsigned int map_size,
 	return (NULL);
       game_info->map_size = map_size;
       game_info->game_status = game_status;
+      game_info->change = 0;
     }
   return (&game_info);
 }
@@ -41,6 +42,7 @@ t_game_info     **get_info()
 {
   t_game_info   **gi;
 
+  my_log(__func__, "init game info from get_info()", 4);
   if ((gi = init_game_info(0, 0)) == NULL)
     return (NULL);
   return (gi);

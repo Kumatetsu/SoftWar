@@ -11,6 +11,9 @@
 #ifndef  _COMMAND_H_
 # define _COMMAND_H_
 
+# define FAIL 0
+# define SUCCESS 1
+
 typedef char *(t_command)(t_game_manager**, char*, char*);
 
 t_command	**get_commands();

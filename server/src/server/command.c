@@ -39,6 +39,25 @@ char	*generate_output(int success)
 }
 
 /*
+** génère le bon début d'output
+** en fonction d'un bool
+** ALLOCATE MEMORY
+*/
+char	*generate_output_param(int success, char *param)
+{
+  char	tmp[4];
+  char	*output;
+  
+  if (success)
+    sprintf(tmp, "ok|%s", param);
+  else
+    sprintf(tmp, "ko|");
+  if ((output = my_strdup(tmp)) == NULL)
+    return (NULL);
+  return (output);
+}
+
+/*
 ** génère un unique id
 ** ALLOCATE MEMORY
 */
@@ -88,6 +107,7 @@ char		*identify(t_game_manager **manager, char *identity, char *optional)
   sprintf(tmp, "ok|%s", new->identity);
   if ((output = my_strdup(tmp)) == NULL)
     return (NULL);
+  (*manager)->set_change(1);
   return (output);
 }
 
@@ -101,6 +121,7 @@ char	*self_id(t_game_manager **manager, char *identity, char *optional)
     sprintf(log, "manager not ready, parameter: %s", identity);
   my_log(__func__, "call function self_id", 3);
   my_log(__func__, optional, 3);
+  (*manager)->set_change(1);
   return (identity);
 }
 
@@ -141,6 +162,7 @@ char		*leave(t_game_manager **manager, char *identity, char *optional)
   my_log(__func__, log, 2);
   if ((output = my_strdup(log)) == NULL)
     return (NULL);
+  (*manager)->set_change(1);
   return (output);
 }
 
@@ -216,6 +238,7 @@ char		*forward(t_game_manager **manager, char *identity, char *optional)
     sprintf(log, "manager not ready, parameter: %s", identity);
   my_log(__func__, "call function forward", 3);
   my_log(__func__, optional, 3);
+  (*manager)->set_change(1);
   return (generate_output(success));
 }
 
@@ -287,6 +310,7 @@ char		*backward(t_game_manager **manager, char *identity, char *optional)
    sprintf(log, "manager not ready, parameter: %s", identity);
   my_log(__func__, "call function backward", 3);
   my_log(__func__, optional, 3);
+  (*manager)->set_change(1);
   return (generate_output(success));
 }
 
@@ -302,7 +326,7 @@ char		*left(t_game_manager **manager, char *identity, char *optional)
       sprintf(log, "manager ready, parameter: %s", identity);
       player = (*manager)->get_player(identity);
       if (player->action < 0.5)
-	sprintf("%s action point are too low", identity);
+	sprintf(log, "%s action point are too low", identity);
       else
 	{
 	  player->action = player->action - 0.5;
@@ -314,6 +338,7 @@ char		*left(t_game_manager **manager, char *identity, char *optional)
     sprintf(log, "manager not ready, parameter: %s", identity);
   my_log(__func__, "call function left", 3);
   my_log(__func__, optional, 3);
+  (*manager)->set_change(1);
   return (generate_output(success));
 }
 
@@ -329,7 +354,7 @@ char		*right(t_game_manager **manager, char *identity, char *optional)
       sprintf(log, "manager ready, parameter: %s", identity);
       player = (*manager)->get_player(identity);
       if (player->action < 0.5)
-	sprintf("%s action point are too low", identity);
+	sprintf(log, "%s action point are too low", identity);
       else if (player->looking == DOWN)
 	{
 	  player->action = player->action - 0.5;
@@ -341,6 +366,7 @@ char		*right(t_game_manager **manager, char *identity, char *optional)
     sprintf(log, "manager not ready, parameter: %s", identity);
   my_log(__func__, "call function right", 3);
   my_log(__func__, optional, 3);
+  (*manager)->set_change(1);
   return (generate_output(success));
 }
 
@@ -370,6 +396,7 @@ char		*leftfwd(t_game_manager **manager, char *identity, char *optional)
     sprintf(log, "manager not ready, parameter: %s", identity);
   my_log(__func__, "call function leftfwd", 3);
   my_log(__func__, optional, 3);
+  (*manager)->set_change(1);
   return (generate_output(success));
 }
 
@@ -402,50 +429,130 @@ char		*rightfwd(t_game_manager **manager, char *identity, char *optional)
   return (generate_output(success));
 }
 
-/**
- ** Prototype des commandes restantes à coder ;)
- */
+/*
+** looking: renvoit l'orientation du processus (voir include/enum.h pour concordance)
+*/
 char		*looking(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
-
+  t_player	*p;
+  char		look[2];
+  
   if ((*manager)->ready)
     {
-      sprintf(log, "manager ready, parameter: %s", identity);
+      if ((p = (*manager)->get_player(identity)) == NULL)
+	return (NULL);
+      sprintf(look, "%d", p->looking);
+      (*manager)->set_change(1);
+      return (generate_output_param(SUCCESS, look));
     }
   else
     sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, "call function rightfwd", 3);
+  my_log(__func__, "call function looking", 3);
   my_log(__func__, optional, 3);
-  return (identity);
+  return (generate_output(FAIL));
 }
 
+/*
+** Choix de la gestion d'erreur:
+** Gather est considérée successful dès lors que le player
+** a récupéré l'énergie. Si la tentative de suppression échoue,
+** aucun segfault n'est à redouté, du coup, l'énergie cell restera
+** sur le plateau et le jeux ne plantera pas. Un warning est loggé
+** en cas d'échec des opérations de passage de l'energy_cell au t_link
+** et de suppression du t_link. On laisse la porte ouverte à un bug
+** pour rendre le programme plus résiliant...
+**
+** Un point d'action est débité si la commande est successfull.
+**
+** Au final, gather fail quand il n'y a pas d'energy_cell sur la case ;). 
+*/
 char		*gather(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
+  t_player	*player;
+  t_chain	*energy_cells;
+  t_link	*link;
+  t_energy_cell *ec;
 
-  if ((*manager)->ready) {
-    sprintf(log, "manager ready, parameter: %s", identity);
-  }
+  player = (*manager)->get_player(identity);
+  energy_cells = (*manager)->get_energy_cells();
+  if ((*manager)->ready)
+    {
+      sprintf(log, "manager ready, parameter: %s", identity);
+      if ((ec = is_energy_cell(player->x, player->y, energy_cells)) != NULL)
+	{
+	  player->energy += ec->value;
+	  player->action -= 1;
+	  if ((link = get_link_by_content(ec, energy_cells)) != NULL)
+	    {
+	      if (remove_link(&energy_cells, link))
+		my_log(__func__, "delete energy cell failed", 3);
+	      else
+		my_log(__func__, "energy cell consumed", 2);
+	    }
+	  else
+	    my_log(__func__, "try retrieving t_link by energy_cell content failed", 3);
+	  (*manager)->set_change(1);
+	  return (generate_output(SUCCESS));
+	}
+    }
   else
-    sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, "call function rightfwd", 3);
-  my_log(__func__, optional, 3);
-  return (identity);
+      sprintf(log, "manager not ready, parameter: %s", optional);
+  return (generate_output(FAIL));
 }
 
 char		*watch(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
+  t_player	*player;
+  t_player	*p;
+  t_energy_cell	*ec;
+  int		it;
+  uint		a;
+  uint		b;
+  int		operator_inv;
+  int		swap;
+  uint		**zone;
+  char		*state;
+  char		*player_output;
 
-  if ((*manager)->ready) {
-    sprintf(log, "manager ready, parameter: %s", identity);
-  }
+  it = 0;
+  if ((*manager)->ready)
+    {
+      sprintf(log, "processus %s is watching", identity);
+      if ((player = (*manager)->get_player(identity)) == NULL)
+	return (NULL);
+      if ((state = my_strdup("[\"")) == NULL)
+	return (NULL);
+      a = (player->looking == LEFT || player->looking == RIGHT) ? player->x : player->y;
+      b = (player->looking == LEFT || player->looking == RIGHT) ? player->y : player->x;
+      operator_inv = (player->looking == RIGHT || player->looking == DOWN) ? 1 : 0;
+      swap = (player->looking == UP || player->looking == DOWN) ? 1 : 0;
+      if ((zone = eq_watch(a, b, operator_inv, swap)) == NULL)
+	return (NULL);
+      while (it < 4)
+	{
+	  if ((ec = is_energy_cell(zone[it][0], zone[it][1], (*manager)->get_energy_cells())) == NULL)
+	    if ((state = my_strcat(state, "energy\",")) == NULL)
+	      return (NULL);
+	  if ((p = is_player(zone[it][0], zone[it][1], (*manager)->get_players())) == NULL)
+	    {
+	      if ((player_output = my_strcat(p->identity, ", ")) == NULL)
+		return (NULL);
+	      if ((state = my_strcat(state, player_output)) == NULL)
+		return (NULL);
+	      free(player_output);
+	    }
+	  (*manager)->set_change(1);
+	  ++it;
+	}
+    }
   else
-    sprintf(log, "manager not ready, parameter: %s", identity);
+    sprintf(log, "manager not ready, processus %s wanted to watch", identity);
   my_log(__func__, "call function rightfwd", 3);
   my_log(__func__, optional, 3);
-  return (identity);
+  return (generate_output(FAIL));
 }
 
 char		*attack(t_game_manager **manager, char *identity, char *optional)

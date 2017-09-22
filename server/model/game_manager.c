@@ -16,6 +16,13 @@
 #include "softwar_ctx.h"
 #include "game_manager.h"
 
+int	set_change(int change)
+{
+ t_game_info **game_info = get_info();
+ (*game_info)->change = change;
+ return ((*game_info)->change);
+}
+
 t_player	*get_player(char *identity)
 {
   t_link	*tmp;
@@ -72,30 +79,31 @@ t_chain		*get_energy_cells()
   return ((*game_info)->energy_cells);
 }
 
-void		energy_fall(uint map_size)
+void		energy_fall(t_game_info **info)
 {
   int		x;
   int		y;
   int		power;
-  t_game_info	**game_info;
   t_energy_cell	*ecs;
   t_map_manager *map;
-
+  uint		map_size;
+  
   map = get_map_manager();
-  game_info = get_info();
+  map_size = (*info)->map_size;
   x = rand() % (map_size + 1);
   y = rand() % (map_size + 1);
   power = rand() % (16 - 5) + 5;
-  if (count_ecs((*game_info)->energy_cells, map_size) == 0)
+  if (count_ecs((*info)->energy_cells, map_size) == 0)
     {
-      if (map->is_free_square(x, y, (*game_info)->players, (*game_info)->energy_cells) == 0) {
-	if ((ecs = create_energy_cell(x, y, power)) == NULL)
-	  return;
-	if (add_link(&((*game_info)->energy_cells), ecs))
-	  return;
-      } else {
-	energy_fall(map_size);
-      }
+      if (map->is_free_square(x, y, (*info)->players, (*info)->energy_cells))
+	{
+	  if ((ecs = create_energy_cell(x, y, power)) == NULL)
+	    return;
+	  if (add_link(&((*info)->energy_cells), ecs))
+	    return;
+	}
+      else
+	energy_fall(info);
     }
   return;
 }
@@ -129,7 +137,7 @@ json_object	*game_info_to_json(t_game_info *info)
   json_object	*players_json;
   json_object	*energy_cells_json;
   t_game_info   **game_info;
-  
+
   game_info		= &info;
   game_info_json	= json_object_new_object();
   map_size_json		= json_object_new_int((*game_info)->map_size);
@@ -187,7 +195,8 @@ t_game_manager		*get_game_manager()
       manager->serialize	 = &game_info_to_json;
       manager->map_manager       = &get_map_manager;
       manager->get_swctx         = &get_swctx;
-      manager->ready		 = 0;
+      manager->set_change	 = &set_change;
+      manager->ready		 = 0; 		
     }
   return (manager);
 }
