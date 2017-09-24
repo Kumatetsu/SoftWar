@@ -13,10 +13,13 @@
 #include <json/json.h>
 #include "libmy.h"
 #include "softwar_ctx.h"
+#include "player.h"
+#include "energy_cell.h"
 #include "game_manager.h"
 #include "hash.h"
 #include "utils.h"
 #include "command.h"
+#include "enum.h"
 
 /*
 ** génère le bon début d'output
@@ -108,6 +111,7 @@ char		*identify(t_game_manager **manager, char *identity, char *optional)
   if ((output = my_strdup(tmp)) == NULL)
     return (NULL);
   (*manager)->set_change(1);
+  my_log(__func__, output, 4);
   return (output);
 }
 
@@ -180,6 +184,12 @@ char		*forward(t_game_manager **manager, char *identity, char *optional)
     {    
       sprintf(log, "manager ready, parameter: %s", identity);
       p = (*manager)->get_player(identity);
+      if (p == NULL)
+	{
+	  sprintf(log, "can't retrieve player by id: %s", identity);
+	  my_log(__func__, log, 2);
+	  return (NULL);
+	}
       switch (p->looking)
 	{
 	case LEFT:
@@ -382,7 +392,7 @@ char		*leftfwd(t_game_manager **manager, char *identity, char *optional)
     {
       sprintf(log, "manager ready, parameter: %s", identity);
       if (player->action < 1)
-	sprintf("%s action point are too low", identity);
+	sprintf(log, "%s action point are too low", identity);
       else
 	{
 	  if ((left(manager, identity, optional)) == NULL)
@@ -412,7 +422,7 @@ char		*rightfwd(t_game_manager **manager, char *identity, char *optional)
     {
       sprintf(log, "manager ready, parameter: %s", identity);
       if (player->action < 1)
-	sprintf("%s action point are too low", identity);
+	sprintf(log, "%s action point are too low", identity);
       else
 	{
 	  if ((right(manager, identity, optional)) == NULL)
@@ -536,7 +546,7 @@ char		*watch(t_game_manager **manager, char *identity, char *optional)
 	  if ((ec = is_energy_cell(zone[it][0], zone[it][1], (*manager)->get_energy_cells())) == NULL)
 	    if ((state = my_strcat(state, "energy\",")) == NULL)
 	      return (NULL);
-	  if ((p = is_player(zone[it][0], zone[it][1], (*manager)->get_players())) == NULL)
+	  if ((p = is_player(zone[it][0], zone[it][1], (*manager)->get_players())) != NULL)
 	    {
 	      if ((player_output = my_strcat(p->identity, ", ")) == NULL)
 		return (NULL);

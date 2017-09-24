@@ -31,14 +31,20 @@ int		check_mvmnt(uint x, uint y, char *identity, t_game_manager *manager)
   ecs = manager->get_energy_cells();
   map = manager->map_manager();
   map_size = manager->get_map_size();
-  if (map->is_wall(x, y, map_size) == 1) {
-    sprintf(log, "%s tried to go in a wall", identity);
-    return (1);
-  } else if (map->is_free_square(x, y, players, ecs) == 1) {
-    sprintf(log, "%s tried to walk on something", identity);
-    return (1);
-  } else
-    return (0);
+  if (map->is_wall(x, y, map_size) == 1)
+    {
+      sprintf(log, "%s tried to go in a wall", identity);
+      my_log(__func__, log, 4);
+      return (1);
+    }
+  else if (map->is_free_square(x, y, players, ecs) == 1)
+    {
+      sprintf(log, "%s tried to walk on something", identity);
+      my_log(__func__, log, 4);
+      return (1);
+    }
+  else
+      return (0);
 }
 
 int		count_ecs(t_chain *ecs, uint map_size)

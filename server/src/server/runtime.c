@@ -54,14 +54,31 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   t_thread	*t;
   t_game_info	**gi;
 
+  t_command	**commands;
+
+  identify(manager, "foo", NULL);
+  identify(manager, "foo", NULL);
+  identify(manager, "foo", NULL);
+  identify(manager, "foo", NULL);
   gi = (*manager)->get_info();
+
+  commands = get_commands();
+  if (commands[hash_command("forward")](manager, "0x01", NULL) == NULL)
+    my_log(__func__, "forward failed", 4);
+  commands[hash_command("backward")](manager, "0x01", NULL);
+  commands[hash_command("leftfwd")](manager, "0x01", NULL);
+  commands[hash_command("rightfwd")](manager, "0x01", NULL);
+  commands[hash_command("left")](manager, "0x01", NULL);
+  commands[hash_command("right")](manager, "0x01", NULL);
+  commands[hash_command("gather")](manager, "0x01", NULL);
+  commands[hash_command("watch")](manager, "0x01", NULL);
+
   t = init_thread(*ctx, *gi);
   if (pthread_create(&tic, NULL, tic_thread, t) == -1) {
     perror("pthread_create");
     return EXIT_FAILURE;
   }
-  
-  
+
   while (!zsys_interrupted)
     {
       if ((response = init_poll(ctx)) == NULL)

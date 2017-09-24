@@ -32,6 +32,7 @@ t_energy_cell	*is_energy_cell(uint x, uint y, t_chain *ecs)
       ec = (t_energy_cell*)(te->content); 
       if (ec->x == x && ec->y == y)
 	return (ec);
+      te = te->next;
     }
   return (NULL);
 }
