@@ -65,7 +65,7 @@ char		*exec(	char *input,
 	    return (NULL);
 	  return (output);
 	}
-      sprintf(log, "execution of function %s succeeded, return = %s", inputs[0], output);
+      my_log(__func__, output, 4);
       return (output);
     }  
   sprintf(log, "command %s doesn't exist", inputs[0]);

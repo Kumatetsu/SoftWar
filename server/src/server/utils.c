@@ -71,11 +71,13 @@ uint	**eq_watch(uint a, uint b, int operator_inv, int swap)
 {
   uint	**coord;
   uint	swaper[2];
+  uint	unit_swaper;
   int	i;
   int	x;
   int	y;
   int	z;
 
+  
   x = (operator_inv) ? 1 : -1;
   y = (operator_inv) ? 2 : -2;
   z = (operator_inv) ? -1 : 1;
@@ -98,6 +100,56 @@ uint	**eq_watch(uint a, uint b, int operator_inv, int swap)
       coord[1][1] = coord[3][1];
       coord[3][0] = swaper[0];
       coord[3][1] = swaper[1];
+      for (i = 0; i < 4; i++)
+	{
+	  unit_swaper = coord[i][0];
+	  coord[i][0] = coord[i][1];
+	  coord[i][1] = unit_swaper;
+	}
     }
   return (coord);
+}
+
+
+/*
+** ALLOCATE_MEMORY
+*/
+char		*compile_watch_return(t_game_manager **manager, uint **zone)
+{
+  int		it;
+  char		*state;
+  t_energy_cell	*ec;
+  t_player	*p;
+
+  if ((state = my_strdup("[")) == NULL)
+    return (NULL);
+  for (it = 0; it < 4; it++)
+    {
+      if ((state = my_strcat(state, "\"")) == NULL)
+	return (NULL);
+      if ((ec = is_energy_cell(zone[it][0], zone[it][1], (*manager)->get_energy_cells())) != NULL)
+	{
+	  if ((state = my_strcat(state, "energy")) == NULL)
+	    return (NULL);
+	}
+      else if ((p = is_player(zone[it][0], zone[it][1], (*manager)->get_players())) != NULL)
+	{
+	  if ((state = my_strcat(state, p->identity)) == NULL)
+	    return (NULL);
+	}
+      else
+	{
+	  if ((state = my_strcat(state, "empty")) == NULL)
+	    return (NULL);
+	}
+      if (it < 3)
+	{
+	  if ((state = my_strcat(state, "\", ")) == NULL)
+	    return (NULL);
+	}
+      else
+	if ((state = my_strcat(state, "\"]")) == NULL)
+	  return (NULL);
+    }
+  return (state);
 }

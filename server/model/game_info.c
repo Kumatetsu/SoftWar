@@ -42,7 +42,8 @@ t_game_info     **get_info()
 {
   t_game_info   **gi;
 
-  my_log(__func__, "init game info from get_info()", 4);
+  // USEFULL LOG TO TRACK STRANGE BEHAVIOUR OF GET_INFO (cause there are...)
+  //  my_log(__func__, "init game info from get_info()", 4);
   if ((gi = init_game_info(0, 0)) == NULL)
     return (NULL);
   return (gi);
