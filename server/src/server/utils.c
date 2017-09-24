@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Mon Sep  4 20:05:35 2017 BILLAUD Jean
-** Last update Fri Sep 15 17:03:31 2017 BILLAUD Jean
+** Last update Mon Sep 25 16:41:36 2017 BILLAUD Jean
 */
 
 
@@ -25,7 +25,7 @@ int		check_mvmnt(uint x, uint y, char *identity, t_game_manager *manager)
   t_chain       *players;
   t_map_manager *map;
   int		map_size;
-  
+
   players = manager->get_players();
   map = manager->map_manager();
   map_size = manager->get_map_size();

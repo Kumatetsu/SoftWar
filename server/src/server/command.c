@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Thu Sep 14 17:25:58 2017 BILLAUD Jean
+** Last update Mon Sep 25 16:38:13 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -372,7 +372,7 @@ char		*right(t_game_manager **manager, char *identity, char *optional)
     {
       sprintf(log, "manager ready, parameter: %s", identity);
       player = (*manager)->get_player(identity);
-      if (player->action < 0.5)
+      if (player->action > 0.5)
 	sprintf(log, "%s action point are too low", identity);
       else
 	{
@@ -594,16 +594,18 @@ char		*jump(t_game_manager **manager, char *identity, char *optional)
   if ((*manager)->ready) {    
     sprintf(log, "manager ready, parameter: %s", identity);
     p = (*manager)->get_player(identity);
+    my_put_nbr(p->looking);
+    my_putstr("\n");
     switch (p->looking)
       {
       case LEFT:
 	if (check_mvmnt(p->x - 2, p->y, identity, (*manager)) == 1)
 	  sprintf(log, "%s can't jump left", identity);
-	else if (p->action < 2)
+	else if (p->energy < 2)
 	  sprintf(log, "%s action point are too low", identity);
 	else
 	  {
-	    p->action = p->action - 2;
+	    p->energy = p->energy - 2;
 	    p->x = p->x - 2;
 	    success = 1;
 	  }
@@ -611,23 +613,29 @@ char		*jump(t_game_manager **manager, char *identity, char *optional)
       case UP:
 	if (check_mvmnt(p->x, p->y - 2, identity, (*manager)) == 1)
 	  sprintf(log, "%s can't jump  up", identity);
-	else if (p->action < 2)
+	else if (p->energy < 2)
 	  sprintf(log, "%s action point are too low", identity);
 	else
 	  {
-	    p->action = p->action - 2;
+	    p->energy = p->energy - 2;
 	    p->y = p->y - 2;
 	    success = 1;
 	  }
 	break;
       case RIGHT:
 	if (check_mvmnt(p->x + 2, p->y, identity, (*manager)) == 1)
-	  sprintf(log, "%s can't jump right", identity);
-	else if (p->action < 2)
-	  sprintf(log, "%s action point are too low", identity);
+	  {
+	    my_putstr("wall right");
+	    sprintf(log, "%s can't jump right", identity);
+	  }
+	else if (p->energy < 2)
+	  {
+	    my_putstr("energy fail");
+	    sprintf(log, "%s action point are too low", identity);
+	  }
 	else
 	  {
-	    p->action = p->action - 2;
+	    p->energy = p->energy - 2;
 	    p->x = p->x + 2;
 	    success = 1;
 	  }
@@ -635,11 +643,11 @@ char		*jump(t_game_manager **manager, char *identity, char *optional)
       case DOWN:
 	if (check_mvmnt(p->x, p->y + 2, identity, (*manager)) == 1)
 	  sprintf(log, "%s can't jump down", identity);
-	else if (p->action < 2)
+	else if (p->energy < 2)
 	  sprintf(log, "%s action point are too low", identity);
 	else
 	  {
-	    p->action = p->action - 2;
+	    p->energy = p->energy - 2;
 	    p->y = p->y + 2;
 	    success = 1;
 	  }
@@ -652,6 +660,9 @@ char		*jump(t_game_manager **manager, char *identity, char *optional)
     sprintf(log, "manager not ready, parameter: %s", identity);
   my_log(__func__, "call function jump", 3);
   my_log(__func__, optional, 3);
+  my_put_nbr(p->x);
+  my_put_nbr(p->y);
+  my_putstr("\n");
   return (generate_output(success));
 }
 
