@@ -189,6 +189,7 @@ char		*forward(t_game_manager **manager, char *identity, char *optional)
   if ((*manager)->ready)
     {    
       sprintf(log, "manager ready, parameter: %s", identity);
+      my_log(__func__, log, 4);
       p = (*manager)->get_player(identity);
       if (p == NULL)
 	{
@@ -247,11 +248,13 @@ char		*forward(t_game_manager **manager, char *identity, char *optional)
 	    }
 	  break;
 	default:
+	  my_log(__func__, "falled in default in forward switch", 3);
 	  break;
 	}
     }
   else
     sprintf(log, "manager not ready, parameter: %s", identity);
+  my_log(__func__, log, 4);
   my_log(__func__, "call function forward", 3);
   my_log(__func__, optional, 3);
   (*manager)->set_change(1);

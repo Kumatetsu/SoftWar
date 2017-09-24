@@ -84,6 +84,7 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
     }
   player->looking = 3;
   player->x = 2;
+  player->action = 5000; 
   /*
   ** on ajoute une energy cell juste en face de lui
   ** position 1 dans le tableau de watch
@@ -115,6 +116,24 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   my_log(__func__, "call to exec passed", 4);
   sprintf(log, "return: %s", ret);
   my_log(__func__, log, 3);
+
+  my_log(__func__, "before call to exec", 4);
+  if ((ret = exec("forward", manager, "0x01")) == NULL)
+    return (1);
+  my_log(__func__, "call to exec passed", 4);
+  sprintf(log, "return: %s", ret);
+  my_log(__func__, log, 3);
+
+  sprintf(log, "Energy possessed by player before gather: %d", player->energy);
+  my_log(__func__, log, 4);
+  my_log(__func__, "before call to exec", 4);
+  if ((ret = exec("gather", manager, "0x01")) == NULL)
+    return (1);
+  my_log(__func__, "call to exec passed", 4);
+  sprintf(log, "return: %s", ret);
+  my_log(__func__, log, 3);
+  sprintf(log, "Energy possessed by player after gather: %d", player->energy);
+  my_log(__func__, log, 4);
 
   if ((response = init_poll(ctx)) == NULL)
     return (1);

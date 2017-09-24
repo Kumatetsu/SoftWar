@@ -23,12 +23,10 @@ int		check_mvmnt(uint x, uint y, char *identity, t_game_manager *manager)
 {
   char		log[50];
   t_chain       *players;
-  t_chain       *ecs;
   t_map_manager *map;
   int		map_size;
   
   players = manager->get_players();
-  ecs = manager->get_energy_cells();
   map = manager->map_manager();
   map_size = manager->get_map_size();
   if (map->is_wall(x, y, map_size) == 1)
@@ -37,9 +35,9 @@ int		check_mvmnt(uint x, uint y, char *identity, t_game_manager *manager)
       my_log(__func__, log, 4);
       return (1);
     }
-  else if (map->is_free_square(x, y, players, ecs) == 1)
+  else if (map->is_player(x, y, players) != NULL)
     {
-      sprintf(log, "%s tried to walk on something", identity);
+      sprintf(log, "%s tried to walk on someone", identity);
       my_log(__func__, log, 4);
       return (1);
     }
