@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Jul 12 13:50:33 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep 25 16:22:24 2017 BILLAUD Jean
+** Last update Mon Sep 25 19:54:24 2017 BILLAUD Jean
 */
 
 #include <time.h>
@@ -59,6 +59,7 @@ void			set_players_pos(t_chain *players, uint map_size)
   int			i;
   int 			x[4] = {(map_size - 1), 0, (map_size - 1), 0};
   int			y[4] = {(map_size - 1), (map_size - 1), 0, 0};
+  int			looking[4] = {1, 1, 4, 4};
 
   i = 0;
   node_player = (players->first);
@@ -66,6 +67,7 @@ void			set_players_pos(t_chain *players, uint map_size)
     player = (t_player*)node_player->content;
     player->x = x[i];
     player->y = y[i];
+    player->looking = looking[i];
     i++;
     node_player = node_player->next;
   }

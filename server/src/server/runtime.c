@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 30 23:34:27 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep 25 17:29:11 2017 BILLAUD Jean
+** Last update Mon Sep 25 20:22:29 2017 BILLAUD Jean
 */
 
 #include <json/json.h>
@@ -155,12 +155,12 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   
   player->action = 5000;
   sprintf(log, "ORIGINAL position of player: x: %d, y: %d", player->x, player->y);
-  my_log(__func__, log, 4);
+  my_log(__func__, log, 3);
   my_log(__func__, "before call to exec", 4);
   if ((ret = exec("leftfwd", manager, "0x01")) == NULL)
     return (1);
   sprintf(log, "new position of player: x: %d, y: %d vue: %d", player->x, player->y, player->looking);
-  my_log(__func__, log, 4);
+  my_log(__func__, log, 3);
   my_log(__func__, "call to exec passed", 4);
   sprintf(log, "return: %s", ret);
   my_log(__func__, log, 3);
@@ -171,7 +171,7 @@ my_log(__func__, "before call to exec", 4);
   if ((ret = exec("rightfwd", manager, "0x01")) == NULL)
     return (1);
   sprintf(log, "new position of player: x: %d, y: %d looking: %d after rightfw", player->x, player->y, player->looking);
-  my_log(__func__, log, 4);
+  my_log(__func__, log, 3);
   my_log(__func__, "call to exec passed", 4);
   sprintf(log, "return: %s", ret);
   my_log(__func__, log, 3);
@@ -180,7 +180,7 @@ my_log(__func__, "before call to exec", 4);
   if ((ret = exec("right", manager, "0x01")) == NULL)
     return (1);
   sprintf(log, "new position of player: x: %d, y: %d", player->x, player->y);
-  my_log(__func__, log, 4);
+  my_log(__func__, log, 3);
   my_log(__func__, "call to exec passed", 4);
   sprintf(log, "return: %s", ret);
   my_log(__func__, log, 3);
@@ -188,7 +188,7 @@ my_log(__func__, "before call to exec", 4);
   if ((ret = exec("forward", manager, "0x01")) == NULL)
     return (1);
   sprintf(log, "new position of player: x: %d, y: %d", player->x, player->y);
-  my_log(__func__, log, 4);
+  my_log(__func__, log, 3);
   my_log(__func__, "call to exec passed", 4);
   sprintf(log, "return: %s", ret);
   my_log(__func__, log, 3);
@@ -202,7 +202,35 @@ my_log(__func__, "before call to exec", 4);
   sprintf(log, "return: %s", ret);
   my_log(__func__, log, 3);
   sprintf(log, "new position of player: x: %d, y: %d", player->x, player->y);
-  my_log(__func__, log, 4);
+  my_log(__func__, log, 3);
+
+  /*
+  ** On veut x:0, y=2
+  */
+  my_log(__func__, "before call to exec for jump", 3);
+  sprintf(log, "energy == %d", player->energy);
+  my_log(__func__, log, 3);
+  if ((ret = exec("jump", manager, "0x01")) == NULL)
+    return (1);
+  my_log(__func__, "call to exec passed for jump", 3);
+  sprintf(log, "return: %s", ret);
+  my_log(__func__, log, 3);
+  sprintf(log, "new position of player: x: %d, y: %d after jump", player->x, player->y);
+  my_log(__func__, log, 3);
+  sprintf(log, "energy == %d", player->energy);
+  my_log(__func__, log, 3);
+  /*
+  ** on veut une erreur pour jump in wall donc un ko
+  */
+  my_log(__func__, "before call to exec for jump in wall", 3);
+  if ((ret = exec("jump", manager, "0x01")) == NULL)
+    return (1);
+  my_log(__func__, "call to exec passed for jump in wall", 3);
+  sprintf(log, "return: %s", ret);
+  my_log(__func__, log, 3);
+  sprintf(log, "new position of player: x: %d, y: %d after jump", player->x, player->y);
+  my_log(__func__, log, 3);
+  
   /*
   ** On passe aux actions sur adversaire dans le prochain...
   */

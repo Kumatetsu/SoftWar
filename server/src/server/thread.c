@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Thu Aug 17 17:00:01 2017 BILLAUD Jean
-** Last update Fri Sep 15 17:03:38 2017 BILLAUD Jean
+** Last update Mon Sep 25 19:55:31 2017 BILLAUD Jean
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,7 +26,7 @@ void		refresh_ap(t_game_info **info)
   while (l)
     {
       p = ((t_player *)(l->content));
-      p->action = 1;
+      p->action = 10;
       l = l->next;
     }
   return;
@@ -108,6 +108,7 @@ void 		*tic_thread(void *manager)
   pthread_exit(NULL);
 }
 */
+/*
 void		*tic_thread(void *manager)
 {
   t_thread	*thread = (t_thread *)(manager);
@@ -124,9 +125,9 @@ void		*tic_thread(void *manager)
   pub = ((t_swsock *)(thread->ctx->sockets->first->content))->socket;
   while (!zsys_interrupted) {
     usleep(cycle);
-    /*
-    ** là il va bombarder j'vais trouver un truc pour qu'il le fasse que quand ça passe de 0 à 1.
-    */
+    
+     là il va bombarder j'vais trouver un truc pour qu'il le fasse que quand ça passe de 0 à 1.
+   
     if (thread->info->game_status == 1) {
       zstr_sendf(pub, "%s %d", "Softwar", GAME_START);
     }
@@ -155,3 +156,4 @@ void		*tic_thread(void *manager)
   }
   pthread_exit(NULL);
 }
+*/
