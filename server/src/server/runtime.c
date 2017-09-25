@@ -347,7 +347,7 @@ my_log(__func__, "before call to exec", 4);
     perror("pthread_create");
     return EXIT_FAILURE;
   }*/
-    while (!zsys_interrupted)
+  while (!zsys_interrupted)
     {
     if ((response = init_poll(ctx)) == NULL)
     return (1);
