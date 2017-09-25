@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 30 23:34:27 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep 25 20:22:29 2017 BILLAUD Jean
+** Last update Mon Sep 25 22:10:09 2017 BILLAUD Jean
 */
 
 #include <json/json.h>
@@ -60,13 +60,28 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   t_energy_cell	*ec;
   t_player	*player;
   t_player	*adversary;
+  t_chain	*players;
+  t_link	*p;
   
   identify(manager, "foo", NULL);
   identify(manager, "foo", NULL);
   identify(manager, "foo", NULL);
   identify(manager, "foo", NULL);
   gi = (*manager)->get_info();
+  players = (*manager)->get_players();
+  p = players->first;
 
+  (*manager)->set_players_pos(players, 4);
+  
+  while (p)
+    {
+      player = p->content;
+      my_put_nbr(player->x);
+      my_put_nbr(player->y);
+      my_putstr("\n\n\n");
+      p = p->next;
+    }
+  
   /*
   ** pour init le hashage des commandes
   */
@@ -230,6 +245,22 @@ my_log(__func__, "before call to exec", 4);
   my_log(__func__, log, 3);
   sprintf(log, "new position of player: x: %d, y: %d after jump", player->x, player->y);
   my_log(__func__, log, 3);
+
+  /*
+  ** on crée une erreur sur le saut sur un player
+  */
+  player->looking = 1;
+  sprintf(log, "looking  %d", player->looking);
+  my_log(__func__, log, 3);
+  my_log(__func__, "before call to exec for jump on player adversary", 3);
+  if ((ret = exec("jump", manager, "0x01")) == NULL)
+    return (1);
+  my_log(__func__, "call to exec passed for jump on adversary", 3);
+  sprintf(log, "return: %s", ret);
+  my_log(__func__, log, 3);
+  sprintf(log, "new position of player: x: %d, y: %d after jump on player", player->x, player->y);
+  my_log(__func__, log, 3);
+
   
   /*
   ** On passe aux actions sur adversaire dans le prochain...
@@ -253,14 +284,15 @@ my_log(__func__, "before call to exec", 4);
   zmsg_send(&response, (*ctx)->active_socket->socket);
   my_log(__func__, "zmsg sent", 3);
     
-  /*
-  t = init_thread(*ctx, *gi);
+ 
+  /*t = init_thread(*ctx, *gi);
   if (pthread_create(&tic, NULL, tic_thread, t) == -1) {
+    my_putstr("erroooooor");
     perror("pthread_create");
     return EXIT_FAILURE;
-  }
-
-  while (!zsys_interrupted)
+  }*/
+  /*
+    while (!zsys_interrupted)
     {
     if ((response = init_poll(ctx)) == NULL)
     return (1);
@@ -280,10 +312,9 @@ my_log(__func__, "before call to exec", 4);
       zmsg_send(&response, (*ctx)->active_socket->socket);
       my_log(__func__, "zmsg sent", 3);
     }
-*/
+  */
   return (0);
 }
-		   
 int			init_runtime()
 {
   t_swctx		*ctx;

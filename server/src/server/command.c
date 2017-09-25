@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep 25 17:58:33 2017 BILLAUD Jean
+** Last update Mon Sep 25 21:46:16 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -617,8 +617,10 @@ char		*jump(t_game_manager **manager, char *identity, char *optional)
 	  }
 	break;
       case UP:
-	if (check_mvmnt(p->x, p->y - 2, identity, (*manager)) == 1)
+	if (check_mvmnt(p->x, p->y - 2, identity, (*manager)) == 1) {
 	  sprintf(log, "%s can't jump  up", identity);
+	  my_log(__func__, log, 3);
+	}
 	else if (p->energy < 2)
 	  sprintf(log, "%s action point are too low", identity);
 	else

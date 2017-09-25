@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Thu Aug 17 17:00:01 2017 BILLAUD Jean
-** Last update Mon Sep 25 19:55:31 2017 BILLAUD Jean
+** Last update Mon Sep 25 21:52:25 2017 BILLAUD Jean
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,7 +51,7 @@ int		dead(t_chain *players)
     }
   return (count);
 }
-/*
+
 void 		*tic_thread(void *manager)
 {
   t_thread	*thread = (t_thread *)(manager);
@@ -107,7 +107,7 @@ void 		*tic_thread(void *manager)
   }
   pthread_exit(NULL);
 }
-*/
+
 /*
 void		*tic_thread(void *manager)
 {
@@ -118,17 +118,16 @@ void		*tic_thread(void *manager)
   int		dead_count;
   int		count;
   int		nb_player;
-
+  
   srand(time(NULL));
   count = 0;
   cycle = thread->ctx->cycle;
   pub = ((t_swsock *)(thread->ctx->sockets->first->content))->socket;
   while (!zsys_interrupted) {
     usleep(cycle);
-    
-     là il va bombarder j'vais trouver un truc pour qu'il le fasse que quand ça passe de 0 à 1.
    
     if (thread->info->game_status == 1) {
+      my_putstr("test");
       zstr_sendf(pub, "%s %d", "Softwar", GAME_START);
     }
     dead_count = dead(thread->info->players);
@@ -146,7 +145,7 @@ void		*tic_thread(void *manager)
 	my_putstr("client win, game is end\n");
       }
     json = game_info_to_json(thread->info);
-    zstr_sendf(pub, "%s %d %s", "Softwar", CYCLE,json_object_to_json_string(json));
+    zstr_sendf(pub, "%s %d %s", "Softwar", CYCLE, json_object_to_json_string(json));
     my_log(__func__, "display game info: ", 3);
     my_putstr(json_object_to_json_string(json));
     my_putstr("\n");
@@ -156,4 +155,5 @@ void		*tic_thread(void *manager)
   }
   pthread_exit(NULL);
 }
+
 */

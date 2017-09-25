@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Mon Sep  4 20:05:35 2017 BILLAUD Jean
-** Last update Mon Sep 25 16:41:36 2017 BILLAUD Jean
+** Last update Mon Sep 25 21:58:19 2017 BILLAUD Jean
 */
 
 
@@ -32,13 +32,13 @@ int		check_mvmnt(uint x, uint y, char *identity, t_game_manager *manager)
   if (map->is_wall(x, y, map_size) == 1)
     {
       sprintf(log, "%s tried to go in a wall", identity);
-      my_log(__func__, log, 4);
+      my_log(__func__, log, 3);
       return (1);
     }
   else if (map->is_player(x, y, players) != NULL)
     {
       sprintf(log, "%s tried to walk on someone", identity);
-      my_log(__func__, log, 4);
+      my_log(__func__, log, 3);
       return (1);
     }
   else
