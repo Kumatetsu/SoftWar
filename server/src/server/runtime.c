@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 30 23:34:27 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep 25 16:39:41 2017 BILLAUD Jean
+** Last update Mon Sep 25 17:29:11 2017 BILLAUD Jean
 */
 
 #include <json/json.h>
@@ -151,12 +151,15 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   ** les déplacements, on va lui faire contourner 0x02 en passant par x3
   ** soit leftfwd, rightfwd, right, forward et watch...
   */
-sprintf(log, "ORIGINAL position of player: x: %d, y: %d", player->x, player->y);
+
+  
+  player->action = 5000;
+  sprintf(log, "ORIGINAL position of player: x: %d, y: %d", player->x, player->y);
   my_log(__func__, log, 4);
   my_log(__func__, "before call to exec", 4);
   if ((ret = exec("leftfwd", manager, "0x01")) == NULL)
     return (1);
-  sprintf(log, "new position of player: x: %d, y: %d", player->x, player->y);
+  sprintf(log, "new position of player: x: %d, y: %d vue: %d", player->x, player->y, player->looking);
   my_log(__func__, log, 4);
   my_log(__func__, "call to exec passed", 4);
   sprintf(log, "return: %s", ret);
@@ -167,7 +170,7 @@ my_log(__func__, "before call to exec", 4);
  
   if ((ret = exec("rightfwd", manager, "0x01")) == NULL)
     return (1);
-  sprintf(log, "new position of player: x: %d, y: %d", player->x, player->y);
+  sprintf(log, "new position of player: x: %d, y: %d looking: %d after rightfw", player->x, player->y, player->looking);
   my_log(__func__, log, 4);
   my_log(__func__, "call to exec passed", 4);
   sprintf(log, "return: %s", ret);
