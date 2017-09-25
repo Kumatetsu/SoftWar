@@ -32,6 +32,7 @@ t_player	*create_player(char *identity)
   p->energy = 50;
   p->looking = 0;
   p->action = 0;
+  p->disabled = 0;
   p->x = 0;
   p->y = 0;
   return (p);

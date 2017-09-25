@@ -151,3 +151,15 @@ char		*compile_watch_return(t_game_manager **manager, uint **zone)
     }
   return (state);
 }
+
+char	*extract_front_from_watched(char *watched)
+{
+  char	*front;
+  char	**splitted;
+
+  if ((splitted = my_split(watched, '\"')) == NULL)
+    return (NULL);
+  if ((front = my_strdup(splitted[1])) == NULL)
+    return (NULL);
+  return (front);
+}

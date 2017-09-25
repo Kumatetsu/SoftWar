@@ -61,7 +61,6 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   t_player	*player;
   t_player	*adversary;
   t_chain	*players;
-  t_link	*p;
   
   identify(manager, "foo", NULL);
   identify(manager, "foo", NULL);
@@ -69,19 +68,8 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   identify(manager, "foo", NULL);
   gi = (*manager)->get_info();
   players = (*manager)->get_players();
-  p = players->first;
 
   (*manager)->set_players_pos(players, 4);
-  
-  while (p)
-    {
-      player = p->content;
-      my_putstr(player->identity);
-      my_put_nbr(player->x);
-      my_put_nbr(player->y);
-      my_putstr("\n\n\n");
-      p = p->next;
-    }
   
   /*
   ** pour init le hashage des commandes
@@ -221,6 +209,30 @@ my_log(__func__, "before call to exec", 4);
   my_log(__func__, log, 3);
 
   /*
+  ** le spy shit
+  */
+  my_log(__func__, "before call to exec", 4);
+  if ((ret = exec("inspect|0x02", manager, "0x01")) == NULL)
+    return (1);
+  my_log(__func__, "call to exec passed", 4);
+  sprintf(log, "return: %s", ret);
+  my_log(__func__, log, 3);
+  sprintf(log, "inspector energy: %d, action: %d, disabled: %d, adversary energy: %d, action: %d, disabled: %d", player->energy, player->action, player->disabled, adversary->energy, adversary->action, adversary->disabled);
+  my_log(__func__, log, 3);
+
+  /*
+  ** le bourre pif
+  */
+  my_log(__func__, "before call to exec", 4);
+  if ((ret = exec("attack", manager, "0x01")) == NULL)
+    return (1);
+  my_log(__func__, "call to exec passed", 4);
+  sprintf(log, "return: %s", ret);
+  my_log(__func__, log, 3);
+  sprintf(log, "attacker energy: %d, action: %d, disabled: %d, adversary energy: %d, action: %d, disabled: %d", player->energy, player->action, player->disabled, adversary->energy, adversary->action, adversary->disabled);
+  my_log(__func__, log, 3);
+
+  /*
   ** On veut x:0, y=2
   */
   my_log(__func__, "before call to exec for jump", 3);
@@ -290,7 +302,6 @@ my_log(__func__, "before call to exec", 4);
   sprintf(log, "player left");
   my_log(__func__, log, 3);
 
-
   /*
   **on veut que 01 selfstat
   */
@@ -330,14 +341,12 @@ my_log(__func__, "before call to exec", 4);
   zmsg_send(&response, (*ctx)->active_socket->socket);
   my_log(__func__, "zmsg sent", 3);
     
- 
-  /*t = init_thread(*ctx, *gi);
+   /*t = init_thread(*ctx, *gi);
   if (pthread_create(&tic, NULL, tic_thread, t) == -1) {
     my_putstr("erroooooor");
     perror("pthread_create");
     return EXIT_FAILURE;
   }*/
-  /*
     while (!zsys_interrupted)
     {
     if ((response = init_poll(ctx)) == NULL)
@@ -358,9 +367,9 @@ my_log(__func__, "before call to exec", 4);
       zmsg_send(&response, (*ctx)->active_socket->socket);
       my_log(__func__, "zmsg sent", 3);
     }
-  */
   return (0);
 }
+
 int			init_runtime()
 {
   t_swctx		*ctx;
