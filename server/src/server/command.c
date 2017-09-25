@@ -374,7 +374,7 @@ char		*right(t_game_manager **manager, char *identity, char *optional)
       player = (*manager)->get_player(identity);
       if (player->action < 0.5)
 	sprintf(log, "%s action point are too low", identity);
-      else if (player->looking == DOWN)
+      else
 	{
 	  player->action = player->action - 0.5;
 	  player->looking = (player->looking == DOWN) ? LEFT : (player->looking + 1);
@@ -436,6 +436,8 @@ char		*rightfwd(t_game_manager **manager, char *identity, char *optional)
 	{
 	  if ((right(manager, identity, optional)) == NULL)
 	    return (NULL);
+	sprintf(log, "new looking value after right(): %d", player->looking);
+	my_log(__func__, log, 4);
 	  if ((forward(manager, identity, optional)) == NULL)
 	    return (NULL);
 	  success = 1;
@@ -501,12 +503,19 @@ char		*gather(t_game_manager **manager, char *identity, char *optional)
       sprintf(log, "manager ready, parameter: %s", identity);
       if ((ec = is_energy_cell(player->x, player->y, energy_cells)) != NULL)
 	{
+	  sprintf(log, "player gathered %d energy", ec->value);
+	  my_log(__func__, log, 4);
 	  player->energy += ec->value;
 	  player->action -= 1;
 	  if ((link = get_link_by_content(ec, energy_cells)) != NULL)
 	    {
-	      if (remove_link(&energy_cells, link))
+	      int removelink = remove_link(&energy_cells, link);
+	      sprintf(log, "value of remove_link() return: %d", removelink);
+	      my_log(__func__, log, 4);
+	      if (removelink == 1)
 		my_log(__func__, "delete energy cell failed", 3);
+	      else if (removelink == -1)
+		my_log(__func__, "no more energy_cell", 4);
 	      else
 		my_log(__func__, "energy cell consumed", 2);
 	    }

@@ -71,7 +71,7 @@ int	is_free_square(uint x, uint y, t_chain *players, t_chain *ecs)
 
 int	is_wall(uint x, uint y, uint map_size)
 {
-  if (x > map_size || y > map_size)
+  if (x >= map_size || y >= map_size)
     return (1);
   return (0);
 }

@@ -86,10 +86,10 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   player->x = 2;
   player->action = 5000; 
   /*
-  ** on ajoute une energy cell juste en face de lui
+  ** on ajoute une energy cell de value 2017 juste en face de lui
   ** position 1 dans le tableau de watch
   */
-  if ((ec = create_energy_cell(2, 1, 6)) == NULL)
+  if ((ec = create_energy_cell(2, 1, 2017)) == NULL)
     {
       my_log(__func__, "fail creating energy cell", 4);
       return (1);
@@ -110,6 +110,9 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
     }
   adversary->x = 1;
   adversary->y = 2;
+  /*
+  ** watch: on veut ["energy", "empty", "empty", "0x02"]
+  */
   my_log(__func__, "before call to exec", 4);
   if ((ret = exec("watch", manager, "0x01")) == NULL)
     return (1);
@@ -117,6 +120,9 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   sprintf(log, "return: %s", ret);
   my_log(__func__, log, 3);
 
+  /*
+  ** on veut ok|
+  */
   my_log(__func__, "before call to exec", 4);
   if ((ret = exec("forward", manager, "0x01")) == NULL)
     return (1);
@@ -124,6 +130,9 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   sprintf(log, "return: %s", ret);
   my_log(__func__, log, 3);
 
+  /*
+  ** on veut 50 sur le premier log
+  */
   sprintf(log, "Energy possessed by player before gather: %d", player->energy);
   my_log(__func__, log, 4);
   my_log(__func__, "before call to exec", 4);
@@ -132,9 +141,68 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   my_log(__func__, "call to exec passed", 4);
   sprintf(log, "return: %s", ret);
   my_log(__func__, log, 3);
+  /*
+  ** on veut 50 + 2017 = 2067
+  */
   sprintf(log, "Energy possessed by player after gather: %d", player->energy);
   my_log(__func__, log, 4);
-
+  /*
+  ** les déplacements, on va lui faire contourner 0x02 en passant par x3
+  ** soit leftfwd, rightfwd, right, forward et watch...
+  */
+sprintf(log, "ORIGINAL position of player: x: %d, y: %d", player->x, player->y);
+  my_log(__func__, log, 4);
+  my_log(__func__, "before call to exec", 4);
+  if ((ret = exec("leftfwd", manager, "0x01")) == NULL)
+    return (1);
+  sprintf(log, "new position of player: x: %d, y: %d", player->x, player->y);
+  my_log(__func__, log, 4);
+  my_log(__func__, "call to exec passed", 4);
+  sprintf(log, "return: %s", ret);
+  my_log(__func__, log, 3);
+my_log(__func__, "before call to exec", 4);
+ sprintf(log, "position: x: %d, y: %d looking: %d before rightfwd", player->x, player->y, player->looking);
+  my_log(__func__, log, 4);
+ 
+  if ((ret = exec("rightfwd", manager, "0x01")) == NULL)
+    return (1);
+  sprintf(log, "new position of player: x: %d, y: %d", player->x, player->y);
+  my_log(__func__, log, 4);
+  my_log(__func__, "call to exec passed", 4);
+  sprintf(log, "return: %s", ret);
+  my_log(__func__, log, 3);
+  my_log(__func__, log, 3);
+  my_log(__func__, "before call to exec", 4);
+  if ((ret = exec("right", manager, "0x01")) == NULL)
+    return (1);
+  sprintf(log, "new position of player: x: %d, y: %d", player->x, player->y);
+  my_log(__func__, log, 4);
+  my_log(__func__, "call to exec passed", 4);
+  sprintf(log, "return: %s", ret);
+  my_log(__func__, log, 3);
+  my_log(__func__, "before call to exec", 4);
+  if ((ret = exec("forward", manager, "0x01")) == NULL)
+    return (1);
+  sprintf(log, "new position of player: x: %d, y: %d", player->x, player->y);
+  my_log(__func__, log, 4);
+  my_log(__func__, "call to exec passed", 4);
+  sprintf(log, "return: %s", ret);
+  my_log(__func__, log, 3);
+  /*
+  ** On veut ["0x02", "empty", "empty", empty"]
+  */
+  my_log(__func__, "before call to exec", 4);
+  if ((ret = exec("watch", manager, "0x01")) == NULL)
+    return (1);
+  my_log(__func__, "call to exec passed", 4);
+  sprintf(log, "return: %s", ret);
+  my_log(__func__, log, 3);
+  sprintf(log, "new position of player: x: %d, y: %d", player->x, player->y);
+  my_log(__func__, log, 4);
+  /*
+  ** On passe aux actions sur adversaire dans le prochain...
+  */
+  
   if ((response = init_poll(ctx)) == NULL)
     return (1);
   address = zmsg_pop(response);
