@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include "libmy.h"
 #include "argument.h"
-#include "Softwar_ctx.h"
-#include "Notification.h"
+#include "softwar_ctx.h"
+#include "notification.h"
 
 /*
 ** DONT FORGET TO COMPLETE IF ADD OPTION

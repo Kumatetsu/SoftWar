@@ -21,12 +21,13 @@ LDFLAGS =       -lzmq -lczmq -lpthread -L ./libmy -lmy $(shell pkg-config --libs
 SRC     =       main.c \
 		src/tools/argument.c \
 		src/tools/hash.c \
-		model/Softwar_ctx.c \
-		model/Notification.c \
-		model/Player.c \
-		model/Energy_cell.c \
-		model/Game_manager.c \
-		model/Map_manager.c \
+		model/softwar_ctx.c \
+		model/notification.c \
+		model/player.c \
+		model/energy_cell.c \
+		model/game_info.c \
+		model/game_manager.c \
+		model/map_manager.c \
 		model/thread_data.c \
 		src/server/pub.c \
 		src/server/rep.c \
@@ -34,6 +35,8 @@ SRC     =       main.c \
 		src/server/poll.c \
 		src/server/utils.c \
 		src/server/command.c \
+		src/server/map.c \
+		src/server/game_status.c \
 		src/server/exec.c \
 		src/server/runtime.c \
 		src/server/thread.c \

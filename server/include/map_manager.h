@@ -16,8 +16,12 @@ typedef struct	s_map_manager
   int		(*get_pos)(char *identity, t_chain *players);
   int		(*is_free_square)(uint x, uint y, t_chain *players, t_chain *ecs);
   int		(*is_wall)(uint x, uint y, uint map_size);
+  t_energy_cell	*(*is_energy_cell)(uint x, uint y, t_chain *ecs);
+  t_player	*(*is_player)(uint x, uint y, t_chain *players);
 }		t_map_manager;
 
+t_energy_cell	*is_energy_cell(uint x, uint y, t_chain *ecs);
+t_player	*is_player(uint x, uint y, t_chain *players);
 t_map_manager	*get_map_manager();
 
 #endif /* !_GAME_INFO_H_ */

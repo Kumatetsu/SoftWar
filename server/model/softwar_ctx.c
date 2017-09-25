@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <czmq.h>
 #include "libmy.h"
-#include "Softwar_ctx.h"
+#include "softwar_ctx.h"
 
 /*
 ** private function
@@ -69,6 +69,7 @@ t_swctx	*finalize_ctx()
       ctx->rep_port = 0;
       ctx->pub_port = 0;
       ctx->cycle = 0;
+      ctx->size = 0;
       if ((ctx->sockets = create_chain(free_sockets)) == NULL)
 	{
 	  my_log(__func__, MEM_ERR, 1);

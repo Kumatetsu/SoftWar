@@ -12,8 +12,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "libmy.h"
-#include "Game_manager.h"
-#include "Softwar_ctx.h"
+#include "game_manager.h"
+#include "softwar_ctx.h"
 #include "thread_data.h"
 
 t_thread	*init_thread(t_swctx *ctx, t_game_info *info)

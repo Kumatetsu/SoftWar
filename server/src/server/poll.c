@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <czmq.h>
 #include "libmy.h"
-#include "Softwar_ctx.h"
+#include "softwar_ctx.h"
 #include "rep.h"
 #include "router.h"
 #include "poll.h"
@@ -32,7 +32,7 @@ zmsg_t  	*init_poll(t_swctx **ctx)
   while (tmp)
     {
       sw_socket = tmp->content;
-      if (my_strcmp(sw_socket->name, "publisher"))
+      if (my_strcmp(sw_socket->name, "pubi"))
 	{
 	  my_log(__func__, "add socket to poll", 3);
 	  my_log(__func__, sw_socket->name, 3);

@@ -13,4 +13,7 @@
 
 int		check_mvmnt(uint x, uint y, char *identity, t_game_manager *manager);
 int		count_ecs(t_chain *ecs, uint map_size);
+uint		**eq_watch(uint a, uint b, int operator_inv, int swap);
+char		*compile_watch_return(t_game_manager **manager, uint **zone);
+
 #endif /* !_UTILS_H_ */

@@ -11,6 +11,8 @@
 #ifndef _ENERGY_CELL_H_
 #define _ENERGY_CELL_H_
 
+#include <json/json.h>
+
 typedef struct  s_energy_cell
 {
   unsigned int	x;
