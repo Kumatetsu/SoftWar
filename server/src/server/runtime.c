@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 30 23:34:27 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep 25 22:54:37 2017 BILLAUD Jean
+** Last update Mon Sep 25 23:39:26 2017 BILLAUD Jean
 */
 
 #include <json/json.h>
@@ -289,7 +289,24 @@ my_log(__func__, "before call to exec", 4);
   my_log(__func__, log, 3);
   sprintf(log, "player left");
   my_log(__func__, log, 3);
-  
+
+
+  /*
+  **on veut que 01 selfstat
+  */
+
+  (*manager)->ready = 1;
+  my_put_nbr(player->energy);
+  my_putstr("\n\n\n");
+  my_log(__func__, "before call to exec for selfstat", 3);
+  if ((ret = exec("selfstats", manager, "0x01")) == NULL)
+    return (1);
+  my_log(__func__, "call to exec passed for selfstat", 3);
+  sprintf(log, "return: %s", ret);
+  my_log(__func__, log, 3);
+  sprintf(log, "player left");
+  my_log(__func__, log, 3);
+
   
   /*
   ** On passe aux actions sur adversaire dans le prochain...

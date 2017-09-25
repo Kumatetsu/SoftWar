@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep 25 22:43:11 2017 BILLAUD Jean
+** Last update Mon Sep 25 23:38:18 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -54,7 +54,7 @@ char	*generate_output_param(int success, char *param)
 
   my_log(__func__, "generating output", 4);
   sprintf(log, "Softwar is generating an output with parameter: %s", param);
-  my_log(__func__, log, 4);
+  my_log(__func__, log, 3);
   if (success)
     sprintf(tmp, "ok|%s", param);
   else
@@ -600,8 +600,6 @@ char		*jump(t_game_manager **manager, char *identity, char *optional)
   if ((*manager)->ready) {    
     sprintf(log, "manager ready, parameter: %s", identity);
     p = (*manager)->get_player(identity);
-    my_put_nbr(p->looking);
-    my_putstr("\n");
     switch (p->looking)
       {
       case LEFT:
@@ -677,15 +675,22 @@ char		*jump(t_game_manager **manager, char *identity, char *optional)
 char		*self_stats(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
+  char		str[15];
+  char		*test;
+  t_player	*p;
 
+  p = (*manager)->get_player(identity);
   if ((*manager)->ready) {
     sprintf(log, "manager ready, parameter: %s", identity);
+    sprintf(str, "%d", p->energy);
+    test = generate_output_param(SUCCESS, str);
+    return (test);
   }
   else
     sprintf(log, "manager not ready, parameter: %s", identity);
   my_log(__func__, "call function self_stat", 3);
   my_log(__func__, optional, 3);
-  return (identity);
+  return (generate_output(FAIL));
 }
 
 char		*inspect(t_game_manager **manager, char *identity, char *optional)
