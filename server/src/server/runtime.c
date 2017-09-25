@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 30 23:34:27 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep 25 22:10:09 2017 BILLAUD Jean
+** Last update Mon Sep 25 22:54:37 2017 BILLAUD Jean
 */
 
 #include <json/json.h>
@@ -76,6 +76,7 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   while (p)
     {
       player = p->content;
+      my_putstr(player->identity);
       my_put_nbr(player->x);
       my_put_nbr(player->y);
       my_putstr("\n\n\n");
@@ -259,8 +260,36 @@ my_log(__func__, "before call to exec", 4);
   sprintf(log, "return: %s", ret);
   my_log(__func__, log, 3);
   sprintf(log, "new position of player: x: %d, y: %d after jump on player", player->x, player->y);
+  my_log(__func__, log, 4);
+
+  /*
+  ** on lui dit d'attendre le prochain tour on veut que ses points tombent à 0
+  */
+  sprintf(log, "action  %d", player->action);
+  my_log(__func__, log, 3);
+  my_log(__func__, "before call to exec for next", 3);
+  if ((ret = exec("next", manager, "0x01")) == NULL)
+    return (1);
+  my_log(__func__, "call to exec passed for next", 3);
+  sprintf(log, "return: %s", ret);
+  my_log(__func__, log, 3);
+  sprintf(log, "player waiting next turn, action: %d", player->action);
   my_log(__func__, log, 3);
 
+/*
+  **on veut qu'il quite et qu'il ne fasse plus partie des joueurs
+  */
+  sprintf(log, "action  %d", player->action);
+  my_log(__func__, log, 3);
+  my_log(__func__, "before call to exec for leave", 3);
+  if ((ret = exec("leave", manager, "0x02")) == NULL)
+    return (1);
+  my_log(__func__, "call to exec passed for leave", 3);
+  sprintf(log, "return: %s", ret);
+  my_log(__func__, log, 3);
+  sprintf(log, "player left");
+  my_log(__func__, log, 3);
+  
   
   /*
   ** On passe aux actions sur adversaire dans le prochain...

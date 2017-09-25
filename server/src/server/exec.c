@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Aug  2 21:58:43 2017 CASTELLARNAU Aurelien
-** Last update Wed Aug  2 22:16:12 2017 CASTELLARNAU Aurelien
+** Last update Mon Sep 25 22:40:31 2017 BILLAUD Jean
 */
 
 #include "libmy.h"
@@ -52,7 +52,7 @@ char		*exec(	char *input,
   if ((inputs = parse_input(input)) == NULL)
     return (NULL);
   if ((hash = hash_command(inputs[0])) == HCOMMANDERR)
-    my_log(__func__, "retrieve hash error", 2);
+    my_log(__func__, "retrieve hash error", 4);
   if (hash != HCOMMANDUNKNOW)
     {
       sprintf(log, "execution of function %s", inputs[0]);

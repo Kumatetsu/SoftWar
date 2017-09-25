@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep 25 21:46:16 2017 BILLAUD Jean
+** Last update Mon Sep 25 22:43:11 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -706,10 +706,11 @@ char		*next(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
   t_player	*p;
-  
+
   if ((*manager)->ready) {
     sprintf(log, "manager ready, parameter: %s", identity);
-    sprintf("%s decided to pass", identity);
+    my_log(__func__, log, 4);
+    sprintf(log, "%s decided to pass", identity);
     p = (*manager)->get_player(identity);
     p->action = 0;
   }
