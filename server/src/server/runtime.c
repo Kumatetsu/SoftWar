@@ -89,6 +89,7 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
     }
   player->looking = 3;
   player->x = 2;
+  player->y = 0;
   player->action = 5000; 
   /*
   ** on ajoute une energy cell de value 2017 juste en face de lui
@@ -104,7 +105,7 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
       my_log(__func__, "failed adding energy cell in front of player", 4);
       return (1);
     }
-  /*
+   /*
   ** on déplace un joueur en diagonale droite de lui
   ** position 4 dans le tableau attendu après watch
   */
@@ -118,6 +119,8 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   /*
   ** watch: on veut ["energy", "empty", "empty", "0x02"]
   */
+  sprintf(log, "player original position: x = %d, y: %d", player->x, player->y);
+  my_log(__func__, log, 4);
   my_log(__func__, "before call to exec", 4);
   if ((ret = exec("watch", manager, "0x01")) == NULL)
     return (1);
@@ -234,6 +237,9 @@ my_log(__func__, "before call to exec", 4);
 
   /*
   ** On veut x:0, y=2
+  */
+  /*
+  ** Juan pour poursuivre tes tests, tu dois replacer ton player... j'ai bouger ses coordonnées de départ pour recoller à mon contexte ^^
   */
   my_log(__func__, "before call to exec for jump", 3);
   sprintf(log, "energy == %d", player->energy);

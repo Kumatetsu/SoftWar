@@ -52,6 +52,26 @@ int		dead(t_chain *players)
   return (count);
 }
 
+/*
+** not tested ^^
+*/
+void		undisabledme(t_game_info **gi)
+{
+  t_chain	*players;
+  t_link	*tmp;
+  t_player	*p;
+
+  players = (*gi)->get_players();
+  tmp = players->first;
+  while (tmp)
+    {
+      p = tmp->content;
+      if (p->disabled > 0)
+	p->disabled--;
+      tmp = tmp->next;
+    }
+}
+
 void 		*tic_thread(void *manager)
 {
   t_thread	*thread = (t_thread *)(manager);
@@ -78,6 +98,7 @@ void 		*tic_thread(void *manager)
     my_log(__func__, "thread info is null", 4);
   while (!zsys_interrupted) {
     usleep(cycle);
+    undisabledme(&(thread->info));
     if (thread->info->game_status == 1) {
       zstr_sendf(pub, "%s %d", "Softwar", GAME_START);
     }
