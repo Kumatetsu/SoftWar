@@ -16,12 +16,14 @@ class Action(object):
                         print message
                         exit()
                 else:
-                        return
+                        return identity
                         
         def forward(self, socket):
                 socket.send('forward|null')
                 message = socket.recv()
                 print message
+                if message == 'ko|null':
+                        watch(socket)
 
         def backward(self, socket):
                 socket.send('backward|null')
