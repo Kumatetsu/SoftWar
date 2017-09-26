@@ -238,9 +238,6 @@ my_log(__func__, "before call to exec", 4);
   /*
   ** On veut x:0, y=2
   */
-  /*
-  ** Juan pour poursuivre tes tests, tu dois replacer ton player... j'ai bouger ses coordonnées de départ pour recoller à mon contexte ^^
-  */
   my_log(__func__, "before call to exec for jump", 3);
   sprintf(log, "energy == %d", player->energy);
   my_log(__func__, log, 3);

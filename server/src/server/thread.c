@@ -57,12 +57,10 @@ int		dead(t_chain *players)
 */
 void		undisabledme(t_game_info **gi)
 {
-  t_chain	*players;
   t_link	*tmp;
   t_player	*p;
 
-  players = (*gi)->get_players();
-  tmp = players->first;
+  tmp = (*gi)->players->first;
   while (tmp)
     {
       p = tmp->content;
