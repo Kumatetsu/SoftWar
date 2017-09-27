@@ -61,11 +61,19 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   t_player	*player;
   t_player	*adversary;
   t_chain	*players;
-  
-  identify(manager, "foo", NULL);
-  identify(manager, "foo", NULL);
-  identify(manager, "foo", NULL);
-  identify(manager, "foo", NULL);
+  char		*id;
+
+  if ((id = my_strdup("0x01")) == NULL)
+    return (1);
+  identify(manager, "foo", id);
+  id = "0x02\0",
+  identify(manager, "foo", id);
+  id = "0x03\0",
+  identify(manager, "foo", id);
+  id = "0x04\0",
+  identify(manager, "foo", id);
+  id = "0x05\0",
+  identify(manager, "foo", id);
   gi = (*manager)->get_info();
   players = (*manager)->get_players();
 

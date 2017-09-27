@@ -70,16 +70,25 @@ char	*generate_output_param(int success, char *param)
 ** génère un unique id
 ** ALLOCATE MEMORY
 */
-char            *new_uid()
+t_player	*check_uid(t_chain *players, char *id)
 {
-  static int    id;
-  char          uid[20];
-  char          *heap_uid;
+  char		log[50];
+  t_link	*tmp;
+  t_player	*p;
 
-  sprintf(uid, "0x0%d", ++id);
-  if ((heap_uid = my_strdup(uid)) == NULL)
-    return (NULL);
-  return (heap_uid);
+  tmp = players->first;
+  while (tmp)
+    {
+      p = tmp->content;
+      if (!my_strcmp(p->identity, id))
+	{
+	  sprintf(log, "Identity %s already taken", id);
+	  my_log(__func__, log, 4);
+	  return (p);
+	}
+      tmp = tmp->next;
+    }
+  return (NULL);
 }
 
 /*
@@ -87,91 +96,109 @@ char            *new_uid()
 */
 char		*identify(t_game_manager **manager, char *identity, char *optional)
 {
-  t_player	*new;
   char		log[50];
-  char		tmp[50];
-  char		*output;
+  t_player	*new;
 
-  sprintf(log, "call function identify \noptional: %s", optional);
-  my_log(__func__, log, 3);
+  my_log(__func__, identity, 3);
+  my_log(__func__, optional, 3);
+  //new = NULL;
   if ((*manager)->ready)
     {
-      my_log(__func__, "server full", 3);
-      if((output = my_strdup("ko|server full")) == NULL)
-	return (NULL);
-      return (output);
+      my_log(__func__, "server full", 4);
+      return (generate_output_param(FAIL, "server_full"));
     }
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
+  if ((new = check_uid((*manager)->get_players(), optional)) != NULL)
+    {
+      if (new->disabled == -1)
+	{
+	  sprintf(log, "client with id %s war disconnected, new client take his place", new->identity);
+	  my_log(__func__, log, 2);
+	  new->disabled = 0;
+	}
+      else
+	return (generate_output(FAIL));
+    }
+  sprintf(log, "Server accept new client with id: %s", optional);
   my_log(__func__, log, 3);
-  my_log(__func__, "attribute new id", 3);
-  if (manager == NULL || (*manager) == NULL || identity == NULL)
-    return (NULL);
-  if ((new = create_player(new_uid())) == NULL)
+  if (new == NULL && (new = create_player(optional)) == NULL)
     return (NULL);
   if ((*manager)->add_player(new))
     return (NULL);
-  if ((*manager)->get_players()->index == 4)
-    (*manager)->ready = 1;
-  sprintf(tmp, "ok|%s", new->identity);
-  if ((output = my_strdup(tmp)) == NULL)
-    return (NULL);
-  (*manager)->set_change(1);
-  my_log(__func__, output, 4);
-  return (output);
+  sprintf(log, "number of client actually registered: %d", (*manager)->get_players()->index);
+  my_log(__func__, log, 3);
+  if ((*manager)->get_players()->index >= 4)
+    {
+      (*manager)->ready = 1;
+      my_log(__func__, "GAME IS READY", 3);
+    }
+  return (generate_output_param(SUCCESS, optional));
 }
 
-char	*self_id(t_game_manager **manager, char *identity, char *optional)
+char		*self_id(t_game_manager **manager, char *identity, char *optional)
 {
-  char	log[50];
+  char		log[50];
+  t_player	*p;
 
-  if ((*manager)->ready)
-    sprintf(log, "manager ready, parameter: %s", identity);
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, "call function self_id", 3);
-  my_log(__func__, optional, 3);
-  return (identity);
+  // pas obligatoire mais permet d'utiliser tout les paramètres
+  // au passage, check l'id, c'est pas plus mal...
+  if ((p = (*manager)->get_player(identity)) == NULL)
+    return (generate_output(FAIL));
+  sprintf(log, "player %s is asking for his own id, optional parameter: %s", identity, optional);
+  my_log(__func__, log, 3);
+  return (generate_output_param(SUCCESS, identity));
 }
 
+/*
+** Si un joueur quitte en cours de partie
+** sa propriété disabled passe à -1
+** Cela permet de réatribuer le joueur
+** si le même client propose la même id (voir identify())
+** cela permet aussi de ne pas bloquer la partie sur un crash client.
+*/
 char		*leave(t_game_manager **manager, char *identity, char *optional)
 {
+  int		rm_link;
   char		log[80];
   t_link	*tmp;
   t_chain	*players;
   t_player	*p;
-  char		*output;
+  t_game_info	**gi;
 
-  if ((*manager)->ready)
-    sprintf(log, "manager ready, parameter: %s", identity);
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
+  
+  players = (*manager)->get_players();
   my_log(__func__, "call function leave", 3);
   my_log(__func__, optional, 3);
-  players = (*manager)->get_players();
-  tmp = players->first;
-  while (tmp)
+  if ((p = (*manager)->get_player(identity)) == NULL)
     {
-      p = (t_player*)tmp->content;
-      if (!my_strcmp(p->identity, identity))
-	{
-	  sprintf(log, "remove link where player identity is: %s.", identity);
-	  my_log(__func__, log, 3);
-	  if (remove_link(&players, tmp) == -1)
-	    my_log(__func__, "no more players", 3);
-	  if ((output = my_strdup("Good Bye!")) == NULL)
-		return (NULL);
-	  if (players->index < 4)
-	    (*manager)->ready = 0;
-	  return (output);
-	}
-      tmp = tmp->next;
+      sprintf(log, "can't retrieve client with id %s", identity);
+      my_log(__func__, log, 2);
+      return (NULL);
     }
-  sprintf(log, "player %s not found, can't remove it", identity);
-  my_log(__func__, log, 2);
-  if ((output = my_strdup(log)) == NULL)
-    return (NULL);
-  return (output);
+  if ((tmp = get_link_by_content(p, (*manager)->get_players())) == NULL)
+    {
+      my_log(__func__, "can't retrieve link by content", 2);
+      return (generate_output_param(FAIL, "server_error"));
+    }
+  if ((gi = (*manager)->get_info()) == NULL)
+    return (NULL);; 
+  if ((*gi)->game_status == 1)
+    p->disabled = -1;
+  else
+    { 
+      my_log(__func__, p->identity, 3);
+      rm_link = remove_link(&players, tmp);
+      if (rm_link == -1)
+	my_log(__func__, "no more players", 3);
+      else if(rm_link)
+	{
+	  sprintf(log, "can't delete player %s", identity);
+	  my_log(__func__, log, 2);
+	  return (NULL);
+	}
+      if ((*gi)->game_status != 1 && players->index < 4)
+	(*manager)->ready = 0;
+    }
+  return (generate_output(SUCCESS));
 }
 
 /*
