@@ -80,7 +80,8 @@ class Action(object):
                 message = socket.recv()
                 print message
                 
-        def inspect(self, socket, process):
+        def inspect(self, socket):
+                process = 'toto'
                 socket.send('inspect|' + process)
                 message = socket.recv()
                 print message
@@ -94,3 +95,25 @@ class Action(object):
                 socket.send('jump|null')
                 message = socket.recv()
                 print message
+                
+        def act_func(self, num, socket) :
+                func = [
+                        self.jump,
+                        self.next,
+                        self.inspect,
+                        self.selfstats,
+                        self.selfid,
+                        self.attack,
+                        self.gather,
+                        self.watch,
+                        self.looking,
+                        self.right,
+                        self.left,
+                        self.forward,
+                        self.backward,
+                        self.identity,
+                        self.forward,
+                        self.rightfwd,
+                        self.leftfwd
+                ]
+                func[num](socket)

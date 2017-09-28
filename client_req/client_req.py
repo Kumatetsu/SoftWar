@@ -11,7 +11,6 @@ import action
 process_player = 0
 Act = action.Action()
 RUNNING = True
-
 def main():
     context = zmq.Context()
     print "Connecting to server..."
@@ -19,9 +18,14 @@ def main():
     print opt.host, opt.port;
     socket.connect ('tcp://%s:%s' % (opt.host, opt.port))
     Act.identity(socket)
-    while RUNNING:
-        Act.forward(socket)
-        Act.backward(socket)
+    if (opt.rand_ia):
+        while RUNNING:
+            num = random.randint(0, 15)
+            Act.act_func(num, socket)
+    else :
+        while RUNNING:
+            Act.forward(socket)
+            Act.backward(socket)
 
 
 
