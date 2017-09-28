@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Thu Aug 17 17:00:01 2017 BILLAUD Jean
-** Last update Mon Sep 25 21:52:25 2017 BILLAUD Jean
+** Last update Thu Sep 28 16:59:45 2017 BILLAUD Jean
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -80,8 +80,7 @@ void 		*tic_thread(void *manager)
   int		dead_count;
   int		count;
   int		nb_player;
-  char		output[50];
-  char		*malloc_output;
+  char		log[1024];
 
   srand(time(NULL));
   count = 0;
@@ -97,10 +96,13 @@ void 		*tic_thread(void *manager)
   while (!zsys_interrupted) {
     usleep(cycle);
     undisabledme(&(thread->info));
+  
     if (thread->info->game_status == 1) {
       zstr_sendf(pub, "%s %d", "Softwar", GAME_START);
     }
+ 
     dead_count = dead(thread->info->players);
+
     nb_player = (4 - dead_count);
     while (dead_count > count) {
       zstr_sendf(pub, "%s %d", "Softwar", CLIENT_DEAD);
@@ -114,12 +116,14 @@ void 		*tic_thread(void *manager)
 	 thread->info->game_status = 0;
 	 my_log(__func__, "client win, game is end\n", 3);
       }
+
     json = game_info_to_json(thread->info);
-    sprintf(output, "%s %d %s l.101", "Softwar", CYCLE, json_object_to_json_string(json));
-    if ((malloc_output = my_strdup(output)) == NULL)
-      return (NULL);
-    my_log(__func__, malloc_output, 3);
-    zstr_send(pub, malloc_output);
+
+    sprintf(log, json_object_to_json_string(json));
+    my_log(__func__, log, 3);
+    
+    zstr_sendf(pub, "%s %d %s", "Softwar", CYCLE, json_object_to_json_string(json));
+ 
     energy_fall(&thread->info);
     refresh_ap(&thread->info);
     count = 0;
