@@ -18,7 +18,7 @@ def main():
     print opt.host, opt.port;
     socket.connect ('tcp://%s:%s' % (opt.host, opt.port))
     Act.identity(socket)
-    if (opt.rand_ia):
+    if ('on' == opt.rand_ia):
         while RUNNING:
             num = random.randint(0, 15)
             Act.act_func(num, socket)

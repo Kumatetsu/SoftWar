@@ -4,7 +4,7 @@ parser = argparse.ArgumentParser(description='Connect your client to Softwar ser
 
 parser.add_argument('--host', default="localhost")
 parser.add_argument('--port', default="4242")
-parser.add_argument('--rand', default="false")
+parser.add_argument('--rand', default="off")
 
 args = parser.parse_args()
 
