@@ -11,7 +11,11 @@
 #include <stdio.h>
 #include <time.h>
 #include "libmy.h"
-
+#define NRM  "\x1B[0m"
+#define RED  "\x1B[31m"
+#define GRN  "\x1B[32m"
+#define YEL  "\x1B[33m"
+#define BLU  "\x1B[34m"
 /*
 ** https://stackoverflow.com/questions/1442116/how-to-get-date-and-time-value-in-c-program
 */
@@ -27,27 +31,35 @@ void	print_time(FILE *o)
 void    log_error(char *str, FILE *o)
 {
   print_time(o);
-  fprintf(o, "< ERROR > ");
+  fprintf(o, "%s< ERROR >%s", RED, NRM);
   fprintf(o, str);
 }
 
 void    log_warning(char *str, FILE *o)
 {
   print_time(o);
-  fprintf(o, "< WARNING > ");
+  fprintf(o, "%s< WARNING >%s ", YEL, NRM);
   fprintf(o, str);
 }
 
 void    log_info(char *str, FILE *o)
 {
   print_time(o);
-  fprintf(o, "< INFO > ");
+  fprintf(o, "%s< INFO >%s ", BLU, NRM);
   fprintf(o, str);
 }
 
 void    log_debug(char *str, FILE *o)
 {
   print_time(o);
-  fprintf(o, "< DEBUG > ");
+  fprintf(o, "%s< DEBUG >%s ", GRN, NRM);
+  fprintf(o, str);
+}
+
+void    log_tic(char *str, FILE *o)
+{
+  fprintf(o, "\n");
+  print_time(o);
+  fprintf(o, "<GAME-INFO>");
   fprintf(o, str);
 }

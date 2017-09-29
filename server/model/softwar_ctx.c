@@ -70,6 +70,7 @@ t_swctx	*finalize_ctx()
       ctx->pub_port = 0;
       ctx->cycle = 0;
       ctx->size = 0;
+      ctx->test = 0;
       if ((ctx->sockets = create_chain(free_sockets)) == NULL)
 	{
 	  my_log(__func__, MEM_ERR, 1);
@@ -80,10 +81,9 @@ t_swctx	*finalize_ctx()
 	  my_log(__func__, MEM_ERR, 1);
 	  return (NULL);
 	}
+      ctx->active_socket->name = NULL;
       ctx->active_id = NULL;
     }
-  if (ctx->sockets->first == NULL)
-    my_log(__func__, "sockets instaciated", 4);
   if (ctx->rep_port == 0)
     ctx->rep_port = 4242;
   if (ctx->pub_port == 0)
@@ -109,7 +109,7 @@ t_swctx			*init_swctx(char *opt, t_chain *parameters)
   char			*param;
 
   param = NULL;
-  if (parameters != NULL)
+  if (parameters != NULL && parameters->dictionnary != NULL)
     {
       tmp = parameters->dictionnary[0];
       param = tmp->content;
@@ -126,10 +126,12 @@ t_swctx			*init_swctx(char *opt, t_chain *parameters)
 	  my_log(__func__, MEM_ERR, 1);
 	  return (NULL);
 	}
+      ctx->active_socket->name = NULL;
       ctx->rep_port = 0;
       ctx->pub_port = 0;
       ctx->cycle = 0;
       ctx->size = 0;
+      ctx->test = 0;
       ctx->poller = NULL;
       ctx->active_id = NULL;
       if ((ctx->sockets = create_chain(free_sockets)) == NULL)
@@ -146,27 +148,14 @@ t_swctx			*init_swctx(char *opt, t_chain *parameters)
     ctx->cycle = my_getnbr(param);
   if (!my_strcmp(opt, "-map-size"))
     ctx->size = my_getnbr(param);
+  if (!my_strcmp(opt, "-test"))
+    ctx->test = 1;
   return (ctx);
 }
 
-/*
-** Getter. le ctx étant une instance
-** unique, privée et statique accessible
-** uniquement grâce à cette méthode, c'est un singleton.
-** Important dans le cas des threads: 
-** si deux threads cherchent à modifier le ctx en même temps
-** ca peut poser problème. Voir mutexes et courses concurrentielles.
-*/
 t_swctx	*get_swctx()
 {
-  t_swctx *ctx;
-
-  ctx = finalize_ctx();
-  if (ctx->sockets != NULL)
-    my_log(__func__, "sockets instanciated", 4);
-  if (ctx->sockets->first == NULL)
-    my_log(__func__, "first == NULL", 4);
-  return (ctx);
+  return (finalize_ctx());
 }
 
 /*
@@ -195,27 +184,13 @@ void		free_ctx()
   if (ctx != NULL)
     {
       if (ctx->sockets != NULL)
-	{
-	  if (ctx->sockets->free != NULL) // DEBUG
-	    my_log(__func__, "sockets list got free function!", 4); //DEBUG
-	  delete_chain(&(ctx->sockets));
-	}
-      if (ctx->active_socket != NULL)
+	delete_chain(&(ctx->sockets));
+      if (ctx->active_socket != NULL )
 	free(ctx->active_socket->name);
       if (ctx->poller != NULL)
 	zpoller_destroy(&(ctx->poller));
       if (ctx->active_id != NULL)
 	free(ctx->active_id);
-      /*
-      ** Not sure at all...
-      ** cette socket est renvoyé par le poller
-      ** c'est la socket active à chaque tour de boucle
-      ** je ne sais pas si zpoller_destroy s'en occuppe déjà
-      ** ou même si cette socket reste en vie ou est un pointeur
-      ** sur l'une des notre...
-      if (ctx->active_socket->socket != NULL)
-        zsock_destroy(&(ctx->active_socket->socket));
-      */
       free(ctx);
     }
 }

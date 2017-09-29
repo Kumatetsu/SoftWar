@@ -85,6 +85,8 @@ typedef struct		s_logger
   char			*level;
   void			(*log)(const char*, char*, int);
   char			*file_path;
+  char			*tic_file;
+  int			tic_in_file;
 }			t_logger;
 
 /*
@@ -163,6 +165,7 @@ void		log_error(char *str, FILE *o);
 void		log_warning(char *str, FILE *o);
 void		log_info(char *str, FILE *o);
 void		log_debug(char *str, FILE *o);
+void		log_tic(char *str, FILE *o);
 t_logger	*build_logger(char *opt, t_chain *parameters);
 t_logger	*get_logger();
 void		devlog(const char *func, char *content, int lvl);

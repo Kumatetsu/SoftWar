@@ -16,31 +16,28 @@
 #include "softwar_ctx.h"
 #include "game_manager.h"
 
-int	set_change(int change)
-{
- t_game_info **game_info = get_info();
- (*game_info)->change = change;
- return ((*game_info)->change);
-}
-
 t_player	*get_player(char *identity)
 {
+  t_chain	*players;
   t_link	*tmp;
   t_player	*player;
   char		log[80];
   t_game_info   **game_info;
   
   game_info = get_info();
-  tmp = (*game_info)->players->first;
-  while (tmp)
+  if ((players = (*game_info)->players) != NULL)
     {
-      player = (t_player*)tmp->content;
-      if (!my_strcmp(identity, player->identity))
-	return (player);
-      tmp = tmp->next;
+      tmp = players->first;
+      while (tmp)
+	{
+	  player = (t_player*)tmp->content;
+	  if (!my_strcmp(identity, player->identity))
+	    return (player);
+	  tmp = tmp->next;
+	}
+      sprintf(log, "player with identity '%s' not found", identity);
+      my_log(__func__, log, 2);
     }
-  sprintf(log, "player with identity '%s' not found", player->identity);
-  my_log(__func__, log, 2);
   return (NULL);
 }
 
@@ -62,7 +59,7 @@ void			set_players_pos(t_chain *players, uint map_size)
   int			looking[4] = {1, 1, 4, 4};
 
   i = 0;
-  node_player = (players->first);
+  node_player = players->first;
   while (node_player) {
     player = (t_player*)node_player->content;
     player->x = x[i];
@@ -81,7 +78,7 @@ t_chain		*get_energy_cells()
   return ((*game_info)->energy_cells);
 }
 
-void		energy_fall(t_game_info **info)
+int		energy_fall(t_game_info **info)
 {
   int		x;
   int		y;
@@ -90,7 +87,8 @@ void		energy_fall(t_game_info **info)
   t_map_manager *map;
   uint		map_size;
   
-  map = get_map_manager();
+  if ((map = get_map_manager()) == NULL)
+    return (1);
   map_size = (*info)->map_size;
   x = rand() % (map_size + 1);
   y = rand() % (map_size + 1);
@@ -100,14 +98,14 @@ void		energy_fall(t_game_info **info)
       if (map->is_free_square(x, y, (*info)->players, (*info)->energy_cells))
 	{
 	  if ((ecs = create_energy_cell(x, y, power)) == NULL)
-	    return;
+	    return (1);
 	  if (add_link(&((*info)->energy_cells), ecs))
-	    return;
+	    return (1);
 	}
       else
 	energy_fall(info);
     }
-  return;
+  return (0);
 }
 
 int		add_player(t_player *player)
@@ -197,7 +195,6 @@ t_game_manager		*get_game_manager()
       manager->serialize	 = &game_info_to_json;
       manager->map_manager       = &get_map_manager;
       manager->get_swctx         = &get_swctx;
-      manager->set_change	 = &set_change;
       manager->ready		 = 0; 		
     }
   return (manager);

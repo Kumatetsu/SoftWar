@@ -29,6 +29,7 @@ typedef struct	s_softwar_context
   char		*active_id;
   zpoller_t	*poller;
   t_chain	*sockets;
+  int		test;
 }		t_swctx;
 
 
