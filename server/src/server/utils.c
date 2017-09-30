@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Mon Sep  4 20:05:35 2017 BILLAUD Jean
-** Last update Mon Sep 25 21:58:19 2017 BILLAUD Jean
+** Last update Sat Sep 30 12:39:24 2017 MESRATI Nada
 */
 
 
@@ -52,7 +52,7 @@ int		count_ecs(t_chain *ecs, uint map_size)
   int		count;
 
   count = 0; 
-  max = (map_size * map_size) - 4;
+  max = (map_size * map_size);
   tmp = ecs->first;
   while(tmp)
     {
