@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Mon Jul 31 18:12:17 2017 CASTELLARNAU Aurelien
-** Last update Sat Sep 30 17:17:20 2017 BILLAUD Jean
+** Last update Sat Sep 30 18:04:25 2017 BILLAUD Jean
 */
 
 #include <czmq.h>
@@ -55,6 +55,7 @@ zmsg_t		*router_read(zsock_t *socket)
       identity = zmsg_popstr(message);
       zmsg_pushstr(message, identity);
       zmsg_pushstr(message, content);
+      zmsg_pushstr(message, void_frame);
       zmsg_push(message, address);
       my_log(__func__, "Dans l'ordre: void_frame, content, identity", 3);
       my_log(__func__, void_frame, 3);
