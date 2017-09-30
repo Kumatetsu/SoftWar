@@ -7,7 +7,7 @@ class Action(object):
                 base_name = "#0x0"
                 rand_name = random.randint(1, 9)
                 identity  = 'identify|' + base_name + str(rand_name)
-                socket.send_multipart([identity, ' '])
+                socket.send_multipart([identity, ' kqjdnfjlanvn'])
                 message = socket.recv()
                 print message
                 if message == 'ko|identity already exists':
