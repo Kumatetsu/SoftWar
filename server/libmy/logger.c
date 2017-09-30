@@ -176,11 +176,13 @@ void		my_log(const char *func, char *str, int lvl)
   int		file;
   t_logger	*logger;
   FILE		*o;
-
+  FILE		*tic_o;
+  
   file = 0;
   if ((logger = get_logger()) != NULL)
     {
       o = stdout;
+      tic_o = stdout;
       if (logger->file_path != NULL)
 	{
 	  o = fopen(logger->file_path, "a");
@@ -190,9 +192,9 @@ void		my_log(const char *func, char *str, int lvl)
 	  && logger->tic_in_file == 1
 	  && logger->tic_file != NULL)
 	{
-	  o = fopen(logger->tic_file, "a");
-	  log_tic(str, o);
-	  fclose(o);
+	  tic_o = fopen(logger->tic_file, "a");
+	  log_tic(str, tic_o);
+	  fclose(tic_o);
 	}
       else if (lvl <= logger->lvl ||
 	       (lvl == 5 && logger->tic_in_file == 0))
