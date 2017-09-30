@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 30 23:34:27 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep 25 23:39:26 2017 BILLAUD Jean
+** Last update Sat Sep 30 17:15:52 2017 BILLAUD Jean
 */
 
 #include <json/json.h>
@@ -58,6 +58,8 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   zmsg_t	*response;
 
   gi = (*manager)->get_info();
+  
+  //ici se lance le thread
   t = init_thread(*ctx, *gi);
   if (pthread_create(&tic, NULL, tic_thread, t) == -1)
     {
@@ -65,11 +67,14 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
       perror("pthread_create");
       return EXIT_FAILURE;
     }
+
+  //ici se lance la boucle principale
   while (!zsys_interrupted)
     {
       if ((response = init_poll(ctx)) == NULL)
 	return (1);
       address = zmsg_pop(response);
+      zmsg_pop(response);
       if (((*ctx)->active_id = my_strdup(zmsg_popstr(response))) == NULL)
 	return (1);
       input = zmsg_popstr(response);

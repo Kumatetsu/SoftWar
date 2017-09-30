@@ -1,4 +1,5 @@
 import random
+import zmq
 
 class Action(object):
 
@@ -6,8 +7,9 @@ class Action(object):
                 base_name = "#0x0"
                 rand_name = random.randint(1, 9)
                 identity  = 'identify|' + base_name + str(rand_name)
-                socket.send(identity)
+                socket.send_multipart([identity, ' '])
                 message = socket.recv()
+                print message
                 if message == 'ko|identity already exists':
                         print message
                         print 'trying with another name'
@@ -16,6 +18,7 @@ class Action(object):
                         print message
                         exit()
                 else:
+                        my_identity = base_name + str(rand_name)
                         return identity
                         
         def forward(self, socket):

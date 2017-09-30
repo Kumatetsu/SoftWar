@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Mon Jul 31 18:12:17 2017 CASTELLARNAU Aurelien
-** Last update Mon Jul 31 18:23:56 2017 CASTELLARNAU Aurelien
+** Last update Sat Sep 30 17:17:20 2017 BILLAUD Jean
 */
 
 #include <czmq.h>
@@ -36,6 +36,7 @@ zmsg_t		*router_read(zsock_t *socket)
   zmsg_t	*message;
   zframe_t	*address;
   char		*identity;
+  char		*void_frame;
   char		*content;
 
   if ((message = malloc(sizeof(zmsg_t*))) == NULL)
@@ -49,14 +50,16 @@ zmsg_t		*router_read(zsock_t *socket)
       ** elle se retrouve à la première place
       */
       address = zmsg_pop(message);
+      void_frame = zmsg_popstr(message);
       content = zmsg_popstr(message);
       identity = zmsg_popstr(message);
-      zmsg_pushstr(message, content);
       zmsg_pushstr(message, identity);
+      zmsg_pushstr(message, content);
       zmsg_push(message, address);
-      my_log(__func__, "Dans l'ordre: identity, content", 3);
-      my_log(__func__, identity, 3);
+      my_log(__func__, "Dans l'ordre: void_frame, content, identity", 3);
+      my_log(__func__, void_frame, 3);
       my_log(__func__, content, 3);
+      my_log(__func__, identity, 3);
     }
   return (message);
 }
