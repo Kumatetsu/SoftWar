@@ -40,7 +40,7 @@ SRC     =       main.c \
 		src/server/exec.c \
 		src/server/runtime.c \
 		src/server/thread.c \
-
+		src/test/softwar_test.c \
 
 OBJ     =       ${SRC:%.c=%.o}
 

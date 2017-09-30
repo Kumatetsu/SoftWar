@@ -18,6 +18,7 @@ typedef struct	s_player
   char		*identity;
   uint		x;
   uint		y;
+  int		disabled;
   uint		energy;
   uint		action;
   uint		looking;

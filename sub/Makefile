@@ -5,34 +5,25 @@
 ## Login   <castel_a@etna-alternance.net>
 ## 
 ## Started on  Wed Feb  1 09:37:15 2017 CASTELLARNAU Aurelien
-## Last update Sat Aug 19 20:27:04 2017 BILLAUD Jean
+## Last update Wed Sep 13 12:23:03 2017 BILLAUD Jean
 ##
 
 CC      =       gcc
 
-NAME    =       demo
+NAME    =       test_serverpub
 
-LIB     =       ./../server/libmy
+CFLAGS  =       -W -Wextra -Werror -Wall 
 
-CFLAGS  =       -W -Wextra -Werror -Wall -g -Iinclude/ -Ilibmy
+LDFLAGS =       -lzmq -lczmq
 
-LDFLAGS =       -lzmq -lczmq -L ./libmy -lmy
-
-SRC     =       main.c \
-		src/tools/argument.c \
-		src/server/protocol.c
+SRC     =       main.c
 
 OBJ     =       ${SRC:%.c=%.o}
 
 RM      =       rm -f
 
-all	:	lib	$(NAME)
+all	:	$(NAME)
 
-lib	:
-		$(MAKE)	-C	$(LIB)
-
-libPar	:
-		$(MAKE)	-C	$(LIBPAR)
 
 re	:	clean	all
 

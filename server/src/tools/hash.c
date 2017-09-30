@@ -49,22 +49,15 @@ int		is_colision(t_chain *colisions, char *command)
 {
   t_link	*tmp;
   t_colision	*colision;
-  char		log[60];
 
   tmp = colisions->first;
   while (tmp)
     {
       colision = (t_colision*)tmp->content;
       if (!my_strcmp(colision->command, command))
-	{
-	  sprintf(log, "%s is colision, hash retrieved", command);
-	  my_log(__func__, log, 3);
 	  return (colision->hash);
-	}
       tmp = tmp->next;
     }
-  sprintf(log, "%s isnt a colision", command);
-  my_log(__func__, log, 3);
   return (NOT_COLISION);
 }
 
@@ -93,25 +86,21 @@ int		resolve_colision(int hash, char *command, t_chain **colisions)
   char		log[60];
   
   limit = 0;
-  sprintf(log, "resolve colision start hash value: %d", hash);
-  my_log(__func__, log, 4);
   while (hash_table_command[hash] != NULL && limit < HCOMMANDSIZE)
     {
-      if (hash == (HCOMMANDSIZE - 1))	   // On déplace le hash entre 0 et max.
+      if (hash == (HCOMMANDSIZE - 1))
 	hash = 0;
       else
 	++hash;
       ++limit;
     }
-  sprintf(log, "hash determined: %d", hash);
-  my_log(__func__, log, 4);
-  if (limit == HCOMMANDSIZE) // Si on a fait le tour, c'est que toute les commandes sont prises
+  if (limit == HCOMMANDSIZE)
     {
       sprintf(log, "%s command unknow", command);
-      my_log(__func__, log, 3);
-      return (HCOMMANDUNKNOW); // on est dans le cas d'un input qui n'est pas une commande
+      my_log(__func__, log, 2);
+      return (HCOMMANDUNKNOW);
     }
-  if ((new_colision = malloc(sizeof(*new_colision))) == NULL) // On ajoute la correspondance dans la liste des colisions
+  if ((new_colision = malloc(sizeof(*new_colision))) == NULL)
     {
       my_log(__func__, MEM_ERR, 1);
       return (HCOMMANDERR);
@@ -121,8 +110,6 @@ int		resolve_colision(int hash, char *command, t_chain **colisions)
     return (HCOMMANDERR);
   if (add_link(colisions, new_colision))
     return (HCOMMANDERR);
-  sprintf(log, "hash out of resolve colision: %d", hash);
-  my_log(__func__, log, 3);
   return (hash);
 }
 
@@ -181,80 +168,33 @@ t_chain			*init_colisions()
 int		hash_command(char *c)
 {
   int		hash;
-  char		log[50];
   char		*command;
   t_chain	*colisions;
   
   hash = 0;
   command = c;
-  sprintf(log, "command in hash process: %s", command);
-  my_log(__func__, log, 4);
-  if ((colisions = init_colisions()) == NULL) // On récupère le singleton des colisions.
+  if ((colisions = init_colisions()) == NULL)
     return (HCOMMANDERR);
-  /*
-  ** On vérifie si le hash est une colision, 
-  ** si c'est le cas, on récupère d'office le bon hash!
-  */
   if ((hash = is_colision(colisions, command)) == NOT_COLISION) 
     {
-      /*
-      ** si ce n'est pas une colision, on génère le hash
-      */
       hash = generate_hash(command);
-      /*
-      ** si le hash n'est pas le bon on a: 
-      ** un hash qui n'est pas une colision 
-      ** et qui n'est pas bon en direct
-      ** cela signifie que le hash n'existe pas encore. 
-      */
       if (!is_good_hash(hash, command))
 	{
-	  my_log(__func__, "generate new hash or command unknow", 3);
-	  /*
-	  ** si le hash est déjà pris
-	  */
 	  if (hash_table_command[hash] != NULL
-	      /*
-	      ** on a un hash qui n'est pas encore enregitré 
-	      ** mais qui colisione, donc on resoud la colision.
-	      */
 	      && (hash = resolve_colision(hash, command, &colisions)) == HCOMMANDERR)
 	    return (HCOMMANDERR);
-	  /*
-	  ** si la colision n'est pas résolue, 
-	  ** on est dans le cas d'une commande inexistante 
-	  ** et d'un tableau de commandes plein.
-	  */
 	  if (hash == HCOMMANDUNKNOW)
 	    {
 	      my_log(__func__, "command unknow", 3);
 	      return (HCOMMANDUNKNOW);
 	    }
-	  /*
-	  ** On enregistre la correspondance dans la table de hash
-	  */
 	  if ((hash_table_command[hash] = my_strdup(command)) == NULL)
 	    return (HCOMMANDERR);
-	  sprintf(log, "new hash generate: %d", hash);
-	  my_log(__func__, log, 3);
 	  return (hash);
 	}
     }
-  else
-    /*
-    ** là c'était une colision, on récupère le hash directement.
-    */
-    my_log(__func__, "is colision, hash retrieved by the small collision table!!", 4);
-  /*
-  ** Ce test est un peu inutile, tout les cas sont
-  ** déjà traités (normalement...). Sécu supplémentaire...
-  */
   if (is_good_hash(hash, c))
-    {
-      sprintf(log, "hash for command %s successfully retrieve, value = %d", c, hash);
-      my_log(__func__, log, 4);
-      return (hash);
-    }
+    return (hash);
   return (HCOMMANDERR);
 }
 

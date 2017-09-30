@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sat Jul  1 01:39:47 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep 11 17:21:18 2017 BILLAUD Jean
+** Last update Mon Sep 25 22:40:32 2017 BILLAUD Jean
 */
 
 #include <stdlib.h>
@@ -24,11 +24,13 @@ void		help()
   my_putstr_color("cyan", "Default -v value is info\n");
   my_putstr_color("cyan", "Without verbose mode, log error in error.log\n");
   my_putstr_color("cyan", "./demo [-log] ![filepath], set a filepath for logs\n");
+  my_putstr_color("cyan", "./demo [-ticfile] [filepath], send Game Info logging in [filepath]\n");
   my_putstr_color("cyan", "./demo [-proto] !int[int...4], display the differents notifications\n");
   my_putstr_color("cyan", "./demo [-rep-port] !int > 0 port for REP/REQ\n");
   my_putstr_color("cyan", "./demo [-pub-port] !int > 0 port for PUB/SUB\n");
   my_putstr_color("cyan", "./demo [-cycle] !int > 0 time in micro sec between two ticks\n");
   my_putstr_color("cyan", "./demo [-map-size] 0 < !int < 8 size for a side of the map\n");
+  my_putstr_color("cyan", "./demo [-test] launch tests, not the program\n");
 }
 
 /*
@@ -47,6 +49,8 @@ t_chain		*get_options()
   t_option	*pub_port;
   t_option	*cycle;
   t_option	*map;
+  t_option	*test;
+  t_option	*tic_file;
   
   if ((options = create_chain(free_options_in_chain)) == NULL)
     {
@@ -71,7 +75,12 @@ t_chain		*get_options()
     }
   if ((log_file = new_option(OPTIONNAL, 1, 0, "-log", build_logger)) == NULL)
     {
-      devlog(__func__, "create option protocol failed", 1); 
+      devlog(__func__, "create option log_file failed", 1); 
+      return (NULL);
+    }
+  if ((tic_file = new_option(OPTIONNAL, 1, 0, "-ticfile", build_logger)) == NULL)
+    {
+      devlog(__func__, "create option ticfile failed", 1); 
       return (NULL);
     }
   if ((rep_port = new_option(OPTIONNAL, 1, 0, "-rep-port", init_swctx)) == NULL)
@@ -94,6 +103,11 @@ t_chain		*get_options()
       devlog(__func__, "create option map size failed", 1); 
       return (NULL);
     }
+  if ((test = new_option(OPTIONNAL, 0, 0, "-test", init_swctx)) == NULL)
+    {
+      devlog(__func__, "create option test failed", 1); 
+      return (NULL);
+    }
   if (add_link(&options, protocol))
     {
       devlog(__func__, "add protocol option to chain failed", 1);
@@ -107,6 +121,11 @@ t_chain		*get_options()
   if (add_link(&options, log_file))
     {
       devlog(__func__, "add log_file option to chain failed", 1);
+      return (NULL);
+    }
+  if (add_link(&options, tic_file))
+    {
+      devlog(__func__, "add tic_file option to chain failed", 1);
       return (NULL);
     }
   if (add_link(&options, rep_port))
@@ -129,6 +148,11 @@ t_chain		*get_options()
       devlog(__func__, "add map option to chain failed", 1);
       return (NULL);
     }
+  if (add_link(&options, test))
+    {
+      devlog(__func__, "add test option to chain failed", 1);
+      return (NULL);
+    }
   return (options);
 }
 
@@ -149,7 +173,9 @@ int	execute(t_option *option)
     (*(void (*)(void))option->action)();
   if (!my_strcmp(opt, "-v") || !my_strcmp(opt, "-log")
       || !my_strcmp(opt, "-rep-port") || !my_strcmp(opt, "-pub-port")
-      || !my_strcmp(opt, "-cycle"))
+      || !my_strcmp(opt, "-cycle")
+      || !my_strcmp(opt, "-test")
+      || !my_strcmp(opt, "-ticfile"))
     (*(void (*)(char*, t_chain*))option->action)(opt, option->parameters);
   if (!my_strcmp(opt, "-proto"))
     (*(void (*)(t_chain*))option->action)(option->parameters);
@@ -193,3 +219,4 @@ int		sw_parse(int argc, char **argv)
   delete_chain(&options);
   return (0);
 }
+

@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Aug  2 21:58:43 2017 CASTELLARNAU Aurelien
-** Last update Wed Aug  2 22:16:12 2017 CASTELLARNAU Aurelien
+** Last update Mon Sep 25 22:40:31 2017 BILLAUD Jean
 */
 
 #include "libmy.h"
@@ -22,7 +22,17 @@ char	**parse_input(char *input)
 {
   char	**arr;
 
-  if ((arr = my_split(input, '|')) == NULL)
+  if (input == NULL)
+    {
+      my_log(__func__, "input == NULL", 4);
+      if ((arr = malloc(sizeof(*arr) * 2)) == NULL)
+	return (NULL);
+      if ((arr[0] = my_strdup("selfid|")) == NULL)
+	return (NULL);
+      if ((arr[1] = my_strdup("no argument provide")) == NULL)
+	return (NULL);
+    }
+  else if ((arr = my_split(input, '|')) == NULL)
     return (NULL);
   if (arr[1] == NULL
       && (arr[1] = my_strdup("no argument provide")) == NULL)
@@ -47,7 +57,6 @@ char		*exec(	char *input,
   char		**inputs;
   char		*output;
 
-  my_log(__func__, "start", 3);
   commands = get_commands();
   if ((inputs = parse_input(input)) == NULL)
     return (NULL);
@@ -55,17 +64,18 @@ char		*exec(	char *input,
     my_log(__func__, "retrieve hash error", 2);
   if (hash != HCOMMANDUNKNOW)
     {
-      sprintf(log, "execution of function %s", inputs[0]);
+      sprintf(log, "EXEC %s", inputs[0]);
       my_log(__func__, log, 3);
       if ((output = commands[hash](manager, active_id, inputs[1])) == NULL)
 	{
 	  sprintf(log, "execution of function %s failed", inputs[0]);
-	  my_log(__func__, log, 2);
+	  my_log(__func__, log, 1);
 	  if ((output = my_strdup("ko|server error")) == NULL)
 	    return (NULL);
 	  return (output);
 	}
-      my_log(__func__, output, 4);
+      sprintf(log, "RETURN %s", output);
+      my_log(__func__, log, 3);
       return (output);
     }  
   sprintf(log, "command %s doesn't exist", inputs[0]);

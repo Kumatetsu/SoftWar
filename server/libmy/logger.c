@@ -1,3 +1,4 @@
+
 /*
 ** logger.c for libmy_extended in /home/aurelien/Documents/Lib_etna/castel_a/libmy_extended/libmy
 ** 
@@ -20,7 +21,8 @@ const static void_char_file log_panel[] = {
   log_error,
   log_warning,
   log_info,
-  log_debug
+  log_debug,
+  log_tic
 };
 
 /*
@@ -83,8 +85,15 @@ int		set_parameters(t_logger **logger, t_chain *parameters, char *opt)
 	  && set_level(logger, "info"))
 	devlog(__func__, "error setting log level to info", 1);
     }
-  if (!my_strcmp(opt, "-log"))
-    (*logger)->file_path = my_strdup((char*)((t_link*)(parameters->dictionnary[0])->content));
+  if (!my_strcmp(opt, "-log")
+      && ((*logger)->file_path = my_strdup((char*)((t_link*)(parameters->dictionnary[0])->content))) == NULL)
+    return (1);
+  if (!my_strcmp(opt, "-ticfile"))
+    {
+      (*logger)->tic_in_file = 1;
+      if (((*logger)->tic_file = my_strdup((char*)((t_link*)(parameters->dictionnary[0])->content))) == NULL)
+	return (1);
+    }
   return (0);
 }
 
@@ -100,10 +109,15 @@ t_logger		*build_default_logger()
   
   if ((logger = malloc(sizeof(*logger))) == NULL)
     return (NULL);
-  logger->level = my_strdup("DEBUG");
+  if ((logger->level = my_strdup("DEBUG")) == NULL)
+    return (NULL);
+  if ((logger->file_path = my_strdup("dev.log")) == NULL)
+    return (NULL);
+  if ((logger->tic_file = my_strdup("tic.log")) == NULL)
+    return (NULL);
+  logger->tic_in_file = 1;
   logger->log = my_log;
   logger->lvl = 4;
-  logger->file_path = my_strdup("dev.log");
   return (logger);
 }
 
@@ -131,7 +145,16 @@ void		devlog(const char *func, char *str, int lvl)
 	  o = fopen(logger->file_path, "a");
 	  file = 1;
 	}
-      if (lvl <= logger->lvl)
+      if (lvl == 5
+	  && logger->tic_in_file
+	  && logger->tic_file != NULL)
+	{
+	  o = fopen(logger->tic_file, "a");
+	  log_tic(str, o);
+	  fclose(o);
+	}
+      else if (lvl <= logger->lvl ||
+	       (lvl == 5 && logger->tic_in_file == 0))
 	{
 	  fprintf(o, "\n[CS/");
 	  fprintf(o, func);
@@ -163,7 +186,16 @@ void		my_log(const char *func, char *str, int lvl)
 	  o = fopen(logger->file_path, "a");
 	  file = 1;
 	}
-      if (lvl <= logger->lvl)
+      if (lvl == 5
+	  && logger->tic_in_file == 1
+	  && logger->tic_file != NULL)
+	{
+	  o = fopen(logger->tic_file, "a");
+	  log_tic(str, o);
+	  fclose(o);
+	}
+      else if (lvl <= logger->lvl ||
+	       (lvl == 5 && logger->tic_in_file == 0))
 	{
 	  fprintf(o, "\n[CS/");
 	  fprintf(o, func);
@@ -186,15 +218,25 @@ t_logger		*build_logger(char *opt, t_chain *parameters)
       logger->log = my_log;
       logger->level = NULL;
       logger->file_path = NULL;
+      logger->tic_file = NULL;
+      logger->tic_in_file = 0;
       if (opt == NULL)
 	{
-	  logger->level = my_strdup("ERROR");
+	  if ((logger->level = my_strdup("ERROR")) == NULL)
+	    return (NULL);
+	  if ((logger->file_path = my_strdup("error.log")) == NULL)
+	    return (NULL);
+	  if ((logger->tic_file = my_strdup("ticker.log")) == NULL)
+	    return (NULL);
 	  logger->lvl = 1;
-	  logger->file_path = my_strdup("error.log");
+	  logger->tic_in_file = 1;
 	}
       }
   if (opt != NULL)
     {
+      char log [50];
+      sprintf(log, "set option %s", opt);
+      devlog(__func__, log, 4);
       if (set_parameters(&logger, parameters, opt))
 	return (NULL);
     }
@@ -220,6 +262,8 @@ void		delete_logger()
 	free(logger->level);
       if (logger->file_path != NULL)
 	free(logger->file_path);
+      if (logger->tic_file != NULL)
+	free(logger->tic_file);
       free(logger);
     }
 }

@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Thu Sep 14 17:25:58 2017 BILLAUD Jean
+** Last update Mon Sep 25 23:38:18 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -49,20 +49,14 @@ char	*generate_output(int success)
 char	*generate_output_param(int success, char *param)
 {
   char	tmp[80];
-  char  log[80];
   char	*output;
 
-  my_log(__func__, "generating output", 4);
-  sprintf(log, "Softwar is generating an output with parameter: %s", param);
-  my_log(__func__, log, 4);
   if (success)
     sprintf(tmp, "ok|%s", param);
   else
     sprintf(tmp, "ko|");
   if ((output = my_strdup(tmp)) == NULL)
     return (NULL);
-  sprintf(log, "returnin output: %s", output);
-  my_log(__func__, log, 4);
   return (output);
 }
 
@@ -70,16 +64,25 @@ char	*generate_output_param(int success, char *param)
 ** génère un unique id
 ** ALLOCATE MEMORY
 */
-char            *new_uid()
+t_player	*check_uid(t_chain *players, char *id)
 {
-  static int    id;
-  char          uid[20];
-  char          *heap_uid;
+  char		log[50];
+  t_link	*tmp;
+  t_player	*p;
 
-  sprintf(uid, "0x0%d", ++id);
-  if ((heap_uid = my_strdup(uid)) == NULL)
-    return (NULL);
-  return (heap_uid);
+  tmp = players->first;
+  while (tmp)
+    {
+      p = tmp->content;
+      if (!my_strcmp(p->identity, id))
+	{
+	  sprintf(log, "Identity %s already taken", id);
+	  my_log(__func__, log, 2);
+	  return (p);
+	}
+      tmp = tmp->next;
+    }
+  return (NULL);
 }
 
 /*
@@ -87,93 +90,111 @@ char            *new_uid()
 */
 char		*identify(t_game_manager **manager, char *identity, char *optional)
 {
-  t_player	*new;
   char		log[50];
-  char		tmp[50];
-  char		*output;
+  t_player	*new;
 
-  sprintf(log, "call function identify \noptional: %s", optional);
-  my_log(__func__, log, 3);
+  my_log(__func__, identity, 4);
   if ((*manager)->ready)
     {
-      my_log(__func__, "server full", 3);
-      if((output = my_strdup("ko|server full")) == NULL)
+      my_log(__func__, "a client attempt to connect but the server is full", 3);
+      return (generate_output_param(FAIL, "server_full"));
+    }
+  if ((new = check_uid((*manager)->get_players(), optional)) != NULL)
+    {
+      if (new->disabled == -1)
+	{
+	  sprintf(log, "client with id %s war disconnected, new client take his place", new->identity);
+	  my_log(__func__, log, 3);
+	  new->disabled = 0;
+	}
+      else
+	return (generate_output(FAIL));
+    }
+  sprintf(log, "Server accept new client with id: %s", optional);
+  my_log(__func__, log, 3);
+  if (new != NULL && (*manager)->add_player(new))
+    return (NULL);
+  else if(new == NULL && (new = create_player(optional)) != NULL)
+    {
+      if ((*manager)->add_player(new))
 	return (NULL);
-      return (output);
     }
   else
-    sprintf(log, "manager not ready, parameter: %s", identity);
+    return (NULL);
+  (*manager)->set_players_pos((*manager)->get_players(), (*manager)->get_map_size());
+  sprintf(log, "number of client actually registered: %d", (*manager)->get_players()->index);
   my_log(__func__, log, 3);
-  my_log(__func__, "attribute new id", 3);
-  if (manager == NULL || (*manager) == NULL || identity == NULL)
-    return (NULL);
-  if ((new = create_player(new_uid())) == NULL)
-    return (NULL);
-  if ((*manager)->add_player(new))
-    return (NULL);
-  if ((*manager)->get_players()->index == 4)
-    (*manager)->ready = 1;
-  sprintf(tmp, "ok|%s", new->identity);
-  if ((output = my_strdup(tmp)) == NULL)
-    return (NULL);
-  (*manager)->set_change(1);
-  my_log(__func__, output, 4);
-  return (output);
+  if ((*manager)->get_players()->index >= 4)
+    {
+      (*manager)->ready = 1;
+      my_log(__func__, "GAME IS READY", 3);
+    }
+  return (generate_output_param(SUCCESS, optional));
 }
 
-char	*self_id(t_game_manager **manager, char *identity, char *optional)
+char		*self_id(t_game_manager **manager, char *identity, char *optional)
 {
-  char	log[50];
+  char		log[1024];
+  t_player	*p;
 
-  if ((*manager)->ready)
-    sprintf(log, "manager ready, parameter: %s", identity);
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, "call function self_id", 3);
-  my_log(__func__, optional, 3);
-  (*manager)->set_change(1);
-  return (identity);
+  // pas obligatoire mais permet d'utiliser tout les paramètres
+  // au passage, check l'id, c'est pas plus mal...
+  if ((p = (*manager)->get_player(identity)) == NULL)
+    return (generate_output(FAIL));
+  sprintf(log, "player %s is asking for his own id, optional parameter: %s", identity, optional);
+  my_log(__func__, log, 3);
+  return (generate_output_param(SUCCESS, identity));
 }
 
+/*
+** Si un joueur quitte en cours de partie
+** sa propriété disabled passe à -1
+** Cela permet de réatribuer le joueur
+** si le même client propose la même id (voir identify())
+** cela permet aussi de ne pas bloquer la partie sur un crash client.
+*/
 char		*leave(t_game_manager **manager, char *identity, char *optional)
 {
+  int		rm_link;
   char		log[80];
   t_link	*tmp;
   t_chain	*players;
   t_player	*p;
-  char		*output;
+  t_game_info	**gi;
 
-  if ((*manager)->ready)
-    sprintf(log, "manager ready, parameter: %s", identity);
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, "call function leave", 3);
-  my_log(__func__, optional, 3);
+  
   players = (*manager)->get_players();
-  tmp = players->first;
-  while (tmp)
+  if ((p = (*manager)->get_player(identity)) == NULL)
     {
-      p = (t_player*)tmp->content;
-      if (!my_strcmp(p->identity, identity))
-	{
-	  sprintf(log, "remove link where player identity is: %s.", identity);
-	  my_log(__func__, log, 3);
-	  if (remove_link(&players, tmp) == -1)
-	    my_log(__func__, "no more players", 3);
-	  if ((output = my_strdup("Good Bye!")) == NULL)
-		return (NULL);
-	  if (players->index < 4)
-	    (*manager)->ready = 0;
-	  return (output);
-	}
-      tmp = tmp->next;
+      sprintf(log, "can't retrieve client with id %s", identity);
+      my_log(__func__, log, 2);
+      return (NULL);
     }
-  sprintf(log, "player %s not found, can't remove it", identity);
-  my_log(__func__, log, 2);
-  if ((output = my_strdup(log)) == NULL)
-    return (NULL);
-  (*manager)->set_change(1);
-  return (output);
+  if ((tmp = get_link_by_content(p, (*manager)->get_players())) == NULL)
+    {
+      my_log(__func__, "can't retrieve link by content", 2);
+      return (generate_output_param(FAIL, "server_error"));
+    }
+  if ((gi = (*manager)->get_info()) == NULL)
+    return (NULL);; 
+  if ((*gi)->game_status == 1)
+    p->disabled = -1;
+  else
+    { 
+      rm_link = remove_link(&players, tmp);
+      if (rm_link == -1)
+	my_log(__func__, "no more players", 3);
+      else if(rm_link)
+	{
+	  sprintf(log, "can't delete player %s", identity);
+	  my_log(__func__, log, 2);
+	  return (NULL);
+	}
+      if ((*gi)->game_status != 1 && players->index < 4)
+	(*manager)->ready = 0;
+    }
+  my_log(__func__, optional, 4);
+  return (generate_output(SUCCESS));
 }
 
 /*
@@ -186,27 +207,22 @@ char		*forward(t_game_manager **manager, char *identity, char *optional)
   t_player	*p;
   
   success = 0;
-  if ((*manager)->ready)
+  my_log(__func__, optional, 4);
+  sprintf(log, "forward done");
+  if ((p = (*manager)->get_player(identity)) == NULL)
+    return (NULL);
+  if ((*manager)->ready && !p->disabled)
     {    
-      sprintf(log, "manager ready, parameter: %s", identity);
-      my_log(__func__, log, 4);
-      p = (*manager)->get_player(identity);
-      if (p == NULL)
-	{
-	  sprintf(log, "can't retrieve player by id: %s", identity);
-	  my_log(__func__, log, 2);
-	  return (NULL);
-	}
       switch (p->looking)
 	{
 	case LEFT:
 	  if (check_mvmnt(p->x - 1, p->y, identity, (*manager)) == 1)
 	    sprintf(log, "%s can't move left", identity);
-	  else if (p->action < 0.5)
+	  else if (p->action < 5)
 	    sprintf(log, "%s action point are too low", identity);
 	  else
 	    {
-	      p->action = p->action - 0.5;
+	      p->action = p->action - 5;
 	      p->x = p->x - 1;
 	      success = 1;
 	    }
@@ -214,11 +230,11 @@ char		*forward(t_game_manager **manager, char *identity, char *optional)
 	case UP:
 	  if (check_mvmnt(p->x, p->y - 1, identity, (*manager)) == 1)
 	    sprintf(log, "%s can't move up", identity);
-	  else if (p->action < 0.5)
+	  else if (p->action < 5)
 	    sprintf(log, "%s action point are too low", identity);
 	  else
 	    {
-	      p->action = p->action - 0.5;
+	      p->action = p->action - 5;
 	      p->y = p->y - 1;
 	      success = 1;
 	    }
@@ -226,11 +242,11 @@ char		*forward(t_game_manager **manager, char *identity, char *optional)
 	case RIGHT:
 	  if (check_mvmnt(p->x + 1, p->y, identity, (*manager)) == 1)
 	    sprintf(log, "%s can't move right", identity);
-	  else if (p->action < 0.5)
+	  else if (p->action < 5)
 	    sprintf(log, "%s action point are too low", identity);
 	  else
 	    {
-	      p->action = p->action - 0.5;
+	      p->action = p->action - 5;
 	      p->x = p->x + 1;
 	      success = 1;
 	    }
@@ -238,26 +254,20 @@ char		*forward(t_game_manager **manager, char *identity, char *optional)
 	case DOWN:
 	  if (check_mvmnt(p->x, p->y + 1, identity, (*manager)) == 1)
 	    sprintf(log, "%s can't move down", identity);
-	  else if (p->action < 0.5)
+	  else if (p->action < 5)
 	    sprintf(log, "%s action point are too low", identity);
 	  else
 	    {
-	      p->action = p->action - 0.5;
+	      p->action = p->action - 5;
 	      p->y = p->y + 1;
 	      success = 1;
 	    }
 	  break;
 	default:
-	  my_log(__func__, "falled in default in forward switch", 3);
 	  break;
 	}
+      my_log(__func__, log, 4);
     }
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, log, 4);
-  my_log(__func__, "call function forward", 3);
-  my_log(__func__, optional, 3);
-  (*manager)->set_change(1);
   return (generate_output(success));
 }
 
@@ -268,19 +278,20 @@ char		*backward(t_game_manager **manager, char *identity, char *optional)
   t_player	*p;
 
   success = 0;
-  if ((*manager)->ready) {
-    sprintf(log, "manager ready, parameter: %s", identity);
-    p = (*manager)->get_player(identity);
+  my_log(__func__, optional, 4);
+  if ((p = (*manager)->get_player(identity)) == NULL)
+    return (NULL);
+  if ((*manager)->ready && !p->disabled) {
     switch (p->looking)
       {
       case LEFT:
 	if (check_mvmnt(p->x + 1, p->y, identity, (*manager)) == 1)
 	  sprintf(log, "%s can't backward right", identity);
-	else if (p->action < 0.5)
+	else if (p->action < 5)
 	  sprintf(log, "%s action point are too low", identity);
 	else
 	  {
-	    p->action = p->action - 0.5;
+	    p->action = p->action - 5;
 	    p->x = p->x + 1;
 	    success = 1;
 	  }
@@ -288,11 +299,11 @@ char		*backward(t_game_manager **manager, char *identity, char *optional)
       case UP:
 	if (check_mvmnt(p->x, p->y + 1, identity, (*manager)) == 1)
 	  sprintf(log, "%s can't backward down", identity);
-	else if (p->action < 0.5)
+	else if (p->action < 5)
 	  sprintf(log, "%s action point are too low", identity);
 	else
 	  {
-	    p->action = p->action - 0.5;
+	    p->action = p->action - 5;
 	    p->y = p->y + 1;
 	    success = 1;
 	  }
@@ -300,11 +311,11 @@ char		*backward(t_game_manager **manager, char *identity, char *optional)
       case RIGHT:
 	if (check_mvmnt(p->x - 1, p->y, identity, (*manager)) == 1)
 	  sprintf(log, "%s can't backward left", identity);
-	else if (p->action < 0.5)
+	else if (p->action < 5)
 	  sprintf(log, "%s action point are too low", identity);
 	else
 	  {
-	    p->action = p->action - 0.5;
+	    p->action = p->action - 5;
 	    p->x = p->x - 1;
 	    success = 1;
 	  }
@@ -312,11 +323,11 @@ char		*backward(t_game_manager **manager, char *identity, char *optional)
       case DOWN:
 	if (check_mvmnt(p->x, p->y + 1, identity, (*manager)) == 1)
 	  sprintf(log, "%s can't backward up", identity);
-	else if (p->action < 0.5)
+	else if (p->action < 5)
 	  sprintf(log, "%s action point are too low", identity);
 	else
 	  {
-	    p->action = p->action - 0.5;
+	    p->action = p->action - 5;
 	    p->y = p->y + 1;
 	    success = 1;
 	  }
@@ -325,11 +336,6 @@ char		*backward(t_game_manager **manager, char *identity, char *optional)
 	break;
       }
   }
- else
-   sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, "call function backward", 3);
-  my_log(__func__, optional, 3);
-  (*manager)->set_change(1);
   return (generate_output(success));
 }
 
@@ -340,24 +346,20 @@ char		*left(t_game_manager **manager, char *identity, char *optional)
   t_player	*player;
 
   success = 0;
-  if ((*manager)->ready)
+  if ((player = (*manager)->get_player(identity)) == NULL)
+    return (NULL);
+  if ((*manager)->ready && !player->disabled)
     {
-      sprintf(log, "manager ready, parameter: %s", identity);
-      player = (*manager)->get_player(identity);
-      if (player->action < 0.5)
+      if (player->action < 5)
 	sprintf(log, "%s action point are too low", identity);
       else
 	{
-	  player->action = player->action - 0.5;
+	  player->action = player->action - 5;
 	  player->looking = (player->looking == LEFT) ? DOWN : (player->looking - 1);
 	  success = 1;
 	}
     }
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, "call function left", 3);
   my_log(__func__, optional, 3);
-  (*manager)->set_change(1);
   return (generate_output(success));
 }
 
@@ -368,24 +370,22 @@ char		*right(t_game_manager **manager, char *identity, char *optional)
   t_player	*player;
 
   success = 0;
-  if ((*manager)->ready)
+  if ((player = (*manager)->get_player(identity)) == NULL)
+    return (NULL);
+  if ((*manager)->ready && !player->disabled)
     {
-      sprintf(log, "manager ready, parameter: %s", identity);
-      player = (*manager)->get_player(identity);
-      if (player->action < 0.5)
+      if (player->action < 5) {
 	sprintf(log, "%s action point are too low", identity);
+	my_log(__func__, log, 4);
+      }
       else
 	{
-	  player->action = player->action - 0.5;
+	  player->action = player->action - 5;
 	  player->looking = (player->looking == DOWN) ? LEFT : (player->looking + 1);
 	  success = 1;
 	}
     }
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, "call function right", 3);
   my_log(__func__, optional, 3);
-  (*manager)->set_change(1);
   return (generate_output(success));
 }
 
@@ -396,11 +396,11 @@ char		*leftfwd(t_game_manager **manager, char *identity, char *optional)
   t_player	*player;
 
   success = 0;
-  player = (*manager)->get_player(identity);
-  if ((*manager)->ready)
+  if ((player = (*manager)->get_player(identity)) == NULL)
+    return (NULL);
+  if ((*manager)->ready && !player->disabled)
     {
-      sprintf(log, "manager ready, parameter: %s", identity);
-      if (player->action < 1)
+      if (player->action < 10)
 	sprintf(log, "%s action point are too low", identity);
       else
 	{
@@ -411,11 +411,7 @@ char		*leftfwd(t_game_manager **manager, char *identity, char *optional)
 	  success = 1;
 	}
     }
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, "call function leftfwd", 3);
   my_log(__func__, optional, 3);
-  (*manager)->set_change(1);
   return (generate_output(success));
 }
 
@@ -426,26 +422,25 @@ char		*rightfwd(t_game_manager **manager, char *identity, char *optional)
   t_player	*player;
 
   success = 0;
-  player = (*manager)->get_player(identity);
-  if ((*manager)->ready)
+  if ((player = (*manager)->get_player(identity)) == NULL)
+    return (NULL);
+  if ((*manager)->ready && !player->disabled)
     {
-      sprintf(log, "manager ready, parameter: %s", identity);
-      if (player->action < 1)
+      if (player->action < 10)
 	sprintf(log, "%s action point are too low", identity);
       else
 	{
+	  sprintf(log, "manager before right in rightfwd, parameter: %s", identity);
+	  my_log(__func__, log, 4);
 	  if ((right(manager, identity, optional)) == NULL)
 	    return (NULL);
-	sprintf(log, "new looking value after right(): %d", player->looking);
-	my_log(__func__, log, 4);
+	  sprintf(log, "new looking value after right(): %d", player->looking);
+	  my_log(__func__, log, 4);
 	  if ((forward(manager, identity, optional)) == NULL)
 	    return (NULL);
 	  success = 1;
 	}
     }
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, "call function rightfwd", 3);
   my_log(__func__, optional, 3);
   return (generate_output(success));
 }
@@ -455,21 +450,16 @@ char		*rightfwd(t_game_manager **manager, char *identity, char *optional)
 */
 char		*looking(t_game_manager **manager, char *identity, char *optional)
 {
-  char		log[50];
   t_player	*p;
   char		look[2];
-  
-  if ((*manager)->ready)
+
+  if ((p = (*manager)->get_player(identity)) == NULL)
+    return (NULL);
+  if ((*manager)->ready && !p->disabled)
     {
-      if ((p = (*manager)->get_player(identity)) == NULL)
-	return (NULL);
       sprintf(look, "%d", p->looking);
-      (*manager)->set_change(1);
       return (generate_output_param(SUCCESS, look));
     }
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, "call function looking", 3);
   my_log(__func__, optional, 3);
   return (generate_output(FAIL));
 }
@@ -495,38 +485,36 @@ char		*gather(t_game_manager **manager, char *identity, char *optional)
   t_chain	*energy_cells;
   t_link	*link;
   t_energy_cell *ec;
+  int		removelink;
 
   player = (*manager)->get_player(identity);
+  if (player->action < 10 || player->disabled)
+    return (generate_output(FAIL));
   energy_cells = (*manager)->get_energy_cells();
   if ((*manager)->ready)
     {
-      sprintf(log, "manager ready, parameter: %s", identity);
       if ((ec = is_energy_cell(player->x, player->y, energy_cells)) != NULL)
 	{
-	  sprintf(log, "player gathered %d energy", ec->value);
-	  my_log(__func__, log, 4);
+	  sprintf(log, "player %s gathered %d energy", player->identity, ec->value);
+	  my_log(__func__, log, 3);
 	  player->energy += ec->value;
 	  player->action -= 1;
 	  if ((link = get_link_by_content(ec, energy_cells)) != NULL)
 	    {
-	      int removelink = remove_link(&energy_cells, link);
-	      sprintf(log, "value of remove_link() return: %d", removelink);
-	      my_log(__func__, log, 4);
+	      removelink = remove_link(&energy_cells, link);
 	      if (removelink == 1)
-		my_log(__func__, "delete energy cell failed", 3);
+		my_log(__func__, "delete energy cell failed", 2);
 	      else if (removelink == -1)
-		my_log(__func__, "no more energy_cell", 4);
+		my_log(__func__, "no more energy_cell on map", 3);
 	      else
-		my_log(__func__, "energy cell consumed", 2);
+		my_log(__func__, "energy cell consumed", 3);
 	    }
 	  else
-	    my_log(__func__, "try retrieving t_link by energy_cell content failed", 3);
-	  (*manager)->set_change(1);
+	    my_log(__func__, "try retrieving t_link by energy_cell content failed", 2);
 	  return (generate_output(SUCCESS));
 	}
     }
-  else
-      sprintf(log, "manager not ready, parameter: %s", optional);
+  my_log(__func__, optional, 4);
   return (generate_output(FAIL));
 }
 
@@ -536,7 +524,7 @@ char		*gather(t_game_manager **manager, char *identity, char *optional)
 char		*watch(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
-  t_player	*player;
+  t_player	*p;
   uint		a;
   uint		b;
   int		operator_inv;
@@ -544,44 +532,55 @@ char		*watch(t_game_manager **manager, char *identity, char *optional)
   uint		**zone;
   char		*state;
 
-  if ((*manager)->ready)
+  
+  if ((p = (*manager)->get_player(identity)) == NULL)
+    return (NULL);
+  if ((*manager)->ready && !p->disabled)
     {
       sprintf(log, "processus %s is watching", identity);
       my_log(__func__, log, 4);
-      if ((player = (*manager)->get_player(identity)) == NULL)
-	return (NULL);
-      a = (player->looking == LEFT || player->looking == RIGHT) ? player->x : player->y;
-      b = (player->looking == LEFT || player->looking == RIGHT) ? player->y : player->x;
-      operator_inv = (player->looking == RIGHT || player->looking == DOWN) ? 1 : 0;
-      swap = (player->looking == UP || player->looking == DOWN) ? 1 : 0;
+      a = (p->looking == LEFT || p->looking == RIGHT) ? p->x : p->y;
+      b = (p->looking == LEFT || p->looking == RIGHT) ? p->y : p->x;
+      operator_inv = (p->looking == RIGHT || p->looking == DOWN) ? 1 : 0;
+      swap = (p->looking == UP || p->looking == DOWN) ? 1 : 0;
       if ((zone = eq_watch(a, b, operator_inv, swap)) == NULL)
 	return (NULL);
       if ((state = compile_watch_return(manager, zone)) == NULL)
 	{
-	  my_log(__func__, "compiling watch return failed", 4);
+	  my_log(__func__, "compiling watch return failed", 2);
 	  return (NULL);
 	}
       return (generate_output_param(SUCCESS, state));
     }
-  else
-    sprintf(log, "manager not ready, processus %s wanted to watch", identity);
-  my_log(__func__, "call function watch", 3);
-  my_log(__func__, optional, 3);
+  my_log(__func__, optional, 4);
   return (generate_output(FAIL));
 }
 
 char		*attack(t_game_manager **manager, char *identity, char *optional)
 {
-  char		log[50];
-
-  if ((*manager)->ready) {
-    sprintf(log, "manager ready, parameter: %s", identity);
-  }
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, "call function attack", 3);
-  my_log(__func__, optional, 3);
-  return (identity);
+  char		*watched;
+  char		*front;
+  t_player	*p;
+  t_player	*adv;
+  
+  if ((p = (*manager)->get_player(identity)) == NULL)
+    return (NULL);
+  if ((*manager)->ready && !p->disabled) {
+     if ((watched = watch(manager, identity, optional)) == NULL)
+	return (NULL);
+      if ((front = extract_front_from_watched(watched)) == NULL)
+	return (NULL);
+      if (p->action < 5)
+	return (generate_output(FAIL));
+      p->action -= 5;
+      p->energy -= 10;
+      if ((adv = (*manager)->get_player(front)) == NULL)
+	return (NULL);
+      adv->disabled = 2;
+      return (generate_output(SUCCESS));
+    }
+  my_log(__func__, optional, 4);
+  return (generate_output(FAIL));
 }
 
 char		*jump(t_game_manager **manager, char *identity, char *optional)
@@ -589,21 +588,23 @@ char		*jump(t_game_manager **manager, char *identity, char *optional)
   int		success;
   char		log[50];
   t_player	*p;
-
+  
   success = 0;
-  if ((*manager)->ready) {    
-    sprintf(log, "manager ready, parameter: %s", identity);
-    p = (*manager)->get_player(identity);
+  if ((p = (*manager)->get_player(identity)) == NULL)
+    return (NULL);
+  if ((*manager)->ready && !p->disabled) {    
+    if ((p = (*manager)->get_player(identity)) == NULL)
+      return (NULL);
     switch (p->looking)
       {
       case LEFT:
 	if (check_mvmnt(p->x - 2, p->y, identity, (*manager)) == 1)
 	  sprintf(log, "%s can't jump left", identity);
-	else if (p->action < 2)
+	else if (p->energy < 2)
 	  sprintf(log, "%s action point are too low", identity);
 	else
 	  {
-	    p->action = p->action - 2;
+	    p->energy = p->energy - 2;
 	    p->x = p->x - 2;
 	    success = 1;
 	  }
@@ -611,11 +612,11 @@ char		*jump(t_game_manager **manager, char *identity, char *optional)
       case UP:
 	if (check_mvmnt(p->x, p->y - 2, identity, (*manager)) == 1)
 	  sprintf(log, "%s can't jump  up", identity);
-	else if (p->action < 2)
+	else if (p->energy < 2)
 	  sprintf(log, "%s action point are too low", identity);
 	else
 	  {
-	    p->action = p->action - 2;
+	    p->energy = p->energy - 2;
 	    p->y = p->y - 2;
 	    success = 1;
 	  }
@@ -623,11 +624,11 @@ char		*jump(t_game_manager **manager, char *identity, char *optional)
       case RIGHT:
 	if (check_mvmnt(p->x + 2, p->y, identity, (*manager)) == 1)
 	  sprintf(log, "%s can't jump right", identity);
-	else if (p->action < 2)
+	else if (p->energy < 2)
 	  sprintf(log, "%s action point are too low", identity);
 	else
 	  {
-	    p->action = p->action - 2;
+	    p->energy = p->energy - 2;
 	    p->x = p->x + 2;
 	    success = 1;
 	  }
@@ -635,70 +636,78 @@ char		*jump(t_game_manager **manager, char *identity, char *optional)
       case DOWN:
 	if (check_mvmnt(p->x, p->y + 2, identity, (*manager)) == 1)
 	  sprintf(log, "%s can't jump down", identity);
-	else if (p->action < 2)
+	else if (p->energy < 2)
 	  sprintf(log, "%s action point are too low", identity);
 	else
 	  {
-	    p->action = p->action - 2;
+	    p->energy = p->energy - 2;
 	    p->y = p->y + 2;
 	    success = 1;
 	  }
 	break;
       default:
 	break;
-    }
+      }
   }
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, "call function jump", 3);
   my_log(__func__, optional, 3);
   return (generate_output(success));
 }
 
 char		*self_stats(t_game_manager **manager, char *identity, char *optional)
 {
-  char		log[50];
+  char		str[15];
+  t_player	*p;
 
-  if ((*manager)->ready) {
-    sprintf(log, "manager ready, parameter: %s", identity);
-  }
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, "call function self_stat", 3);
-  my_log(__func__, optional, 3);
-  return (identity);
+  if ((p = (*manager)->get_player(identity)) == NULL)
+    return (NULL);
+  if ((*manager)->ready)
+    {
+      sprintf(str, "%d", p->energy);
+      return (generate_output_param(SUCCESS, str));
+    }
+  my_log(__func__, optional, 4);
+  return (generate_output(FAIL));
 }
 
 char		*inspect(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
+  t_player	*p;
+  t_player	*adv;
 
-  if ((*manager)->ready) {
-    sprintf(log, "manager ready, parameter: %s", identity);
-  }
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, "call function inspect", 3);
-  my_log(__func__, optional, 3);
-  return (identity);
+  if ((p = (*manager)->get_player(identity)) == NULL)
+	return (NULL);
+  if ((*manager)->ready && p->action > 5 && !p->disabled)
+    {
+      if ((p = (*manager)->get_player(identity)) == NULL)
+	return (NULL);
+      if ((adv = (*manager)->get_player(optional)) == NULL)
+	{
+	  sprintf(log, "%s?", optional);
+	  return (generate_output_param(FAIL, log));
+	}
+      else
+	{
+	  sprintf(log, "%d", adv->energy);
+	  return (generate_output_param(SUCCESS, log));
+	}
+    }
+  return (generate_output(FAIL));
 }
 
 char		*next(t_game_manager **manager, char *identity, char *optional)
 {
-  char		log[50];
   t_player	*p;
-  
-  if ((*manager)->ready) {
-    sprintf(log, "manager ready, parameter: %s", identity);
-    sprintf("%s decided to pass", identity);
-    p = (*manager)->get_player(identity);
-    p->action = 0;
-  }
-  else
-    sprintf(log, "manager not ready, parameter: %s", identity);
-  my_log(__func__, "call function next", 3);
-  my_log(__func__, optional, 3);
-  return (identity);
+
+  if ((*manager)->ready)
+    {
+      if ((p = (*manager)->get_player(identity)) == NULL)
+	return (NULL);
+      p->action = 0;
+      return (generate_output(SUCCESS));
+    }
+  my_log(__func__, optional, 4);
+  return (generate_output(FAIL));
 }
 
 /*
