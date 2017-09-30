@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Jul 12 13:50:33 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep 25 22:16:18 2017 BILLAUD Jean
+** Last update Thu Sep 28 22:23:43 2017 MESRATI Nada
 */
 
 #include <time.h>
@@ -92,8 +92,8 @@ void		energy_fall(t_game_info **info)
   
   map = get_map_manager();
   map_size = (*info)->map_size;
-  x = rand() % (map_size + 1);
-  y = rand() % (map_size + 1);
+  x = rand() % (map_size);
+  y = rand() % (map_size);
   power = rand() % (16 - 5) + 5;
   if (count_ecs((*info)->energy_cells, map_size) == 0)
     {

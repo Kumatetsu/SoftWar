@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Thu Aug 17 17:00:01 2017 BILLAUD Jean
-** Last update Thu Sep 28 16:59:45 2017 BILLAUD Jean
+** Last update Thu Sep 28 22:14:05 2017 MESRATI Nada
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -119,7 +119,8 @@ void 		*tic_thread(void *manager)
 
     json = game_info_to_json(thread->info);
 
-    sprintf(log, json_object_to_json_string(json));
+    my_putstr(json_object_to_json_string(json));
+    my_putstr("\n");
     my_log(__func__, log, 3);
     
     zstr_sendf(pub, "%s %d %s", "Softwar", CYCLE, json_object_to_json_string(json));
