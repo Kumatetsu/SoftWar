@@ -95,7 +95,7 @@ int		energy_fall(t_game_info **info)
   power = rand() % (16 - 5) + 5;
   if (count_ecs((*info)->energy_cells, map_size) == 0)
     {
-      if (map->is_free_square(x, y, (*info)->players, (*info)->energy_cells))
+      if (map->is_energy_cell(x, y, (*info)->energy_cells) == NULL)
 	{
 	  if ((ecs = create_energy_cell(x, y, power)) == NULL)
 	    return (1);
