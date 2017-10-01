@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 30 23:34:27 2017 CASTELLARNAU Aurelien
-** Last update Sat Sep 30 19:53:00 2017 BILLAUD Jean
+** Last update Sun Oct  1 14:01:40 2017 BILLAUD Jean
 */
 
 #include <json/json.h>
@@ -96,7 +96,6 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
 	  if ((ret = my_strdup(log)) == NULL)
 	    return (1);
 	}
-      my_putstr((*ctx)->active_id);
       zmsg_pushstr(response, ret);
       zmsg_pushstr(response, (*ctx)->active_id);
       zmsg_pushstr(response, void_frame);
