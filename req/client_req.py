@@ -24,9 +24,8 @@ def main():
             num = random.randint(0, 15)
             Act.act_func(num, socket)
     else :
-        print 'OK'
-        #while RUNNING:
-        #    print 'in normal'
+        while RUNNING:
+            Act.forward(socket)
 
 
 
