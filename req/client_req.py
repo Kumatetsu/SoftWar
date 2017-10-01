@@ -7,9 +7,11 @@ import zmq
 #nos import
 import option_req as opt
 import action
+import first_ia
 
 process_player = 0
 Act = action.Action()
+IA = first_ia.First_IA()
 RUNNING = True
 def main():
     context = zmq.Context()
@@ -26,6 +28,7 @@ def main():
             Act.act_func(num, socket)
     else :
         print 'OK'
+        IA.ia(socket)
         #while RUNNING:
         #    print 'in normal'
 
