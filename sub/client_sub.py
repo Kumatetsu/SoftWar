@@ -72,7 +72,7 @@ def my_json(win, messagedata):
             draw_client(win, pl_x, pl_y, pl_identity, gap)
         
 def socket(win):
-    port = "5556"
+    port = "4243"
     if len(sys.argv) > 1:
         port = sys.argv[1]
         int(port)

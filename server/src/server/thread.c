@@ -118,7 +118,7 @@ void 		*tic_thread(void *manager)
 	}
       json = game_info_to_json(thread->info);
       sprintf(output, "%s %d %s", "Softwar", CYCLE, json_object_to_json_string(json));
-      // my_log(__func__, output, 5);
+      my_log(__func__, output, 5);
       zstr_sendf(pub, "%s %d %s", "Softwar", CYCLE, json_object_to_json_string(json));
       if (energy_fall(&thread->info))
 	pthread_exit(NULL);
