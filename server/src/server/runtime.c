@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 30 23:34:27 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep 25 23:39:26 2017 BILLAUD Jean
+** Last update Sat Sep 30 19:53:00 2017 BILLAUD Jean
 */
 
 #include <json/json.h>
@@ -51,6 +51,8 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   char		*ret;
   zframe_t	*address;
   char		*input;
+  char		*void_frame;
+  
   pthread_t 	tic;
   t_thread	*t;
   
@@ -58,6 +60,8 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
   zmsg_t	*response;
 
   gi = (*manager)->get_info();
+  
+  //ici se lance le thread
   t = init_thread(*ctx, *gi);
   if (pthread_create(&tic, NULL, tic_thread, t) == -1)
     {
@@ -65,13 +69,16 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
       perror("pthread_create");
       return EXIT_FAILURE;
     }
+
+  //ici se lance la boucle principale
   while (!zsys_interrupted)
     {
       if ((response = init_poll(ctx)) == NULL)
 	return (1);
       address = zmsg_pop(response);
+      void_frame = zmsg_popstr(response);
       if (((*ctx)->active_id = my_strdup(zmsg_popstr(response))) == NULL)
-	return (1);
+	return (1); 
       input = zmsg_popstr(response);
       if (input != NULL
 	  && my_strlen(input) > 0)
@@ -82,7 +89,6 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
 	    return (1);
 	  sprintf(log, "return: %s", ret);
 	  my_log(__func__, log, 3);
-	  zmsg_pushstr(response, ret);
 	}
       else
 	{
@@ -90,8 +96,10 @@ int		serve_game(t_swctx **ctx, t_game_manager **manager)
 	  if ((ret = my_strdup(log)) == NULL)
 	    return (1);
 	}
+      my_putstr((*ctx)->active_id);
       zmsg_pushstr(response, ret);
       zmsg_pushstr(response, (*ctx)->active_id);
+      zmsg_pushstr(response, void_frame);
       zmsg_push(response, address);
       zmsg_send(&response, (*ctx)->active_socket->socket);
       my_log(__func__, "zmsg sent", 3);

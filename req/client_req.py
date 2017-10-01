@@ -18,14 +18,15 @@ def main():
     print opt.host, opt.port;
     socket.connect ('tcp://%s:%s' % (opt.host, opt.port))
     Act.identity(socket)
-    if (opt.rand_ia):
+    if (opt.rand_ia == 'true'):
         while RUNNING:
+            print 'in rand'
             num = random.randint(0, 15)
             Act.act_func(num, socket)
     else :
-        while RUNNING:
-            Act.forward(socket)
-            Act.backward(socket)
+        print 'OK'
+        #while RUNNING:
+        #    print 'in normal'
 
 
 
