@@ -32,22 +32,46 @@ void		refresh_ap(t_game_info **info)
   return;
 }
 
+/*
+** return management: 
+** -1 : no more players
+** -2: remove link failed, server error
+** >0: count of dead people.  
+*/
 int		dead(t_chain *players)
 {
   t_link	*l;
+  t_player	*p;
+  int		rm_link;
   int		count;
   
   l = players->first;
   count = 0;
+  p = NULL;
   while (l)
     {
-      if (((t_player*)(l->content))->energy <= 0) {
-	count++;
-	l = l->next;
-	remove_link(&players, l->prev);
-      } else {
-	l = l->next;
-      }
+      p = (t_player*)(l->content);
+      if (p == NULL)
+	return (-2);
+      if (p->energy <= 0 || p->energy > 100)
+	{
+	  count++;
+	  l = l->next;
+	  rm_link = remove_link(&players, l->prev);
+	  if (rm_link == -1)
+	    {
+	      my_log(__func__, "no more players", 3);
+	      return (-1);
+	    }
+	  else if (rm_link == 1)
+	    {
+	      my_log(__func__, "remove link failed", 4);
+	      return (-2);
+	    }
+	  else
+	    my_log(__func__, "client deleted", 4);
+	  l = l->next;
+	}
     }
   return (count);
 }
@@ -77,12 +101,9 @@ void 		*tic_thread(void *manager)
   json_object	*json;
   uint		cycle;
   int		dead_count;
-  int		count;
-  int		nb_player;
   char		output[1024];
 
   srand(time(NULL));
-  count = 0;
   cycle = thread->ctx->cycle;
   pub = ((t_swsock *)(thread->ctx->sockets->first->content))->socket;
   if (thread == NULL)
@@ -94,7 +115,7 @@ void 		*tic_thread(void *manager)
     {
       my_log(__func__, "thread info is null", 1);
       pthread_exit(NULL);
-   }
+    }
   while (!zsys_interrupted)
     {
       usleep(cycle);
@@ -102,14 +123,15 @@ void 		*tic_thread(void *manager)
       if (thread->info->game_status == 1)
 	zstr_sendf(pub, "%s %d", "Softwar", GAME_START);
       dead_count = dead(thread->info->players);
-      nb_player = (4 - dead_count);
-      while (dead_count > count)
+      if (dead_count == -2)
+	pthread_exit(NULL);
+      while (dead_count)
 	{
 	  zstr_sendf(pub, "%s %d", "Softwar", CLIENT_DEAD);
-	  count++;
 	  my_log(__func__, "client dead\n", 3);
+	  --dead_count;
 	}
-      if (nb_player < 2)
+      if (thread->info->players->index < 2 && thread->info->game_status)
 	{
 	  zstr_sendf(pub, "%s %d", "Softwar", CLIENT_WIN);
 	  zstr_sendf(pub, "%s %d", "Softwar", GAME_END);
@@ -123,7 +145,6 @@ void 		*tic_thread(void *manager)
       if (energy_fall(&thread->info))
 	pthread_exit(NULL);
       refresh_ap(&thread->info);
-      count = 0;
     }
   pthread_exit(NULL);
 }
