@@ -92,12 +92,15 @@ char		*identify(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
   t_player	*new;
+  t_game_info	**info;
 
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
   my_log(__func__, identity, 4);
-  if ((*manager)->ready)
+  if ((*info)->game_status)
     {
       my_log(__func__, "a client attempt to connect but the server is full", 3);
-      return (generate_output_param(FAIL, "server_full"));
+      return (generate_output_param(FAIL, "game full"));
     }
   if ((new = check_uid((*manager)->get_players(), optional)) != NULL)
     {
@@ -108,7 +111,7 @@ char		*identify(t_game_manager **manager, char *identity, char *optional)
 	  new->disabled = 0;
 	}
       else
-	return (generate_output(FAIL));
+	return (generate_output_param(FAIL, "identity already exists"));
     }
   sprintf(log, "Server accept new client with id: %s", optional);
   my_log(__func__, log, 3);
@@ -127,6 +130,7 @@ char		*identify(t_game_manager **manager, char *identity, char *optional)
   if ((*manager)->get_players()->index >= 4)
     {
       (*manager)->ready = 1;
+      (*info)->game_status = 1;
       my_log(__func__, "GAME IS READY", 3);
     }
   return (generate_output_param(SUCCESS, optional));
@@ -198,7 +202,7 @@ char		*leave(t_game_manager **manager, char *identity, char *optional)
 }
 
 /*
-**
+** 
 */
 char		*forward(t_game_manager **manager, char *identity, char *optional)
 {

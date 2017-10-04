@@ -70,7 +70,7 @@ char		*exec(	char *input,
 	{
 	  sprintf(log, "execution of function %s failed", inputs[0]);
 	  my_log(__func__, log, 1);
-	  if ((output = my_strdup("ko|server error")) == NULL)
+	  if ((output = my_strdup("ko|")) == NULL)
 	    return (NULL);
 	  return (output);
 	}
