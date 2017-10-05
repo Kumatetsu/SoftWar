@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Wed Oct  4 22:39:20 2017 BILLAUD Jean
+** Last update Thu Oct  5 16:54:54 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -54,7 +54,7 @@ char	*generate_output_param(int success, char *param)
   if (success)
     sprintf(tmp, "ok|%s", param);
   else
-    sprintf(tmp, "ko|");
+    sprintf(tmp, "ko|%s", param);
   if ((output = my_strdup(tmp)) == NULL)
     return (NULL);
   return (output);
@@ -110,8 +110,10 @@ char		*identify(t_game_manager **manager, char *identity, char *optional)
 	  my_log(__func__, log, 3);
 	  new->disabled = 0;
 	}
-      else
+      else {
+	my_log(__func__, "before identity exist", 3);
 	return (generate_output_param(FAIL, "identity already exists"));
+      }
     }
   sprintf(log, "Server accept new client with id: %s", optional);
   my_log(__func__, log, 3);

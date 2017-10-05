@@ -6,9 +6,10 @@ class Action(object):
         name = ""
 
         def identity(self, socket):
-                base_name = "#0x0"
-                rand_name = random.randint(1, 9)
-                full_name = base_name + str(rand_name)
+                #base_name = "#0x0"
+                #rand_name = random.randint(1, 9)
+                #full_name = base_name + str(rand_name)
+                full_name = "#0x00"
                 identity  = 'identify|' + full_name
                 self.name = full_name
                 print 'action: ' + identity
