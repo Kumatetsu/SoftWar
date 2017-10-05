@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Wed Aug  2 21:58:43 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep 25 22:40:31 2017 BILLAUD Jean
+** Last update Wed Oct  4 22:09:26 2017 BILLAUD Jean
 */
 
 #include "libmy.h"
@@ -70,7 +70,7 @@ char		*exec(	char *input,
 	{
 	  sprintf(log, "execution of function %s failed", inputs[0]);
 	  my_log(__func__, log, 1);
-	  if ((output = my_strdup("ko|server error")) == NULL)
+	  if ((output = my_strdup("ko|")) == NULL)
 	    return (NULL);
 	  return (output);
 	}

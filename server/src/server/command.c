@@ -5,7 +5,7 @@
 ** Login   <castel_a@etna-alternance.net>
 ** 
 ** Started on  Sun Jul 16 00:15:51 2017 CASTELLARNAU Aurelien
-** Last update Mon Sep 25 23:38:18 2017 BILLAUD Jean
+** Last update Wed Oct  4 22:39:20 2017 BILLAUD Jean
 */
 
 #include <stdio.h>
@@ -92,12 +92,15 @@ char		*identify(t_game_manager **manager, char *identity, char *optional)
 {
   char		log[50];
   t_player	*new;
+  t_game_info	**info;
 
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
   my_log(__func__, identity, 4);
-  if ((*manager)->ready)
+  if ((*info)->game_status)
     {
       my_log(__func__, "a client attempt to connect but the server is full", 3);
-      return (generate_output_param(FAIL, "server_full"));
+      return (generate_output_param(FAIL, "game full"));
     }
   if ((new = check_uid((*manager)->get_players(), optional)) != NULL)
     {
@@ -108,7 +111,7 @@ char		*identify(t_game_manager **manager, char *identity, char *optional)
 	  new->disabled = 0;
 	}
       else
-	return (generate_output(FAIL));
+	return (generate_output_param(FAIL, "identity already exists"));
     }
   sprintf(log, "Server accept new client with id: %s", optional);
   my_log(__func__, log, 3);
@@ -126,6 +129,7 @@ char		*identify(t_game_manager **manager, char *identity, char *optional)
   my_log(__func__, log, 3);
   if ((*manager)->get_players()->index >= 4)
     {
+      (*info)->game_status = 1;
       (*manager)->ready = 1;
       my_log(__func__, "GAME IS READY", 3);
     }
@@ -160,10 +164,13 @@ char		*leave(t_game_manager **manager, char *identity, char *optional)
   t_link	*tmp;
   t_chain	*players;
   t_player	*p;
-  t_game_info	**gi;
+  t_game_info	**info;
 
-  
-  players = (*manager)->get_players();
+
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
+  if ((players = (*manager)->get_players()) == NULL)
+    return (NULL);
   if ((p = (*manager)->get_player(identity)) == NULL)
     {
       sprintf(log, "can't retrieve client with id %s", identity);
@@ -175,9 +182,7 @@ char		*leave(t_game_manager **manager, char *identity, char *optional)
       my_log(__func__, "can't retrieve link by content", 2);
       return (generate_output_param(FAIL, "server_error"));
     }
-  if ((gi = (*manager)->get_info()) == NULL)
-    return (NULL);; 
-  if ((*gi)->game_status == 1)
+  if ((*info)->game_status == 1)
     p->disabled = -1;
   else
     { 
@@ -190,8 +195,11 @@ char		*leave(t_game_manager **manager, char *identity, char *optional)
 	  my_log(__func__, log, 2);
 	  return (NULL);
 	}
-      if ((*gi)->game_status != 1 && players->index < 4)
+      if ((*info)->game_status != 1 && players->index < 4) {
 	(*manager)->ready = 0;
+	(*info)->game_status = 0;
+      }
+      
     }
   my_log(__func__, optional, 4);
   return (generate_output(SUCCESS));
@@ -205,13 +213,17 @@ char		*forward(t_game_manager **manager, char *identity, char *optional)
   int		success;
   char		log[50];
   t_player	*p;
-  
+  t_game_info	**info;
+
+
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
   success = 0;
   my_log(__func__, optional, 4);
   sprintf(log, "forward done");
   if ((p = (*manager)->get_player(identity)) == NULL)
     return (NULL);
-  if ((*manager)->ready && !p->disabled)
+  if ((*info)->game_status && !p->disabled)
     {    
       switch (p->looking)
 	{
@@ -276,12 +288,16 @@ char		*backward(t_game_manager **manager, char *identity, char *optional)
   int		success;
   char		log[50];
   t_player	*p;
+  t_game_info	**info;
 
+
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
   success = 0;
   my_log(__func__, optional, 4);
   if ((p = (*manager)->get_player(identity)) == NULL)
     return (NULL);
-  if ((*manager)->ready && !p->disabled) {
+  if ((*info)->game_status && !p->disabled) {
     switch (p->looking)
       {
       case LEFT:
@@ -344,11 +360,15 @@ char		*left(t_game_manager **manager, char *identity, char *optional)
   int		success;
   char		log[50];
   t_player	*player;
+  t_game_info	**info;
 
+
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
   success = 0;
   if ((player = (*manager)->get_player(identity)) == NULL)
     return (NULL);
-  if ((*manager)->ready && !player->disabled)
+  if ((*info)->game_status && !player->disabled)
     {
       if (player->action < 5)
 	sprintf(log, "%s action point are too low", identity);
@@ -368,11 +388,14 @@ char		*right(t_game_manager **manager, char *identity, char *optional)
   int		success;
   char		log[50];
   t_player	*player;
+  t_game_info	**info;
 
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
   success = 0;
   if ((player = (*manager)->get_player(identity)) == NULL)
     return (NULL);
-  if ((*manager)->ready && !player->disabled)
+  if ((*info)->game_status && !player->disabled)
     {
       if (player->action < 5) {
 	sprintf(log, "%s action point are too low", identity);
@@ -394,11 +417,15 @@ char		*leftfwd(t_game_manager **manager, char *identity, char *optional)
   int		success;
   char		log[50];
   t_player	*player;
+  t_game_info	**info;
 
+
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
   success = 0;
   if ((player = (*manager)->get_player(identity)) == NULL)
     return (NULL);
-  if ((*manager)->ready && !player->disabled)
+  if ((*info)->game_status && !player->disabled)
     {
       if (player->action < 10)
 	sprintf(log, "%s action point are too low", identity);
@@ -420,11 +447,14 @@ char		*rightfwd(t_game_manager **manager, char *identity, char *optional)
   int		success;
   char		log[50];
   t_player	*player;
+  t_game_info	**info;
 
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
   success = 0;
   if ((player = (*manager)->get_player(identity)) == NULL)
     return (NULL);
-  if ((*manager)->ready && !player->disabled)
+  if ((*info)->game_status && !player->disabled)
     {
       if (player->action < 10)
 	sprintf(log, "%s action point are too low", identity);
@@ -452,7 +482,11 @@ char		*looking(t_game_manager **manager, char *identity, char *optional)
 {
   t_player	*p;
   char		look[2];
+  t_game_info	**info;
 
+
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
   if ((p = (*manager)->get_player(identity)) == NULL)
     return (NULL);
   if ((*manager)->ready && !p->disabled)
@@ -486,19 +520,37 @@ char		*gather(t_game_manager **manager, char *identity, char *optional)
   t_link	*link;
   t_energy_cell *ec;
   int		removelink;
+  t_game_info	**info;
 
-  player = (*manager)->get_player(identity);
+
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
+  sprintf(log, "start gather");
+  my_log(__func__, log, 3);
+  if ((player = (*manager)->get_player(identity)) == NULL){
+    return (generate_output(FAIL));
+  };
+  sprintf(log, "before if");
+  my_log(__func__, log, 3);
   if (player->action < 10 || player->disabled)
     return (generate_output(FAIL));
+  sprintf(log, "before los energy");
+  my_log(__func__, log, 3);
   energy_cells = (*manager)->get_energy_cells();
-  if ((*manager)->ready)
+  sprintf(log, "before ready");
+  my_log(__func__, log, 3);
+  if ((*info)->game_status)
     {
+      sprintf(log, "before is energy cell");
+      my_log(__func__, log, 3);
       if ((ec = is_energy_cell(player->x, player->y, energy_cells)) != NULL)
 	{
 	  sprintf(log, "player %s gathered %d energy", player->identity, ec->value);
 	  my_log(__func__, log, 3);
 	  player->energy += ec->value;
-	  player->action -= 1;
+	  player->action -= 10;
+	  sprintf(log, "before get link");
+	  my_log(__func__, log, 3);
 	  if ((link = get_link_by_content(ec, energy_cells)) != NULL)
 	    {
 	      removelink = remove_link(&energy_cells, link);
@@ -531,11 +583,13 @@ char		*watch(t_game_manager **manager, char *identity, char *optional)
   int		swap;
   uint		**zone;
   char		*state;
+  t_game_info	**info;
 
-  
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
   if ((p = (*manager)->get_player(identity)) == NULL)
     return (NULL);
-  if ((*manager)->ready && !p->disabled)
+  if ((*info)->game_status && !p->disabled)
     {
       sprintf(log, "processus %s is watching", identity);
       my_log(__func__, log, 4);
@@ -562,10 +616,13 @@ char		*attack(t_game_manager **manager, char *identity, char *optional)
   char		*front;
   t_player	*p;
   t_player	*adv;
-  
+  t_game_info	**info;
+
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
   if ((p = (*manager)->get_player(identity)) == NULL)
     return (NULL);
-  if ((*manager)->ready && !p->disabled) {
+  if ((*info)->game_status && !p->disabled) {
      if ((watched = watch(manager, identity, optional)) == NULL)
 	return (NULL);
       if ((front = extract_front_from_watched(watched)) == NULL)
@@ -573,7 +630,7 @@ char		*attack(t_game_manager **manager, char *identity, char *optional)
       if (p->action < 5)
 	return (generate_output(FAIL));
       p->action -= 5;
-      p->energy -= 10;
+      p->energy -= 2;
       if ((adv = (*manager)->get_player(front)) == NULL)
 	return (NULL);
       adv->disabled = 2;
@@ -588,11 +645,14 @@ char		*jump(t_game_manager **manager, char *identity, char *optional)
   int		success;
   char		log[50];
   t_player	*p;
-  
+  t_game_info	**info;
+
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
   success = 0;
   if ((p = (*manager)->get_player(identity)) == NULL)
     return (NULL);
-  if ((*manager)->ready && !p->disabled) {    
+  if ((*info)->game_status && !p->disabled) {    
     if ((p = (*manager)->get_player(identity)) == NULL)
       return (NULL);
     switch (p->looking)
@@ -657,10 +717,13 @@ char		*self_stats(t_game_manager **manager, char *identity, char *optional)
 {
   char		str[15];
   t_player	*p;
+  t_game_info	**info;
 
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
   if ((p = (*manager)->get_player(identity)) == NULL)
     return (NULL);
-  if ((*manager)->ready)
+  if ((*info)->game_status)
     {
       sprintf(str, "%d", p->energy);
       return (generate_output_param(SUCCESS, str));
@@ -674,10 +737,14 @@ char		*inspect(t_game_manager **manager, char *identity, char *optional)
   char		log[50];
   t_player	*p;
   t_player	*adv;
+  t_game_info	**info;
 
+
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
   if ((p = (*manager)->get_player(identity)) == NULL)
 	return (NULL);
-  if ((*manager)->ready && p->action > 5 && !p->disabled)
+  if ((*info)->game_status && p->action > 5 && !p->disabled)
     {
       if ((p = (*manager)->get_player(identity)) == NULL)
 	return (NULL);
@@ -698,8 +765,11 @@ char		*inspect(t_game_manager **manager, char *identity, char *optional)
 char		*next(t_game_manager **manager, char *identity, char *optional)
 {
   t_player	*p;
+  t_game_info	**info;
 
-  if ((*manager)->ready)
+  if ((info = (*manager)->get_info()) == NULL)
+    return (NULL);
+  if ((*info)->game_status)
     {
       if ((p = (*manager)->get_player(identity)) == NULL)
 	return (NULL);
