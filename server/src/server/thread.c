@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Thu Aug 17 17:00:01 2017 BILLAUD Jean
-** Last update Wed Oct  4 23:16:40 2017 BILLAUD Jean
+** Last update Thu Oct  5 17:42:33 2017 BILLAUD Jean
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -89,9 +89,11 @@ void 		*tic_thread(void *manager)
   json_object	*json;
   uint		cycle;
   int		dead_count;
+  int		game_start;
   char		output[1024];
 
   srand(time(NULL));
+  game_start = 1;
   cycle = thread->ctx->cycle;
   pub = ((t_swsock *)(thread->ctx->sockets->first->content))->socket;
   if (thread == NULL)
@@ -108,8 +110,10 @@ void 		*tic_thread(void *manager)
     {
       usleep(cycle);
       undisabledme(&(thread->info));
-      if (thread->info->game_status == 1)
+      if (thread->info->game_status == 1 && game_start == 1) {
 	zstr_sendf(pub, "%s %d %s", "Softwar", GAME_START, "{}");
+	game_start = 0;
+      }
       dead_count = dead(thread->info->players);
       if (dead_count == -2)
 	pthread_exit(NULL);
@@ -124,18 +128,20 @@ void 		*tic_thread(void *manager)
 	  zstr_sendf(pub, "%s %d %s", "Softwar", CLIENT_WIN, "{}");
 	  zstr_sendf(pub, "%s %d %s", "Softwar", GAME_END, "{}");
 	  thread->info->game_status = 0;
+	  game_start = 1;
+	  sprintf(output, "client %s win this game", (((t_player *)(thread->info->players->first->content))->identity));
 	  my_log(__func__, "client win, game is end\n", 3);
-	}  
-      json = game_info_to_json(thread->info);
-      sprintf(output, "%s %d %s", "Softwar", CYCLE, json_object_to_json_string(json));
-      my_log(__func__, output, 5);
-      zstr_sendf(pub, "%s %d %s", "Softwar", CYCLE, json_object_to_json_string(json));
-      sprintf(output, "%d", thread->info->game_status);
-      my_log(__func__, output, 3);
-      if(thread->info->game_status == 1) {
+	}
+      if (thread->info->game_status == 1) {
+	json = game_info_to_json(thread->info);
+	sprintf(output, "%s %d %s", "Softwar", CYCLE, json_object_to_json_string(json));
+	my_log(__func__, output, 5);
+	zstr_sendf(pub, "%s %d %s", "Softwar", CYCLE, json_object_to_json_string(json));
+	sprintf(output, "%d", thread->info->game_status);
+	my_log(__func__, output, 3);
 	if (energy_fall(&thread->info))
 	  pthread_exit(NULL);
-       }
+      }
       refresh_ap(&thread->info);
     }
   pthread_exit(NULL);
