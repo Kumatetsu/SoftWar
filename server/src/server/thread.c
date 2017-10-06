@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Thu Aug 17 17:00:01 2017 BILLAUD Jean
-** Last update Thu Oct  5 17:42:33 2017 BILLAUD Jean
+** Last update Fri Oct  6 16:35:05 2017 BILLAUD Jean
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -132,13 +132,13 @@ void 		*tic_thread(void *manager)
 	  sprintf(output, "client %s win this game", (((t_player *)(thread->info->players->first->content))->identity));
 	  my_log(__func__, "client win, game is end\n", 3);
 	}
+      json = game_info_to_json(thread->info);
+      sprintf(output, "%s %d %s", "Softwar", CYCLE, json_object_to_json_string(json));
+      my_log(__func__, output, 5);
+      zstr_sendf(pub, "%s %d %s", "Softwar", CYCLE, json_object_to_json_string(json));
+      sprintf(output, "%d", thread->info->game_status);
+      my_log(__func__, output, 3);
       if (thread->info->game_status == 1) {
-	json = game_info_to_json(thread->info);
-	sprintf(output, "%s %d %s", "Softwar", CYCLE, json_object_to_json_string(json));
-	my_log(__func__, output, 5);
-	zstr_sendf(pub, "%s %d %s", "Softwar", CYCLE, json_object_to_json_string(json));
-	sprintf(output, "%d", thread->info->game_status);
-	my_log(__func__, output, 3);
 	if (energy_fall(&thread->info))
 	  pthread_exit(NULL);
       }
