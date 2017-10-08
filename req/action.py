@@ -6,21 +6,20 @@ class Action(object):
         name = ""
 
         def identity(self, socket):
-                #base_name = "#0x0"
-                #rand_name = random.randint(1, 9)
-                #full_name = base_name + str(rand_name)
-                full_name = "#0x00"
+                base_name = "#0x0"
+                rand_name = random.randint(1, 9)
+                full_name = base_name + str(rand_name)
                 identity  = 'identify|' + full_name
                 self.name = full_name
                 print 'action: ' + identity
                 socket.send_multipart([full_name, identity])
                 message = socket.recv_multipart()
                 print message
-                if message == 'ko|identity already exists':
+                if message[1] == 'identity already exists':
                         print message
                         print 'trying with another name'
                         identity()
-                elif message == 'ko|game full':
+                elif message[1] == 'game full':
                         print message
                         exit()
                 else:

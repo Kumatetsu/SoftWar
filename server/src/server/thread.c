@@ -5,7 +5,7 @@
 ** Login   <billau_j@etna-alternance.net>
 ** 
 ** Started on  Thu Aug 17 17:00:01 2017 BILLAUD Jean
-** Last update Fri Oct  6 16:35:05 2017 BILLAUD Jean
+** Last update Sun Oct  8 12:04:15 2017 BILLAUD Jean
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -125,12 +125,16 @@ void 		*tic_thread(void *manager)
 	}
       if (thread->info->players->index < 2 && thread->info->game_status)
 	{
-	  zstr_sendf(pub, "%s %d %s", "Softwar", CLIENT_WIN, "{}");
+	  zstr_sendf(pub, "%s %d %s", "Softwar", CLIENT_WIN, (((t_player *)(thread->info->players->first->content))->identity));
 	  zstr_sendf(pub, "%s %d %s", "Softwar", GAME_END, "{}");
 	  thread->info->game_status = 0;
 	  game_start = 1;
 	  sprintf(output, "client %s win this game", (((t_player *)(thread->info->players->first->content))->identity));
 	  my_log(__func__, "client win, game is end\n", 3);
+	  remove_link(&thread->info->players, thread->info->players->first);
+	  while (thread->info->energy_cells->first) {
+	    remove_link(&thread->info->energy_cells, thread->info->energy_cells->first);
+	  }
 	}
       json = game_info_to_json(thread->info);
       sprintf(output, "%s %d %s", "Softwar", CYCLE, json_object_to_json_string(json));
