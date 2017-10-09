@@ -35,7 +35,6 @@ def main():
     Act.identity(socket)
     if (opt.rand_ia == 'true'):
         while RUNNING:
-            time.sleep(1)
             print 'in rand'
             num = random.randint(0, 15)
             Act.act_func(num, socket)
