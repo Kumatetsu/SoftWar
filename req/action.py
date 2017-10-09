@@ -15,11 +15,11 @@ class Action(object):
                 socket.send_multipart([full_name, identity])
                 message = socket.recv_multipart()
                 print message
-                if message == 'ko|identity already exists':
+                if message[1] == 'identity already exists':
                         print message
                         print 'trying with another name'
                         identity()
-                elif message == 'ko|game full':
+                elif message[1] == 'game full':
                         print message
                         exit()
                 else:
