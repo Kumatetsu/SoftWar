@@ -12,9 +12,10 @@ process_player = 0
 Act = action.Action()
 RUNNING = True
 
-def first_ia(socket):
+def simple_ia(socket):
     message = Act.watch(socket)
-    #message = ['#0x01', 'ok|["#0x01", "empty", "energy", "empty"]']
+    while message[1] == "ko|":
+        message = Act.watch(socket)
     identity, cells = message[1].split("[")
     values = cells.split("\"")
     for i in range(1, len(values)):
@@ -42,7 +43,7 @@ def main():
         print 'OK'
         while RUNNING:
            print 'in normal'
-           first_ia(socket)
+           simple_ia(socket)
 
 
 
