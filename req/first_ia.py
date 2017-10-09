@@ -6,4 +6,4 @@ class First_IA(object):
 	Act = action.Action()
 
 	def ia(self, soket):
-		Act.looking(soket)
+		self.Act.looking(soket)

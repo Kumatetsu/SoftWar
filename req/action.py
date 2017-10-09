@@ -81,6 +81,7 @@ class Action(object):
                 socket.send_multipart([self.name, 'watch|null'])
                 message = socket.recv_multipart()
                 print message
+                return message
                 
         def attack(self, socket):
                 print 'action: ' + 'attack|null'
