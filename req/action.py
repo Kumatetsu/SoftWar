@@ -14,11 +14,11 @@ class Action(object):
                 print 'action: ' + identity
                 socket.send_multipart([full_name, identity])
                 message = socket.recv_multipart()
-                print message
-                if message[1] == 'identity already exists':
+                print message[1]
+                if message[1] == 'ko|identity already exists':
                         print message
                         print 'trying with another name'
-                        identity()
+                        self.identity(socket)
                 elif message[1] == 'game full':
                         print message
                         exit()
@@ -38,6 +38,7 @@ class Action(object):
                 socket.send_multipart([self.name, 'backward|null'])
                 message = socket.recv_multipart()
                 print message
+                
                 
         def leftfwd(self, socket):
                 print 'action: ' + 'leftfwd|null'
@@ -80,6 +81,7 @@ class Action(object):
                 socket.send_multipart([self.name, 'watch|null'])
                 message = socket.recv_multipart()
                 print message
+                return message
                 
         def attack(self, socket):
                 print 'action: ' + 'attack|null'
